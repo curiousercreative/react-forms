@@ -169,6 +169,7 @@ export default class Form extends React.Component {
    * @param {string|any} value
    * @param {string} context
    * @param {number} [index]
+   * @return {Promise}
    */
   _setValue (name, value, context, index) {
     // if we don't have a field specific setter, make one based on setValue

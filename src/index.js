@@ -1,10 +1,10 @@
-import styles from './styles.module.css'
+import './index.css';
 
-export { default as Editable } from './components/Editable.jsx'
-export * as Fields from './components/fields'
-export { default as Form } from './components/Form.jsx'
-export { default as FormCollection } from './components/FormCollection.jsx'
-export { default as SubmitButton } from './components/SubmitButton.jsx'
+export { default as Editable } from './components/Editable.jsx';
+export * as Fields from './components/fields';
+export { default as Form } from './components/Form.jsx';
+export { default as FormCollection } from './components/FormCollection.jsx';
+export { default as SubmitButton } from './components/SubmitButton.jsx';
 
 export * as fieldUtil from './components/fields/util';
 export * as util from './util';
