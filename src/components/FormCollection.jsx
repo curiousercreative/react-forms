@@ -112,6 +112,7 @@ export default class FormCollection extends Form {
   /**
    * add - create a new default object and add to collection
    * @param {object} [attr] - model attributes to merge in while adding
+   * @return {object}
    */
   create (attr={}) {
     // default object with a cid merged over
@@ -130,7 +131,7 @@ export default class FormCollection extends Form {
   getData (omitCid = true) {
     const data = this.state.values.map(temporaryData => {
       const persistentData = this.props.values.find(({ id }) => id === temporaryData.id);
-      return { ...temporaryData, ...persistentData };
+      return { ...persistentData, ...temporaryData };
     });
 
     if (omitCid) data.forEach(item => delete item.cid);
@@ -185,7 +186,7 @@ export default class FormCollection extends Form {
 
   /**
    * removeTemporaryItem - remove this item from the temporary collection
-   * @param  {object} data - item to remove from temporary
+   * @param  {object|string} dataOrCid - item to remove from temporary
    * MODIFIES STATE
    */
   removeTemporaryItem (dataOrCid) {
@@ -261,8 +262,7 @@ export default class FormCollection extends Form {
           {...componentProps}
           handleClickRemove={this.handleClickRemove}
           index={i}
-          key={data.cid}
-        />)}
+          key={data.cid} />)}
       </FormContext.Provider>
     );
   }
