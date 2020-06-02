@@ -13,9 +13,13 @@
   "scripts": {
     "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --source-maps --keep-file-extension --copy-files",
     "start": "cd example && yarn install && yarn start",
-    "predeploy": "yarn build && cd example && yarn install && yarn build"
+    "predeploy": "yarn build && cd example && yarn install && yarn build",
+    "test": "jest"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "react": ">=16.0.0",
+    "react-dom": ">=16.0.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
     "@babel/core": "^7.10.2",
@@ -31,7 +35,10 @@
     "eslint-plugin-react": "^7.20.0",
     "jest": "^26.0.1",
     "jsdoc": "^3.6.4",
-    "jsdoc-memberof-namespace": "^2.2.0"
+    "jsdoc-memberof-namespace": "^2.2.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-test-renderer": "^16.13.1"
   },
   "files": [
     "dist"

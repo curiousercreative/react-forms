@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 
-import Form from 'components/form/Form';
+import Form from '../Form.jsx';
 
 describe('Form shouldRespondToValuesUpdatedInProps prop', () => {
   test('Form should not respond to incoming values by default', () => {

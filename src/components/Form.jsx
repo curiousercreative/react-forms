@@ -71,7 +71,7 @@ export default class Form extends React.Component {
   }
 
   componentDidMount () {
-    setTimeout(() => this.validate(false), 120);
+    setTimeout(() => this.validate(false), 15);
   }
 
   componentDidUpdate (props) {

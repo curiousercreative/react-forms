@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Form from 'components/form/Form';
+import Form from '../Form.jsx';
 
 import F from './TestHelper';
 
@@ -10,7 +10,10 @@ test('getValue method should return expected value', () => {
 
 test('Form instance should have isValid flag set on mount', () => {
   const form = F.render(<Form values={{ a: '' }} validations={F.getValidations()} />);
-  expect(form.isValid).toBe(false);
+
+  setTimeout(() => {
+    expect(form.isValid).toBe(false);
+  }, 20);
 });
 
 // validateAsYouGo prop

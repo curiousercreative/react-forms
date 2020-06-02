@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Pubsub } from 'lib/pubsub';
+import { Pubsub } from '../../lib/pubsub';
 
 import F from './TestHelper';
 

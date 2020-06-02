@@ -1,10 +1,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 
-import Form from 'components/form/Form';
+import Form from '../Form.jsx';
 
-import bindMethods from 'util/bindMethods';
-import { messages, tests } from 'lib/validator';
+import bindMethods from '../../util/bindMethods.js';
+import { messages, tests } from '../../lib/validator';
 
 export default class F {
   static simpleFormJsx = <Form formName="test" values={{ a: 'b' }} />;

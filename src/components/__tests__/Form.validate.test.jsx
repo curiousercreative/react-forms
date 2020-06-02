@@ -1,5 +1,5 @@
 import React from 'react';
-import Form from 'components/form/Form';
+import Form from '../Form.jsx';
 
 import F from './TestHelper';
 
