@@ -1,29 +1,109 @@
 # form
 
-> Made with create-react-library
-
-[![NPM](https://img.shields.io/npm/v/form.svg)](https://www.npmjs.com/package/form) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-
 ## Install
 
 ```bash
-npm install --save form
+yarn add @curiouser/react-forms
 ```
 
 ## Usage
-
+### Render a simple form
+A simple login form with validation that requires both fields to be filled in and a password of at least 6 characters.
 ```jsx
-import React, { Component } from 'react'
+import React from 'react';
 
-import MyComponent from 'form'
-import 'form/dist/index.css'
+import { Fields, Form, util, validator } from 'form';
+import 'form/dist/index.css';
 
-class Example extends Component {
+class MyForm extends Form {
+  static defaultProps = {
+    ...Form.defaultProps,
+    validations: [{
+      names: [ 'username', 'password' ],
+      tests: [[ validator.tests.required, validator.messages.required ]],
+    }, {
+      names: [ 'password' ],
+      tests: [[ validator.tests.minLength(6), validator.messages.minLength(6) ]],
+    }],
+    values: {
+      username: '',
+      password: '',
+    },
+  };
+
+  constructor (...args) {
+    super(..args);
+    util.bindMethods(this);
+  }
+
+  handleSubmit () {
+    if (!this.validate() || this.state.isLoading) return;
+
+    const formData = this.getData();
+
+    // do something with formData...
+  }
+
   render() {
-    return <MyComponent />
+    return super.render(
+      <form className="form" onSubmit={this.handleSubmit}>
+        <div className="form__fields">
+          <Fields.TextField label="Name" name="username" />
+          <Fields.PasswordField label="Password" name="password" />
+        </div>
+        <button type="submit">Sign in</button>
+      </form>
+    );
   }
 }
 ```
+
+### Extending with your own form field components
+Form fields are broken into two, one representing the field (with label and error messaging) and the actual input/control component.
+
+#### Field component
+```jsx
+import React from 'react';
+import Field from 'form/dist/components/fields/Field.jsx';
+import NativeSelect from './NativeSelect.jsx';
+
+export default function NativeSelectField (props) {
+  return <Field {...props} component={NativeSelect} type="select" />
+}
+```
+
+#### Input/Control component
+```jsx
+import React from 'react';
+import { FormContext, util } from 'form';
+import { getValue, setValue } from  'form/dist/components/fields/util';
+
+export default class NativeSelect extends React.Component {
+  static contextType = FormContext;
+
+  constructor (...args) {
+    super(...args);
+    util.bindMethods(this);
+  }
+
+  handleChange (e) {
+    setValue(this, e.target.value);
+  }
+
+  render () {
+    return (
+      <select onChange={this.handleChange} value={getValue(this)}>
+        {this.props.options.map(o => (
+          <option key={o.value} value={o.value}>{o.label}</option>
+        ))}
+      </select>
+    );
+  }
+}
+```
+
+### Styles
+You're responsible for including the stylesheet as a CSS module with `import 'form/dist/index.css';` or any other way you like, it's just a css file. The package styles don't try to do anything pretty for you, just provide functional styles. Class names try to follow the BEM model.
 
 ## License
 
