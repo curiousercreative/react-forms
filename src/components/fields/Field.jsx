@@ -152,6 +152,7 @@ export default class Field extends React.Component {
 
     // add errors class
     if (this.getErrors().length) classes.push(this.formatClassName('has', 'errors'));
+    else classes.push(this.formatClassName('no', 'errors'));
 
     // TODO: add modifiers for things like has_value, etc
     return (

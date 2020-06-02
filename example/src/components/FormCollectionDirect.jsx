@@ -28,7 +28,7 @@ export default class FormCollectionDirect extends React.Component {
 
   render () {
     return (
-      <div className="form-collection-extended">
+      <div className="form form-collection-extended">
         <FormCollection ref="collection" {...props} component={User} />
         <button onClick={this.handleClickAdd} type="button">Add</button>
         <button onClick={this.handleSubmit}>Check form state</button>
@@ -40,8 +40,10 @@ export default class FormCollectionDirect extends React.Component {
 function User ({ index, username, password }) {
   return (
     <div className="form-collection-extended__item" key={index}>
-      <Fields.TextField index={index} label="username" name="username" />
-      <Fields.PasswordField index={index} label="password" name="password" />
+      <div className="form__fields">
+        <Fields.TextField index={index} label="username" name="username" />
+        <Fields.PasswordField index={index} label="password" name="password" />
+      </div>
     </div>
   );
 }

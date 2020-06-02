@@ -1,9 +1,297 @@
-/* add css module styles here (optional) */
+.form,
+.form * {
+  box-sizing: border-box;
+}
+.form__fields {
+  display: flex;
+  align-items: flex-end;
+}
+.form__field {
+  flex-basis: 100%;
+  margin-bottom: 1em;
+}
+/* border-collapsing of adjacent fields */
+/* .form__field--no_errors + .form__field--no_errors .form__input, */
+.form__field--has_errors + .form__field--has_errors .form__input {
+  border-left-color: transparent;
+}
+.form__label,
+.form__field-error {
+  font-size: 13px;
+  line-height: 1.15em;
+  margin-bottom: 8px;
+}
+.form__label {
+  display: inline-block;
+  color: #9b9b9b;
+}
+.form__field-error {
+  color: red;
+}
+.form__label + .form__field {
+  margin-top: 10px;
+}
+.form__field--all_25 { flex-basis: 25%; }
+.form__field--all_50 { flex-basis: 50%; }
+.form__field--all_75 { flex-basis: 75%; }
+.form__field--all_100 { flex-basis: 100%; }
 
-.test {
-  margin: 2em;
-  padding: 0.5em;
-  border: 2px solid #000;
-  font-size: 2em;
-  text-align: center;
+@media (max-width: 767px) {
+  .form__field--m_25 { flex-basis: 25%; }
+  .form__field--m_50 { flex-basis: 50%; }
+  .form__field--m_75 { flex-basis: 75%; }
+  .form__field--m_100 { flex-basis: 100%; }
+}
+@media (min-width: 768px) {
+  .form__field--nm_25 { flex-basis: 25%; }
+  .form__field--nm_50 { flex-basis: 50%; }
+  .form__field--nm_75 { flex-basis: 75%; }
+  .form__field--nm_100 { flex-basis: 100%; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .form__field--t_25 { flex-basis: 25%; }
+  .form__field--t_50 { flex-basis: 50%; }
+  .form__field--t_75 { flex-basis: 75%; }
+  .form__field--t_100 { flex-basis: 100%; }
+}
+@media (max-width: 767px), (min-width: 1024px) {
+  .form__field--nt_25 { flex-basis: 25%; }
+  .form__field--nt_50 { flex-basis: 50%; }
+  .form__field--nt_75 { flex-basis: 75%; }
+  .form__field--nt_100 { flex-basis: 100%; }
+}
+@media (min-width: 1024px) {
+  .form__field--d_25 { flex-basis: 25%; }
+  .form__field--d_50 { flex-basis: 50%; }
+  .form__field--d_75 { flex-basis: 75%; }
+  .form__field--d_100 { flex-basis: 100%; }
+}
+@media (max-width: 1023px) {
+  .form__field--nd_25 { flex-basis: 25%; }
+  .form__field--nd_50 { flex-basis: 50%; }
+  .form__field--nd_75 { flex-basis: 75%; }
+  .form__field--nd_100 { flex-basis: 100%; }
+}
+.form__input {
+  width: 100%;
+}
+.form__field--theme_default .form__input {
+  font-size: 16px;
+  line-height: 24px;
+  padding: 15px 21px 9px;
+  border: solid 1px #dedede;
+}
+.form__field--has_focus .form__input {
+  border-color: #17419b;
+}
+.form__field--has_errors .form__input {
+  border-color: red;
+}
+.form__errors {
+  color: red;
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+}
+.form__errors:empty {
+  margin: 0;
+}
+.form__error + .form__error {
+  margin-top: 1em;
+}
+
+.form-select {
+  position: relative;
+}
+.form-select__value {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  white-space: nowrap;
+  color: #000;
+}
+.form-select .icon-angle-down {
+  font-size: 1.5em;
+  margin-left: 0.2em;
+}
+.form-select__dropdown {
+  display: none;
+  box-shadow: 0px 15px 30px 6px rgba(0,0,0,0.2);
+  position: absolute;
+  width: 100%;
+  z-index: 20;
+  background: white;
+  left: 0;
+  top: calc(100% + 2px); /* for the border-bottom of parent */
+}
+.form-select--is_open .form-select__dropdown {
+  display: block;
+}
+.form-select__dropdown-item {
+  line-height: 1.8em;
+}
+.form-select__dropdown-item button {
+  display: block;
+  width: 100%;
+  padding: 0.33em 1em;
+}
+.form-select__dropdown-item:first-child button {
+  padding-top: 0.667em;
+}
+.form-select__dropdown-item:last-child button {
+  padding-bottom: 0.667em;
+}
+.form-select__dropdown-item:hover button,
+.form-select__dropdown-item button:focus {
+  background: #dedede;
+}
+
+.form-password {
+  position: relative;
+}
+.form-password button {
+  position: absolute;
+  top: calc(50% - 10px);
+  right: 15px;
+  width: 20px;
+  height: 20px;
+  background: url(https://assets.ajmadison.com/image/upload/eye.svg) center / contain no-repeat;
+}
+.form-password .form__input {
+  padding-right: 40px;
+}
+
+.form__button {
+  font-family: 'open-sans', sans-serif;
+}
+
+.form__submit {
+  position: relative;
+}
+.form__submit--is_loading:after {
+  /* insert url here for loading graphic */
+  /* background: url() center / contain no-repeat; */
+
+  background-color: inherit;
+  position: absolute;
+  content: '';
+  z-index: 5;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+}
+
+
+
+/* this will probably go? */
+.form__field--theme_minimal {
+  .form-select {
+    border-bottom: 2px solid;
+  }
+  .form-select__value {
+    font-size: 16px;
+    line-height: 1.5em;
+    padding: 0.3125em;
+  }
+  &.form__field--bg_dark {
+    .form-select {
+      border-color: white;
+    }
+    .form-select__value {
+      color: white;
+    }
+  }
+}
+
+
+/* I think this will go */
+.form__field--type_checkbox,
+.form__field--type_radio {
+  position: relative;
+
+  /* Keep for accessibility purposes */
+  input[type="checkbox"],
+  input[type="radio"] {
+    opacity: 0;
+    position: absolute;
+    top: 3px;
+    left: 0;
+    height: 16px;
+    width: 16px;
+  }
+  .form__label {
+    position: relative;
+    display: block;
+    padding-left: 28px;
+    cursor: pointer;
+    line-height: 1.4;
+  }
+  .form__button {
+    position: absolute;
+    left: 0;
+  }
+  .form__label:before,
+  .form__label:after {
+    position: absolute;
+  }
+
+  /* Outer-box */
+  input[type="checkbox"],
+  input[type="radio"] {
+    + .form__label:before{
+      content: "";
+      display: inline-block;
+      height: 18px;
+      width: 18px;
+      border: 1px solid #cccccc;
+      top: 3px;
+      left: 0;
+      background-color: $white;
+    }
+  }
+
+  /* Checkbox CheckMark */
+  input[type="checkbox"] + .form__label:after {
+    content: "";
+    display: inline-block;
+    height: 5px;
+    width: 8px;
+    border-left: 2px solid $white;
+    border-bottom: 2px solid $white;
+    transform: translate(0, 4px) rotate(-45deg);
+    left: 4px;
+    top: 4px;
+  }
+
+  /* Radio Button Logic */
+  /* make the radio circle */
+  input[type="radio"] + .form__label:before{
+    border-radius: 50%;
+  }
+
+  /* radio checked */
+  input[type="radio"]:checked + .form__label:before {
+    box-shadow: inset 0 0 0 6px #9b9b9b;
+    border: none;
+  }
+
+  /* CheckMark Logic */
+  /* Hide the checkmark by default */
+  input[type="checkbox"] + label::after {
+    content: none;
+  }
+
+  /* Unhide the checkmark on the checked state */
+  input[type="checkbox"]:checked + label::after {
+    content: "";
+  }
+
+  /* place background on the checked state */
+  input[type="checkbox"]:checked + .form__label::before {
+    background-color: #9b9b9b;
+    border: none;
+  }
 }

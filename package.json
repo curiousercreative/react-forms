@@ -12,9 +12,10 @@
   },
   "scripts": {
     "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --source-maps --keep-file-extension --copy-files",
-    "start": "cd example && yarn install && yarn start",
+    "start": "(rm -rf node_modules/react node_modules/react-dom && yarn watch) & (cd example && yarn install && yarn start)",
     "predeploy": "yarn build && cd example && yarn install && yarn build",
-    "test": "jest"
+    "test": "jest",
+    "watch": "yarn build -- --watch"
   },
   "peerDependencies": {
     "react": ">=16.0.0",

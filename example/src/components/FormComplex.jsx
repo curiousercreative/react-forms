@@ -29,21 +29,25 @@ export default class FormComplex extends Form {
 
   render () {
     return super.render(
-      <div className="form-complex">
+      <div className="form form-complex">
         <Form ref="movie">
-          <Fields.TextField label="Title" name="title" />
-          <Fields.TextField label="Year" name="year" />
+          <div className="form__fields">
+            <Fields.TextField label="Title" name="title" />
+            <Fields.TextField label="Year" name="year" />
+          </div>
         </Form>
 
         <FormExtended ref="user" />
 
         <FormCollectionExtended ref="cast" />
 
-        <Fields.EmailField label="email" name="email" />
-        <Fields.TextField label="extra text" name="extra_text" />
-        <Fields.SelectField label="extra select" name="extra_select" options={[{ label: 'Label', value: 'value' }]} />
-        <Fields.RadioField label="extra radio" name="extra_radio" value="radio on" />
-        <Fields.CheckboxField label="extra checkbox" name="extra_checkbox" value="checkbox on" />
+        <div className="form__fields">
+          <Fields.EmailField label="email" name="email" />
+          <Fields.TextField label="extra text" name="extra_text" />
+          <Fields.SelectField label="extra select" name="extra_select" options={[{ label: 'Label', value: 'value' }]} />
+          <Fields.RadioField label="extra radio" name="extra_radio" value="radio on" />
+          <Fields.CheckboxField label="extra checkbox" name="extra_checkbox" value="checkbox on" />
+        </div>
         <Fields.TextareaField label="extra textarea" name="extra_textarea" />
         <SubmitButton onClick={this.handleSubmit.bind(this)}>Check form state</SubmitButton>
       </div>
