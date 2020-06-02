@@ -1,5 +1,4 @@
 import React from 'react';
-import { findDOMNode, render } from 'react-dom';
 
 import bindMethods from '../../util/bindMethods.js';
 
@@ -23,13 +22,6 @@ export default class Textarea extends React.Component {
     bindMethods(this);
   }
 
-  componentDidMount () {
-    const value = getValue(this);
-
-    // set initial value
-    if (value) findDOMNode(this).value = value;
-  }
-
   handleChange (e) {
     setValue(this, e.target.value);
   }
@@ -39,6 +31,7 @@ export default class Textarea extends React.Component {
       id={this.props.id}
       className="form__input form__input--type_textarea"
       onChange={this.handleChange}
-      name={this.props.name} />;
+      name={this.props.name}
+      value={getValue(this) || ''} />;
   }
 }

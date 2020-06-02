@@ -1,8 +1,6 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
 
 import bindMethods from '../../util/bindMethods.js';
-import exists from '../../util/exists.js';
 
 import FormContext from '../config/FormContext';
 import getFieldTopic from './util/getFieldTopic';
@@ -36,7 +34,7 @@ export default class Text extends React.Component {
   componentDidMount () {
     const topic = getFieldTopic(this.props.name);
 
-    this.onChange();
+    // this.onChange();
 
     this.context.state.form.pubsub.on(topic, this.onChange);
   }
@@ -50,15 +48,6 @@ export default class Text extends React.Component {
   handleChange (e) {
     // handle a change to this field's value by user input
     setValue(this, e.target.value);
-  }
-
-  onChange (value) {
-    value = value || getValue(this);
-
-    if (!exists(value)) return;
-
-    // handle a change to this field's value from above
-    findDOMNode(this.refs.input).value = value;
   }
 
   getInputMode () {
@@ -94,6 +83,7 @@ export default class Text extends React.Component {
       onChange={this.handleChange}
       ref="input"
       placeholder={this.props.placeholder}
-      type={this.getType()} />;
+      type={this.getType()}
+      value={getValue(this) || ''} />;
   }
 }

@@ -44,6 +44,7 @@ export default class FormComplex extends Form {
         <Fields.SelectField label="extra select" name="extra_select" options={[{ label: 'Label', value: 'value' }]} />
         <Fields.RadioField label="extra radio" name="extra_radio" value="radio on" />
         <Fields.CheckboxField label="extra checkbox" name="extra_checkbox" value="checkbox on" />
+        <Fields.TextareaField label="extra textarea" name="extra_textarea" />
         <SubmitButton onClick={this.handleSubmit.bind(this)}>Check form state</SubmitButton>
       </div>
     );

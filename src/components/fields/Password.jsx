@@ -1,5 +1,4 @@
 import React from 'react';
-import { findDOMNode, render } from 'react-dom';
 
 import bindMethods from '../../util/bindMethods.js';
 
@@ -24,13 +23,6 @@ export default class Password extends React.Component {
     bindMethods(this);
   }
 
-  componentDidMount () {
-    const value = getValue(this);
-
-    // set initial value
-    if (value) findDOMNode(this.refs.input).value = value;
-  }
-
   handleChange (e) {
     setValue(this, e.target.value);
   }
@@ -49,7 +41,8 @@ export default class Password extends React.Component {
         name={this.props.name}
         onChange={this.handleChange}
         ref="input"
-        type={type} />
+        type={type}
+        value={getValue(this) || ''} />
       <button className="btn-reset" onClick={this.handleClick} type="button" />
     </div>);
   }
