@@ -1,21 +1,18 @@
 {
-  "name": "form",
-  "version": "1.0.0",
-  "description": "Made with create-react-library",
+  "name": "@curiouser/react-forms",
+  "version": "0.1.0",
+  "description": "A simple library for rendering React forms and form fields along with managing form state and validation",
   "author": "curiousercreative",
   "license": "MIT",
-  "repository": "curiousercreative/form",
+  "repository": "curiousercreative/react-forms",
   "main": "dist/index.js",
   "source": "src/index.js",
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
-    "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --source-maps --keep-file-extension --copy-files",
+    "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --ignore './src/**/__mocks__/' --source-maps --keep-file-extension --copy-files",
     "start": "(rm -rf node_modules/react node_modules/react-dom && yarn watch) & (cd example && yarn install && yarn start)",
     "predeploy": "yarn build && cd example && yarn install && yarn build",
     "test": "jest",
-    "watch": "yarn build -- --watch"
+    "watch": "yarn build --watch"
   },
   "peerDependencies": {
     "react": ">=16.0.0",
@@ -30,7 +27,6 @@
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.10.1",
     "babel-eslint": "^10.0.3",
-    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.13.2",
     "eslint-plugin-react": "^7.20.0",

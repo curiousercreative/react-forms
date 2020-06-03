@@ -1,17 +1,36 @@
 import React from 'react';
-import { Fields, Form, FormCollection, SubmitButton, util, validator } from 'form';
+import { Fields, Form, SubmitButton, util, validator } from 'form';
 import NativeSelectField from './NativeSelectField.jsx';
 
 import FormCollectionExtended from './FormCollectionExtended.jsx';
 import FormExtended from './FormExtended.jsx';
+
+const OPTIONS = [
+  { label: 'apple', value: 'apple' },
+  { label: 'banana', value: 'banana' },
+  { label: 'pear', value: 'pear' },
+  { label: 'cantelope', value: 'cantelope' },
+  { label: 'grapes', value: 'grapes' },
+  { label: 'peach', value: 'peach' },
+  { label: 'grapefruit', value: 'grapefruit' },
+];
 
 export default class FormComplex extends Form {
   static defaultProps = {
     ...Form.defaultProps,
     values: {
       native_select: '',
+      tag_selector: [],
     },
   }
+
+  constructor (...args) {
+    super(...args);
+    util.bindMethods(this);
+
+    this.state.values.cast = this.props.collectionProps.values;
+  }
+
   getData () {
     let refsData = {};
 
@@ -57,6 +76,7 @@ export default class FormComplex extends Form {
         </div>
         <Fields.TextareaField label="extra textarea" name="extra_textarea" />
         <NativeSelectField label="native select" name="native_select" options={[{ label: 'Something something', value: 'yes' }, { label: 'and another', value: 'no' }]} />
+        <Fields.TagSelectorField label="tag selector" name="tag_selector" options={OPTIONS} placeholder="Select your favorite fruits!" />
         <SubmitButton onClick={this.handleSubmit.bind(this)}>Check form state</SubmitButton>
       </div>
     );

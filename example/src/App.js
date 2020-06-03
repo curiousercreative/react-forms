@@ -50,7 +50,7 @@ class App extends React.Component {
         <h2>Simple Form collection direct</h2>
         <FormCollectionDirect {...collectionProps} />
         <h2>Complex Form with nested collection</h2>
-        <FormComplex {...collectionProps} />
+        <FormComplex collectionProps={collectionProps} />
       </div>
     );
   }

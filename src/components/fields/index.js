@@ -11,5 +11,6 @@ export { default as Field } from './Field';
 export { default as RadioField } from './RadioField';
 export { default as PasswordField } from './PasswordField';
 export { default as SelectField } from './SelectField';
+export { default as TagSelectorField } from './TagSelectorField';
 export { default as TextField } from './TextField';
 export { default as TextareaField } from './TextareaField';

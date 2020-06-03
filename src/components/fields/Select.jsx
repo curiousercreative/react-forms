@@ -155,12 +155,12 @@ export default class Select extends React.Component {
     const ref = el => el && this.list.push(el);
 
     return this.props.options.map(({ label, value }) => {
-      let classes = ['form-select__dropdown-item'];
+      let classes = ['form__dropdown-item'];
 
-      if (value === getValue(this)) classes.push('form-select__dropdown-item--is_selected');
+      if (value === getValue(this)) classes.push('form__dropdown-item--is_selected');
 
       return (
-        <li className="form-select__dropdown-item" key={value}>
+        <li className="form__dropdown-item" key={value}>
           <button
             className="btn-reset"
             onClick={this.handleClickItem}
@@ -172,16 +172,16 @@ export default class Select extends React.Component {
   }
 
   render () {
-    let classes = ['form__input', 'form__select', 'form-select'];
+    let classes = ['form__input', 'form__select', 'form-select', 'form__dropdown-wrapper'];
 
-    if (this.state.isOpen) classes.push('form-select--is_open');
+    if (this.state.isOpen) classes.push('form__dropdown-wrapper--is_open');
 
     return <div className={classes.join(' ')}>
       <button className="btn-reset form-select__value" onClick={this.handleClick} type="button">
         <span>{this.getLabel()}</span>
         <i className="icon icon-angle-down" />
       </button>
-      <ul className="list-reset form-select__dropdown">
+      <ul className="list-reset form__dropdown">
         {this.renderOptions()}
       </ul>
     </div>;

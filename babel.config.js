@@ -1,11 +1,10 @@
-/* eslint no-process-env: 0 */
-
 module.exports = function (api) {
-  api.cache(true);
+  api.cache.using(() => process.env.NODE_ENV || 'development');
 
   return {
     presets: [
       [ '@babel/preset-env', {
+        modules: process.env.NODE_ENV === 'test' ? 'auto' : false,
         targets: {
           node: '10',
         },

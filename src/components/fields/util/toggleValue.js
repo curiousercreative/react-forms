@@ -23,7 +23,7 @@ export default function toggleValue (field, value) {
       : formVal.concat(value);
   }
   else {
-    toggledVal = getValue(field) === value
+    toggledVal = formVal === value
       // value is already set, reset to default
       ? DEFAULT_VALUE
       // value isn't set, set it
