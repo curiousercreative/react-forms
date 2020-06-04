@@ -1,13 +1,12 @@
 module.exports = function (api) {
-  api.cache.using(() => process.env.NODE_ENV || 'development');
+  /* eslint no-process-env: 0 */
+  const { NODE_ENV } = process.env;
+  api.cache.using(() => NODE_ENV || 'development');
 
   return {
     presets: [
       [ '@babel/preset-env', {
-        modules: process.env.NODE_ENV === 'test' ? 'auto' : false,
-        targets: {
-          node: '10',
-        },
+        modules: NODE_ENV === 'test' ? 'auto' : false,
       }],
       '@babel/preset-react',
     ],

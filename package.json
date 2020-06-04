@@ -4,13 +4,14 @@
   "description": "A simple library for rendering React forms and form fields along with managing form state and validation",
   "author": "curiousercreative",
   "license": "MIT",
-  "repository": "curiousercreative/react-forms",
+  "repository": "github:curiousercreative/react-forms",
   "main": "dist/index.js",
   "source": "src/index.js",
   "scripts": {
     "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --ignore './src/**/__mocks__/' --source-maps --keep-file-extension --copy-files",
+    "docs": "jsdoc -c ./jsdoc/conf.json -R ./jsdoc/README.md -r ./src",
+    "prepare": "yarn build && cd example && yarn install && yarn build",
     "start": "(rm -rf node_modules/react node_modules/react-dom && yarn watch) & (cd example && yarn install && yarn start)",
-    "predeploy": "yarn build && cd example && yarn install && yarn build",
     "test": "jest",
     "watch": "yarn build --watch"
   },
@@ -43,5 +44,9 @@
   "dependencies": {
     "memoize-one": ">=3.0.0",
     "pubsub-js": "^1.8.0"
+  },
+  "directories": {
+    "example": "example",
+    "lib": "src/components"
   }
 }

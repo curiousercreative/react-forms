@@ -4,11 +4,11 @@
  * @credit https://javascript.info/currying-partials
  */
 export default function curry (func) {
-  return (function curried (...args) {
+  return function curried (...args) {
     return args.length >= func.length
       ? func.apply(this, args)
-      : (function pass(...args2) {
+      : function pass (...args2) {
         return curried.apply(this, args.concat(args2));
-      });
-  });
-};
+      };
+  };
+}

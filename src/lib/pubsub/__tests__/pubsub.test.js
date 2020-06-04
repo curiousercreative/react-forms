@@ -1,4 +1,4 @@
-import { Pubsub, default as pubsub} from '../index.js';
+import { Pubsub, default as pubsub } from '../index.js';
 
 afterEach(() => {
   window.PubSub.clearAllSubscriptions();
