@@ -1,0 +1,15 @@
+{
+  "opts": {
+    "destination": "./docs/",
+    "template": "./jsdoc/templates/default"
+  },
+  "plugins": [
+    "node_modules/jsdoc-memberof-namespace"
+  ],
+  "recurseDepth": 10,
+  "templates": {
+    "default": {
+      "useLongnameInNav": true
+    }
+  }
+}
