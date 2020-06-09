@@ -16,6 +16,8 @@ import FormContext from './config/FormContext';
 
 const CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD = 60;
 
+const emptyErrors = [];
+
 /**
  * @class Form
  * @property {string} [className = '']
@@ -340,7 +342,7 @@ export default class Form extends React.Component {
   }
 
   resetErrors () {
-    this.setState({ errors: [] });
+    this.setState({ errors: emptyErrors });
   }
 
   /**
@@ -348,7 +350,7 @@ export default class Form extends React.Component {
    * @param {array} errors
    */
   setErrors (errors) {
-    this.setState({ errors });
+    this.setState({ errors: errors.length ? errors : emptyErrors });
   }
 
   /**
@@ -365,7 +367,7 @@ export default class Form extends React.Component {
     const isValid = this.isValid = errors.length === 0;
 
     // store errors for rendering
-    if (displayErrors) state.errors = errors;
+    if (displayErrors) state.errors = errors.length ? errors : emptyErrors;
 
     this.setState({ ...state, isValid });
 
