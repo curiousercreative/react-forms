@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fields, Form, SubmitButton, util, validator } from 'form';
+import { Fields, Form, SubmitButton, util, validator } from '@curiouser/react-forms';
 import NativeSelectField from './NativeSelectField.jsx';
 
 import FormCollectionExtended from './FormCollectionExtended.jsx';

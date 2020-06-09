@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fields, Form, FormCollection, SubmitButton, util, validator } from 'form';
+import { Fields, Form, FormCollection, SubmitButton, util, validator } from '@curiouser/react-forms';
 
 export default class FormDirect extends React.Component {
   handleSubmit () {

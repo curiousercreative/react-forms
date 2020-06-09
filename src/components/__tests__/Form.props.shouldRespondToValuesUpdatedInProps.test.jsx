@@ -23,7 +23,7 @@ describe('Form shouldRespondToValuesUpdatedInProps prop', () => {
     const fn = jest.fn();
     const rendered = renderer.create(<Form shouldRespondToValuesUpdatedInProps values={{ a: 'b' }} />);
     const form = rendered.getInstance();
-    form.pubsub.on('valuesUpdatedFromProps', fn);
+    form.props.pubsub.on('valuesUpdatedFromProps', fn);
     rendered.update(<Form shouldRespondToValuesUpdatedInProps values={{ a: 'c' }} />);
 
     // valuesUpdatedFromProps isn't exactly synchronous

@@ -1,6 +1,6 @@
 import React from 'react';
-import { FormContext, util } from 'form';
-import { getValue, setValue } from  'form/dist/components/fields/util';
+import { FormContext, util } from '@curiouser/react-forms';
+import { getValue, setValue } from '@curiouser/react-forms/dist/components/fields/util';
 
 export default class NativeSelect extends React.Component {
   static contextType = FormContext;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 import FormCollectionDirect from './components/FormCollectionDirect.jsx';
 import FormCollectionExtended from './components/FormCollectionExtended.jsx';
@@ -6,7 +6,7 @@ import FormComplex from './components/FormComplex.jsx';
 import FormDirect from './components/FormDirect.jsx';
 import FormExtended from './components/FormExtended.jsx';
 
-import 'form/dist/index.css'
+import '@curiouser/react-forms/dist/index.css'
 
 let collectionValues = [{
   username: 'chuck',

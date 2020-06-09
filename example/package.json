@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "form": "link:..",
+    "@curiouser/react-forms": "link:../",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1"
@@ -13,7 +13,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "cd ./node_modules/@curiouser/react-forms && rm -rf yarn.lock node_modules/react node_modules/react-dom"
   },
   "eslintConfig": {
     "extends": "react-app"

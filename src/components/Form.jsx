@@ -20,6 +20,7 @@ const CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD = 60;
  * @class Form
  * @property {string} [className = '']
  * @property {string} [formName = '']
+ * @property {object} [pubsub]
  * @property {boolean} [shouldRespondToValuesUpdatedInProps = false] when true, will
  * call Form.filterIncomingValuesToUpdate and Form.updateValuesFromIncomingProps
  * @property {boolean} [validateAsYouGo = true]
@@ -43,6 +44,7 @@ export default class Form extends React.Component {
   static defaultProps = {
     className: '',
     formName: 'form',
+    pubsub: new Pubsub(),
     shouldRespondToValuesUpdatedInProps: false,
     validateAsYouGo: true,
     validations: [],
@@ -66,8 +68,6 @@ export default class Form extends React.Component {
     this.getContextValue = memoize(this.getContextValue);
     this.filterIncomingValuesToUpdate = memoize(this.filterIncomingValuesToUpdate);
     this.updateValuesFromIncomingProps = memoize(this.updateValuesFromIncomingProps);
-
-    this.pubsub = new Pubsub();
   }
 
   componentDidMount () {
@@ -87,8 +87,7 @@ export default class Form extends React.Component {
     // gets called after the parent otherwise
     setTimeout(() => {
       // this should clear all subscriptions for all namespaces within this form
-      this.pubsub.off();
-      delete this.pubsub;
+      this.props.pubsub.off();
     }, 60);
   }
 
@@ -329,7 +328,10 @@ export default class Form extends React.Component {
       }, () => {
         // NOTE: overriding this method will require reimplementing this pubsub messga
         // publish a message to let field respond to external update
-        if (context !== 'field') this.pubsub.trigger(`${getFieldTopic(name)}.updatedFromAbove`, value);
+        let topic = `${getFieldTopic(name)}.updated`;
+        if (context !== 'field') topic += '.fromAbove';
+        this.props.pubsub.trigger(topic, value);
+        this.props.pubsub.trigger('field.updated', [ name, value ]);
 
         resolve();
       });
@@ -397,7 +399,7 @@ export default class Form extends React.Component {
       // with all fields updated, validate the form against updated values (show errors if previously shown)
       .then(() => this.validate(this.getErrors().length > 0))
       // publish a message for the completion of this process
-      .then(() => this.pubsub.trigger('valuesUpdatedFromProps'));
+      .then(() => this.props.pubsub.trigger('valuesUpdatedFromProps'));
   }
 
   renderErrors (includeFieldErrors = false) {

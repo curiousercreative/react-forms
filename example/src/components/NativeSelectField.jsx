@@ -1,5 +1,5 @@
 import React from 'react';
-import Field from 'form/dist/components/fields/Field.jsx';
+import Field from '@curiouser/react-forms/dist/components/fields/Field.jsx';
 import NativeSelect from './NativeSelect.jsx';
 
 export default function NativeSelectField (props) {

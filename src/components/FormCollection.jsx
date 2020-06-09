@@ -1,4 +1,5 @@
 import React from 'react';
+import memo from 'memoize-one';
 
 import Form from './Form.jsx';
 
@@ -60,6 +61,26 @@ export default class FormCollection extends Form {
       this.fieldsBlurred.push([]);
       this.state.errors.push([]);
     });
+
+    this._getData = memo(this._getData);
+    this._getDataWithCid = memo(this._getDataWithCid);
+  }
+
+  _getData (tempValues, persistentValues) {
+    const data = tempValues.map(temporaryData => {
+      const persistentData = persistentValues.find(({ id }) => id === temporaryData.id);
+      return { ...persistentData, ...temporaryData };
+    });
+
+    return data;
+  }
+
+  _getDataWithCid (tempValues, persistentValues) {
+    const data = this._getData(tempValues, persistentValues);
+
+    data.forEach(item => delete item.cid);
+
+    return data;
   }
 
   /**
@@ -129,14 +150,9 @@ export default class FormCollection extends Form {
    * @return {collection} merged collection
    */
   getData (omitCid = true) {
-    const data = this.state.values.map(temporaryData => {
-      const persistentData = this.props.values.find(({ id }) => id === temporaryData.id);
-      return { ...persistentData, ...temporaryData };
-    });
-
-    if (omitCid) data.forEach(item => delete item.cid);
-
-    return data;
+    return omitCid
+      ? this._getData(this.state.values, this.props.values)
+      : this._getDataWithCid(this.state.values, this.props.values);
   }
 
   /**

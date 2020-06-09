@@ -36,13 +36,13 @@ export default class Text extends React.Component {
 
     // this.onChange();
 
-    this.context.state.form.pubsub.on(topic, this.onChange);
+    this.context.state.form.props.pubsub.on(topic, this.onChange);
   }
 
   componentWillUnmount () {
     const topic = getFieldTopic(this.props.name);
 
-    this.context.state.form.pubsub.off(topic);
+    this.context.state.form.props.pubsub.off(topic);
   }
 
   handleChange (e) {
