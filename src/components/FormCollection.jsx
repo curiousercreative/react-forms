@@ -237,7 +237,11 @@ export default class FormCollection extends Form {
       this.setState({ values }, () => {
         // NOTE: overriding this method will require reimplementing this pubsub messga
         // publish a message to let field respond to external update
-        if (context !== 'field') this.pubsub.trigger(`${getFieldTopic(name)}.updatedFromAbove`, value);
+        let topic = `${getFieldTopic(name)}.updated`;
+        const data = [ name, value, context, index ];
+        if (context !== 'field') topic += '.fromAbove';
+        this.props.pubsub.trigger(topic, data);
+        this.props.pubsub.trigger('field.updated', data);
 
         resolve();
       });

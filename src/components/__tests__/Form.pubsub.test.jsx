@@ -21,4 +21,18 @@ describe('Form instance pubsub', () => {
 
     expect(eventTriggered).toBe(false);
   });
+
+  test('Form instance pubsub should emit when form value updates', () => {
+    let fieldUpdated = null;
+    const form = F.render();
+
+    form.props.pubsub.on('field.updated', update => {
+      [ fieldUpdated ] = update;
+    });
+
+    return form.setValue('name', 'value')
+      .then(() => {
+        setTimeout(() => expect(fieldUpdated).toBe('name'), 0);
+      });
+  });
 });

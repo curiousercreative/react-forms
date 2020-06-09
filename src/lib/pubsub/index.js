@@ -52,6 +52,7 @@ export class Pubsub {
    * @return {string}  token for unsubscribing
    */
   on (topic, callback) {
+    // console.log('pubsub listening', topic, callback)
     // juggle the args, but keep a reference to both juggled and prejuggled functions
     // for use in .off
     this.listeners[callback] = (topic, data) => callback(data, topic);

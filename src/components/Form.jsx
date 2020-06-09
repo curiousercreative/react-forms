@@ -329,9 +329,10 @@ export default class Form extends React.Component {
         // NOTE: overriding this method will require reimplementing this pubsub messga
         // publish a message to let field respond to external update
         let topic = `${getFieldTopic(name)}.updated`;
+        const data = [ name, value, context ];
         if (context !== 'field') topic += '.fromAbove';
-        this.props.pubsub.trigger(topic, value);
-        this.props.pubsub.trigger('field.updated', [ name, value ]);
+        this.props.pubsub.trigger(topic, data);
+        this.props.pubsub.trigger('field.updated', data);
 
         resolve();
       });

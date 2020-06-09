@@ -3,7 +3,6 @@ import React from 'react';
 import bindMethods from '../../util/bindMethods.js';
 
 import FormContext from '../config/FormContext';
-import getFieldTopic from './util/getFieldTopic';
 import getValue from './util/getValue';
 import setValue from './util/setValue';
 
@@ -29,20 +28,6 @@ export default class Text extends React.Component {
   constructor (...args) {
     super(...args);
     bindMethods(this);
-  }
-
-  componentDidMount () {
-    const topic = getFieldTopic(this.props.name);
-
-    // this.onChange();
-
-    this.context.state.form.props.pubsub.on(topic, this.onChange);
-  }
-
-  componentWillUnmount () {
-    const topic = getFieldTopic(this.props.name);
-
-    this.context.state.form.props.pubsub.off(topic);
   }
 
   handleChange (e) {
