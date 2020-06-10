@@ -115,19 +115,24 @@ export default class FormCollection extends Form {
   /**
    * add - create a new default object and add to collection
    * @param {object} [attr] - model attributes to merge in while adding
+   * @return {Promise}
    */
   add (attr={}) {
     // default object with a cid merged over
     let object = this.create(attr);
 
     // add a default object to the end of the collection
-    this.setState({
-      errors: [ ...this.getErrors(), [] ],
-      values: this.state.values.concat(object),
-    });
+    return new Promise(resolve => {
+      this.setState({
+        errors: [ ...this.getErrors(), [] ],
+        values: this.state.values.concat(object),
+      }, resolve);
+    }).then(() => {
+      // init lists for this new item
+      this.fieldsBlurred.push([]);
 
-    // init lists for this new item
-    this.fieldsBlurred.push([]);
+      this.onAdd();
+    });
   }
 
   /**
@@ -173,6 +178,14 @@ export default class FormCollection extends Form {
     return this.getData()[index][name];
   }
 
+  onAdd () {
+    this.props.pubsub.trigger('item.added');
+  }
+
+  onRemove () {
+    this.props.pubsub.trigger('item.removed');
+  }
+
   /**
    * remove - removes a temporary object or deletes a persistent object
    * @param  {object|number} dataOrIndex - the collection item to remove (or its index)
@@ -187,12 +200,13 @@ export default class FormCollection extends Form {
     // if object is new, just handle in state
     if (isNew(data)) {
       this.removeTemporaryItem(data);
-      return Promise.resolve();
+      return Promise.resolve().then(this.onRemove);
     }
 
     // object isn't new, pass it to the prop function
     return this.props.delete(data)
       .then(() => this.removeTemporaryItem(data))
+      .then(this.onRemove)
       .catch(errors => {
         this.handleErrors(data, errors);
         // bubble up the rejection
