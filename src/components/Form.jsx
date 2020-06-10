@@ -315,6 +315,17 @@ export default class Form extends React.Component {
   }
 
   /**
+   * setData - overwrites form data
+   * @param {object|any} values
+   * @return {Promise}
+   */
+  setData (values) {
+    return new Promise(resolve => {
+      this.setState({ values }, resolve);
+    });
+  }
+
+  /**
    * setValue - Sets form field value in form state. You can override me, especially
    * if you want to read/write form state elsewhere. You can also override me for
    * side effects and still call me using super.setValue
@@ -324,10 +335,8 @@ export default class Form extends React.Component {
    * @returns {Promise}
    */
   setValue (name, value, context) {
-    return new Promise(resolve => {
-      this.setState({
-        values: { ...this.state.values, [name]: value },
-      }, () => {
+    return this.setData({ ...this.state.values, [name]: value })
+      .then(() => {
         // NOTE: overriding this method will require reimplementing this pubsub messga
         // publish a message to let field respond to external update
         let topic = `${getFieldTopic(name)}.updated`;
@@ -335,10 +344,7 @@ export default class Form extends React.Component {
         if (context !== 'field') topic += '.fromAbove';
         this.props.pubsub.trigger(topic, data);
         this.props.pubsub.trigger('field.updated', data);
-
-        resolve();
       });
-    });
   }
 
   resetErrors () {

@@ -226,15 +226,15 @@ export default class FormCollection extends Form {
    * @returns {Promise}
    */
   setValue (name, value, context, index) {
-    return new Promise(resolve => {
-      // don't touch any values except for index requested
-      const values = this.state.values.map((v, i) => (
-        i === index
-          ? { ...v, [name]: value }
-          : v
-      ));
+    // don't touch any values except for index requested
+    const values = this.state.values.map((v, i) => (
+      i === index
+        ? { ...v, [name]: value }
+        : v
+    ));
 
-      this.setState({ values }, () => {
+    return this.setData(values)
+      .then(() => {
         // NOTE: overriding this method will require reimplementing this pubsub messga
         // publish a message to let field respond to external update
         let topic = `${getFieldTopic(name)}.updated`;
@@ -242,10 +242,7 @@ export default class FormCollection extends Form {
         if (context !== 'field') topic += '.fromAbove';
         this.props.pubsub.trigger(topic, data);
         this.props.pubsub.trigger('field.updated', data);
-
-        resolve();
       });
-    });
   }
 
   /**
