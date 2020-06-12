@@ -43,7 +43,7 @@ export default class Password extends React.Component {
         ref="input"
         type={type}
         value={getValue(this) || ''} />
-      <button className="btn-reset" onClick={this.handleClick} type="button" />
+      <button className="form__btn-reset" onClick={this.handleClick} type="button" />
     </div>);
   }
 }

@@ -4,6 +4,8 @@ import memo from 'memoize-one';
 import exists from '../../util/exists.js';
 import renderIf from '../../util/renderIf.js';
 
+import AutosizeInput from './AutosizeInput.jsx';
+
 import bindMethods from '../../util/bindMethods.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
 
@@ -88,13 +90,21 @@ export default class TagSelector extends React.Component {
     toggleValue(this, opt.value);
   }
 
+  handleFocus () {
+    // open the dropdown (and focus on our text input)
+    this.open();
+  }
+
   // TODO: this and other methods are modified copies from SearchField.jsx
   // look into having the code shared?
   handleKeys (e) {
     const { highlightIndex } = this.state;
+    const value = getValue(this);
 
     // don't do anything if not focused
-    if (this.props.hasFocus && this.list.length) {
+    if (!this.state.isOpen) return;
+
+    if (this.list.length) {
       switch (e.which) {
         case 27: // escape
           this.close();
@@ -111,6 +121,9 @@ export default class TagSelector extends React.Component {
           break;
       }
     }
+
+    // if our query is empty, we've got tags and user is backspacing...
+    if (!this.state.query && value.length && e.which === 8) this.popTag();
   }
 
   handleWindowClick (nativeEvent) {
@@ -155,15 +168,30 @@ export default class TagSelector extends React.Component {
   }
 
   open () {
-    if (this.state.isOpen) return;
+    return new Promise(resolve => {
+      if (this.state.isOpen) return resolve();
 
-    this.setState({ isOpen: true }, () => {
-      setTimeout(() => {
+      this.setState({ isOpen: true }, () => setTimeout(resolve, 0));
+    })
+      .then(() => {
         // NOTE: this click handler is the main way the dropdown closes
+        // add event listeners
         addEventListener('click', this.handleWindowClick);
         addEventListener('keydown', this.handleKeys);
-      }, 0);
-    });
+
+        // focus on the actual text input
+        if (this.refs.input) this.refs.input.focus();
+      });
+  }
+
+  /**
+   * removes the (visually) last tag
+   */
+  popTag () {
+    const indexes = this.getSelectedIndexes(getValue(this));
+    const index = indexes[indexes.length - 1];
+    const option = this.props.options[index];
+    toggleValue(this, option.value);
   }
 
   renderOptions () {
@@ -179,19 +207,19 @@ export default class TagSelector extends React.Component {
     const selectedIndexes = this.getSelectedIndexes(getValue(this));
 
     return (
-      <ul className="form__dropdown">
+      <ul className="form__ul-reset form__dropdown">
         {this.getOptionsWithIndexes(this.props.options)
           // if a query has been entered, filter the options!
           .filter(({ label }) => !query || label.toLowerCase().includes(query))
           .map(({ label, i, value }) => {
-            let classes = ['form__dropdown-item'];
+            let classes = [ 'form__li-reset', 'form__dropdown-item' ];
 
             if (selectedIndexes.includes(i)) classes.push('form__dropdown-item--is_selected');
 
             return (
-              <li className={classes} key={value}>
+              <li className={classes.join(' ')} key={value}>
                 <button
-                  className="btn-reset"
+                  className="form__btn-reset"
                   onClick={this.handleClickItem}
                   ref={ref}
                   type="button"
@@ -205,14 +233,14 @@ export default class TagSelector extends React.Component {
 
   renderTags () {
     return (
-      <ul className="form-tag-selector__tags">
+      <ul className="form__ul-reset form-tag-selector__tags">
         {this.getSelectedIndexes(getValue(this)).map(i => {
           const opt = this.props.options[i];
 
           return (
-            <li className="form-tag-selector__tag" key={opt.value}>
+            <li className="form__li-reset form-tag-selector__tag" key={opt.value}>
               {opt.label}
-              <button onClick={this.handleClickTagRemove} type="button" value={i}>X</button>
+              <button className="form__btn-reset form-tag-selector__tag-remove" onClick={this.handleClickTagRemove} type="button" value={i}>X</button>
             </li>
           );
         })}
@@ -232,15 +260,16 @@ export default class TagSelector extends React.Component {
       {renderIf(this.state.isOpen, () => (
         <div className="form-tag-selector__input-wrapper">
           {renderIf(getValue(this).length, this.renderTags)}
-          <input
-            className="form-tag-selector__input"
+          <AutosizeInput
+            className="form__input-reset form-tag-selector__input"
             onChange={this.handleChange}
             placeholder="Type to filter..."
+            ref="input"
             type="text"
             value={this.state.query} />
         </div>
       ), () => (
-        <button className="form-tag-selector__value" onClick={this.handleClickOpen} type="button">
+        <button className="form__btn-reset form-tag-selector__value" onClick={this.handleClickOpen} onFocus={this.handleFocus} type="button">
           <span>{this.getLabel()}</span>
         </button>
       ))}
