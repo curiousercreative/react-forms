@@ -19,6 +19,7 @@ export default class FormComplex extends Form {
   static defaultProps = {
     ...Form.defaultProps,
     values: {
+      cast: [],
       native_select: '',
       tag_selector: [],
     },
@@ -36,7 +37,7 @@ export default class FormComplex extends Form {
 
     try {
       refsData = {
-        cast: this.refs.cast.getData(),
+        // cast: this.refs.cast.getData(),
         movie: this.refs.movie.getData(),
         user: this.refs.user.getData(),
       };
@@ -65,7 +66,7 @@ export default class FormComplex extends Form {
 
         <FormExtended ref="user" />
 
-        <FormCollectionExtended ref="cast" />
+        <FormCollectionExtended name="cast" />
 
         <div className="form__fields">
           <Fields.EmailField label="email" name="email" />

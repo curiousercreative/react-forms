@@ -10,7 +10,7 @@ import { Pubsub } from '../lib/pubsub';
 import { pascalize } from '../lib/transformers';
 import { validate } from '../lib/validator';
 
-import getFieldTopic from './fields/util/getFieldTopic';
+import getFieldTopic from './fields/util/getFieldTopic.js';
 
 import FormContext from './config/FormContext';
 
@@ -305,6 +305,15 @@ export default class Form extends React.Component {
   }
 
   /**
+   * parseData - transform form data before sending to external sources
+   * @param  {object|object[]} data
+   * @return {object|object[]}
+   */
+  parseData (data) {
+    return data;
+  }
+
+  /**
    * parseValue - transform stored data before sending to form field
    * @param {string} name
    * @param {string|any} value
@@ -322,6 +331,16 @@ export default class Form extends React.Component {
   setData (values) {
     return new Promise(resolve => {
       this.setState({ values }, resolve);
+
+      if (this.props.name) {
+        try {
+          // similar logic to what's found in ./fields/util/setValue.js
+          this.context.actions.setValue(this.props.name, this.parseValue(values), 'field', this.props.index);
+        }
+        catch (e) {
+          console.error('Form was assigned a "name" prop, but erred trying to update parent form', e);
+        }
+      }
     });
   }
 
