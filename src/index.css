@@ -51,7 +51,7 @@
 
 .form__fields {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 }
 .form__field {
   flex-basis: 100%;
