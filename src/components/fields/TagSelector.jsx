@@ -92,7 +92,7 @@ export default class TagSelector extends React.Component {
   // TODO: this and other methods are modified copies from SearchField.jsx
   // look into having the code shared?
   handleKeys (e) {
-    const { highlightIndex } = this.state;
+    const { highlightIndex, query } = this.state;
     const value = this.props.getValue();
 
     // don't do anything if not focused
@@ -101,7 +101,14 @@ export default class TagSelector extends React.Component {
     if (this.list.length) {
       switch (e.which) {
         case 27: // escape
-          this.close();
+          // if search was entered, clear it and refocus on the input to allow
+          // a new search
+          if (query) {
+            this.setState({ query: '' });
+            this.refs.input.focus();
+          }
+          // no search, close everything
+          else this.close();
           break;
         case 38: // up
           e.preventDefault();
@@ -135,7 +142,7 @@ export default class TagSelector extends React.Component {
   }
 
   focusResult (highlightIndex) {
-    this.open();
+    // this.open();
     this.setState({ highlightIndex });
     this.list[highlightIndex].focus();
   }
