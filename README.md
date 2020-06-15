@@ -75,30 +75,21 @@ export default function NativeSelectField (props) {
 #### Input/Control component
 ```jsx
 import React from 'react';
-import { FormContext, util } from 'form';
-import { getValue, setValue } from  'form/dist/components/fields/util';
+import { util } from '@curiouser/react-forms';
 
-export default class NativeSelect extends React.Component {
-  static contextType = FormContext;
+export default function NativeSelect ({ getValue, id, options, placeholder, required = true, setValue }) {
+  const handleChange = React.useCallback((e) => setValue(e.target.value), [ setValue ]);
 
-  constructor (...args) {
-    super(...args);
-    util.bindMethods(this);
-  }
-
-  handleChange (e) {
-    setValue(this, e.target.value);
-  }
-
-  render () {
-    return (
-      <select onChange={this.handleChange} value={getValue(this)}>
-        {this.props.options.map(o => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-    );
-  }
+  return (
+    <select id={id} onChange={handleChange} value={getValue()}>
+      {util.renderIf(placeholder, () => (
+        <option disabled={required} value="">{placeholder}</option>
+      ))}
+      {options.map(o => (
+        <option key={o.value} value={o.value}>{o.label}</option>
+      ))}
+    </select>
+  );
 }
 ```
 

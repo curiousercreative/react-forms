@@ -8,6 +8,8 @@ export { default as Button } from './Button';
 export { default as CheckboxField } from './CheckboxField';
 export { default as EmailField } from './EmailField';
 export { default as Field } from './Field';
+export { default as NativeDateField } from './NativeDateField.jsx';
+export { default as NativeSelectField } from './NativeSelectField.jsx';
 export { default as RadioField } from './RadioField';
 export { default as PasswordField } from './PasswordField';
 export { default as SelectField } from './SelectField';

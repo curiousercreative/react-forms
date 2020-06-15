@@ -5,10 +5,6 @@ import { findDOMNode } from 'react-dom';
 import bindMethods from '../../util/bindMethods.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
 
-import FormContext from '../config/FormContext';
-import getValue from './util/getValue';
-import setValue from './util/setValue';
-
 let id = 0;
 /**
  * a custom dropdown/select input
@@ -31,8 +27,6 @@ let id = 0;
  * Given dropdown is visible, pressing escape should hide dropdown
  */
 export default class Select extends React.Component {
-  static contextType = FormContext;
-
   id = `select${id++}`;
   list = [];
   state = {
@@ -46,7 +40,7 @@ export default class Select extends React.Component {
   }
 
   componentDidMount () {
-    const value = getValue(this);
+    const value = this.props.getValue();
 
     // set initial value
     if (value) findDOMNode(this).value = value;
@@ -70,9 +64,9 @@ export default class Select extends React.Component {
   }
 
   handleClickItem (e) {
-    // setValue(this, e.target.value);
+    // this.props.setValue(e.target.value);
     const val = this.props.options.find(({ value }) => String(value) === e.target.value).value;
-    setValue(this, val);
+    this.props.setValue(val);
   }
 
   // TODO: this and other methods are modified copies from SearchField.jsx
@@ -114,7 +108,7 @@ export default class Select extends React.Component {
   }
 
   getLabel () {
-    const opt = this.props.options.find(opt => opt.value === getValue(this));
+    const opt = this.props.options.find(opt => opt.value === this.props.getValue());
     let { placeholder } = this.props;
 
     // placeholder not supplied, attempt to use the label of first option provided
@@ -157,7 +151,7 @@ export default class Select extends React.Component {
     return this.props.options.map(({ label, value }) => {
       let classes = [ 'form__li-reset', 'form__dropdown-item' ];
 
-      if (value === getValue(this)) classes.push('form__dropdown-item--is_selected');
+      if (value === this.props.getValue()) classes.push('form__dropdown-item--is_selected');
 
       return (
         <li className={classes.join(' ')} key={value}>

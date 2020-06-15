@@ -4,11 +4,6 @@ import bindMethods from '../../util/bindMethods.js';
 import callMe from '../../util/callMe.js';
 import renderIf from '../../util/renderIf.js';
 
-import FormContext from '../config/FormContext';
-import isChecked from './util/isChecked';
-import setValue from './util/setValue';
-import toggleValue from './util/toggleValue';
-
 /**
  * when clicked, will set a value on form, like a radio button
  * @class Button
@@ -21,7 +16,6 @@ import toggleValue from './util/toggleValue';
  * @return {jsx} button.form__input
  */
 export default class Button extends React.Component {
-  static contextType = FormContext;
   static defaultProps = {
     className: '',
     type: 'radio',
@@ -33,22 +27,22 @@ export default class Button extends React.Component {
   }
 
   handleClick (e) {
-    this.setValue(this, this.props.value);
+    this.setValue(this.props.value);
 
     callMe(this.props.onClick, { args: [e] });
   }
 
-  setValue (...args) {
+  setValue (value) {
     switch (this.props.type) {
       case 'radio':
-        return setValue(...args);
+        return this.props.setValue(value);
       case 'checkbox':
-        return toggleValue(...args);
+        return this.props.toggleValue(value);
     }
   }
 
   render () {
-    const isSelected = isChecked(this);
+    const isSelected = this.props.isChecked();
     let classes = this.props.className.split(' ').concat([
       'form__button',
       `form__button--type_${this.props.type}`,

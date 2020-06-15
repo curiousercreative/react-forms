@@ -3,6 +3,8 @@ import { findDOMNode } from 'react-dom';
 
 import FormContext from '../config/FormContext';
 
+import { getValue, isChecked, setValue, toggleValue } from './util';
+
 import bindMethods from '../../util/bindMethods.js';
 import callMe from '../../util/callMe.js';
 import omit from '../../util/omit.js';
@@ -98,8 +100,12 @@ export default class Field extends React.Component {
   getProps () {
     return {
       ...omit('className', this.props),
+      getValue: () => getValue(this),
       hasFocus: this.state.hasFocus,
       id: this.id,
+      isChecked: () => isChecked(this),
+      setValue: value => setValue(this, value),
+      toggleValue: value => toggleValue(this, value),
     };
   }
 

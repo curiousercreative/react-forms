@@ -2,10 +2,6 @@ import React from 'react';
 
 import bindMethods from '../../util/bindMethods.js';
 
-import FormContext from '../config/FormContext';
-import getValue from './util/getValue';
-import setValue from './util/setValue';
-
 // map an input type to it's inputmode attribute
 const TYPE_MODE_MAP = {
   number: 'numeric',
@@ -20,7 +16,6 @@ const TYPE_MODE_MAP = {
  * @return {jsx} input.form__input
  */
 export default class Text extends React.Component {
-  static contextType = FormContext;
   static defaultProps = {
     type: 'text',
   };
@@ -32,7 +27,7 @@ export default class Text extends React.Component {
 
   handleChange (e) {
     // handle a change to this field's value by user input
-    setValue(this, e.target.value);
+    this.props.setValue(e.target.value);
   }
 
   getInputMode () {
@@ -69,6 +64,6 @@ export default class Text extends React.Component {
       ref="input"
       placeholder={this.props.placeholder}
       type={this.getType()}
-      value={getValue(this) || ''} />;
+      value={this.props.getValue() || ''} />;
   }
 }

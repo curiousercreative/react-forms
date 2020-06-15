@@ -2,10 +2,6 @@ import React from 'react';
 
 import bindMethods from '../../util/bindMethods.js';
 
-import FormContext from '../config/FormContext';
-import getValue from './util/getValue';
-import setValue from './util/setValue';
-
 /**
  * password input that allows for toggling visibility
  * @class Password
@@ -14,8 +10,6 @@ import setValue from './util/setValue';
  * @return {jsx} div.form-password
  */
 export default class Password extends React.Component {
-  static contextType = FormContext;
-
   state = { showPassword: false };
 
   constructor (...args) {
@@ -24,7 +18,7 @@ export default class Password extends React.Component {
   }
 
   handleChange (e) {
-    setValue(this, e.target.value);
+    this.props.setValue(e.target.value);
   }
 
   handleClick () {
@@ -42,7 +36,7 @@ export default class Password extends React.Component {
         onChange={this.handleChange}
         ref="input"
         type={type}
-        value={getValue(this) || ''} />
+        value={this.props.getValue() || ''} />
       <button className="form__btn-reset" onClick={this.handleClick} type="button" />
     </div>);
   }

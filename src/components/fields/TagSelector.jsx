@@ -9,10 +9,6 @@ import AutosizeInput from './AutosizeInput.jsx';
 import bindMethods from '../../util/bindMethods.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
 
-import FormContext from '../config/FormContext.js';
-import getValue from './util/getValue.js';
-import toggleValue from './util/toggleValue.js';
-
 let id = 0;
 /**
  * a custom dropdown/select input
@@ -35,8 +31,6 @@ let id = 0;
  * Given dropdown is visible, pressing escape should hide dropdown
  */
 export default class TagSelector extends React.Component {
-  static contextType = FormContext;
-
   id = `tag-selector${id++}`;
   list = [];
   options = {};
@@ -50,7 +44,7 @@ export default class TagSelector extends React.Component {
     super(...args);
     bindMethods(this);
 
-    this.state.isOpen = !exists(getValue(this));
+    this.state.isOpen = !exists(this.props.getValue());
 
     // TODO: figure out why these memoized functions don't update with incoming props
     // this.getOptionsWithIndexes = memo(this.getOptionsWithIndexes);
@@ -76,7 +70,7 @@ export default class TagSelector extends React.Component {
   handleClickItem (e) {
     const opt = this.props.options[Number(e.target.value)];
 
-    toggleValue(this, opt.value);
+    this.props.toggleValue(opt.value);
   }
 
   handleClickOpen () {
@@ -87,7 +81,7 @@ export default class TagSelector extends React.Component {
     e.nativeEvent.stopImmediatePropagation();
     const opt = this.props.options[Number(e.target.value)];
 
-    toggleValue(this, opt.value);
+    this.props.toggleValue(opt.value);
   }
 
   handleFocus () {
@@ -99,7 +93,7 @@ export default class TagSelector extends React.Component {
   // look into having the code shared?
   handleKeys (e) {
     const { highlightIndex } = this.state;
-    const value = getValue(this);
+    const value = this.props.getValue();
 
     // don't do anything if not focused
     if (!this.state.isOpen) return;
@@ -147,7 +141,7 @@ export default class TagSelector extends React.Component {
   }
 
   getLabel () {
-    const label = this.getSelectedIndexes(getValue(this))
+    const label = this.getSelectedIndexes(this.props.getValue())
       .map(i => this.props.options[i])
       .filter(exists)
       .map(o => o.label)
@@ -188,10 +182,10 @@ export default class TagSelector extends React.Component {
    * removes the (visually) last tag
    */
   popTag () {
-    const indexes = this.getSelectedIndexes(getValue(this));
+    const indexes = this.getSelectedIndexes(this.props.getValue());
     const index = indexes[indexes.length - 1];
     const option = this.props.options[index];
-    toggleValue(this, option.value);
+    this.props.toggleValue(option.value);
   }
 
   renderOptions () {
@@ -204,7 +198,7 @@ export default class TagSelector extends React.Component {
     const ref = el => el && this.list.push(el);
 
     const query = this.state.query.toLowerCase();
-    const selectedIndexes = this.getSelectedIndexes(getValue(this));
+    const selectedIndexes = this.getSelectedIndexes(this.props.getValue());
 
     return (
       <ul className="form__ul-reset form__dropdown">
@@ -234,7 +228,7 @@ export default class TagSelector extends React.Component {
   renderTags () {
     return (
       <ul className="form__ul-reset form-tag-selector__tags">
-        {this.getSelectedIndexes(getValue(this)).map(i => {
+        {this.getSelectedIndexes(this.props.getValue()).map(i => {
           const opt = this.props.options[i];
 
           return (
@@ -259,7 +253,7 @@ export default class TagSelector extends React.Component {
     return <div className={classes.join(' ')}>
       {renderIf(this.state.isOpen, () => (
         <div className="form-tag-selector__input-wrapper">
-          {renderIf(getValue(this).length, this.renderTags)}
+          {renderIf(this.props.getValue().length, this.renderTags)}
           <AutosizeInput
             className="form__input-reset form-tag-selector__input"
             onChange={this.handleChange}

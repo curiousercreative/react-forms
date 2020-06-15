@@ -3,10 +3,6 @@ import React from 'react';
 import bindMethods from '../../util/bindMethods.js';
 import callMe from '../../util/callMe.js';
 
-import FormContext from '../config/FormContext';
-import isChecked from './util/isChecked';
-import setValue from './util/setValue';
-
 /**
  * when clicked, will set a value on form, like a radio button
  * @class Radio
@@ -19,7 +15,6 @@ import setValue from './util/setValue';
  * @return {jsx} input.form__input
  */
 export default class Radio extends React.Component {
-  static contextType = FormContext;
   static defaultProps = {
     className: '',
     type: 'radio',
@@ -31,14 +26,14 @@ export default class Radio extends React.Component {
   }
 
   handleClick (e) {
-    setValue(this, this.props.value);
+    this.props.setValue(this.props.value);
 
     callMe(this.props.onClick, { args: [e] });
   }
 
   render () {
     let classes = this.props.className.split(' ').concat('form__button');
-    const checked = isChecked(this);
+    const checked = this.props.isChecked();
 
     if (checked) classes.push('form__button--is_active');
 
