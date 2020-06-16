@@ -16,20 +16,15 @@ const OPTIONS = [
 ];
 
 export default class FormComplex extends Form {
-  static defaultProps = {
-    ...Form.defaultProps,
-    values: {
-      cast: [],
-      native_select: '',
-      tag_selector: [],
-    },
-  }
-
   constructor (...args) {
     super(...args);
     util.bindMethods(this);
 
-    this.state.values.cast = this.props.collectionProps.values;
+    this.store.initData({
+      cast: this.props.collectionProps.values || [],
+      native_select: '',
+      tag_selector: [],
+    });
   }
 
   getData () {

@@ -35,6 +35,10 @@ class App extends React.Component {
 
   render () {
     const collectionProps = {
+      defaultValues: {
+        username: '',
+        password: '',
+      },
       delete: this.deleteCollectionItem,
       values: this.state.collectionValues,
     };

@@ -16,7 +16,7 @@ describe('_getValue method', () => {
       },
     });
     // mount component
-    const form = F.render(<Component values={{ first_name: 'david' }} />);
+    const form = F.render(<Component initialValues={{ first_name: 'david' }} />);
 
     // expect that our getData
     expect(form._getValue('first_name')).toEqual('charles');
@@ -30,7 +30,7 @@ describe('_getValue method', () => {
       },
     });
     // mount component
-    const form = F.render(<Component values={{ first_name: 'david' }} />);
+    const form = F.render(<Component initialValues={{ first_name: 'david' }} />);
 
     // expect that our getData
     expect(form._getValue('first_name')).toEqual('DAVID');

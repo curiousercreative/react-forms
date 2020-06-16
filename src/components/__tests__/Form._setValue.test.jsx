@@ -14,7 +14,7 @@ describe('_setValue method', () => {
       },
     });
     // mount component
-    const form = F.render(<Component values={someState} />);
+    const form = F.render(<Component initialValues={someState} />);
     form._setValue('first_name', 'chuck');
 
     expect(someState.first_name).toEqual('chuck');
@@ -28,7 +28,7 @@ describe('_setValue method', () => {
       },
     });
     // mount component
-    const form = F.render(<Component values={{ first_name: 'BOB' }} />);
+    const form = F.render(<Component initialValues={{ first_name: 'BOB' }} />);
     form._setValue('first_name', 'CHUCK');
 
     expect(form.getValue('first_name')).toEqual('chuck');

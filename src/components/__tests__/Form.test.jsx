@@ -9,7 +9,7 @@ test('getValue method should return expected value', () => {
 });
 
 test('Form instance should have isValid flag set on mount', () => {
-  const form = F.render(<Form values={{ a: '' }} validations={F.getValidations()} />);
+  const form = F.render(<Form initialValues={{ a: '' }} validations={F.getValidations()} />);
 
   setTimeout(() => {
     expect(form.isValid).toBe(false);

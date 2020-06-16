@@ -23,7 +23,7 @@ describe('setValue method', () => {
       },
     });
     // mount component
-    const form = F.render(<Component values={someState} />);
+    const form = F.render(<Component initialValues={someState} />);
     // update value internally
     form.setValue('a', 'c');
 

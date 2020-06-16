@@ -25,11 +25,11 @@ describe('getData method', () => {
     // create a new component
     const Component = F.extendForm({
       getData () {
-        return this.props.values;
+        return this.props.randomKey;
       },
     });
     // mount component
-    const form = F.render(<Component values={{ a: 'b' }} />);
+    const form = F.render(<Component randomKey={{ a: 'b' }} />);
     // update value internally
     form.setValue('a', 'c');
 

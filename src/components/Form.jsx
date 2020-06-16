@@ -11,20 +11,21 @@ import { pascalize } from '../lib/transformers';
 import { validate } from '../lib/validator';
 
 import getFieldTopic from './fields/util/getFieldTopic.js';
+import localStateStore from '../lib/form/stores/localStateStore.js';
+import { mergeStores } from '../lib/form/store.js';
 
 import FormContext from './config/FormContext';
 
 const CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD = 60;
 
-const emptyErrors = [];
+const defaultStore = localStateStore;
 
 /**
  * @class Form
  * @property {string} [className = '']
  * @property {string} [formName = '']
+ * @property {object} [initialValues]
  * @property {object} [pubsub]
- * @property {boolean} [shouldRespondToValuesUpdatedInProps = false] when true, will
- * call Form.filterIncomingValuesToUpdate and Form.updateValuesFromIncomingProps
  * @property {boolean} [validateAsYouGo = true]
  * @property {collection} [validations = []] - very specific data structure expected by
  * the validate function. The below example is for a form with two fields that are both required.
@@ -35,9 +36,6 @@ const emptyErrors = [];
  *   names: ['username', 'password'],
  *   tests: [[ tests.required, messages.required ]]
  * }]
- * @property {object} [values = {}] set initial values NOTE: if you're passing values in,
- * consider overwriting setValue and getValue in your instance so field values are
- * always passed down
  * @return {jsx} form.form, though this class is frequently extended rather than
  * used directly and the render method is overriden
  */
@@ -46,43 +44,39 @@ export default class Form extends React.Component {
   static defaultProps = {
     className: '',
     formName: 'form',
+    initialValues: {},
     pubsub: new Pubsub(),
-    shouldRespondToValuesUpdatedInProps: false,
+    store: {},
     validateAsYouGo: true,
     validations: [],
-    values: {},
   };
 
   /** @property {array} fieldsBlurred - list of field names that have been blurred used for validating as you go */
   fieldsBlurred = [];
   /** @property {boolean} isValid - keep this instance flag to allow us immediate get/set  */
   isValid;
+  parentFormWarned = false;
   state = {};
+  store = {};
 
   constructor (...args) {
     super(...args);
     bindMethods(this);
 
-    this.state.errors = [];
-    this.state.values = this.state.values || this.props.values || {};
-
+    this._setStore = memoize(this._setStore);
     this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, false);
     this.getContextValue = memoize(this.getContextValue);
-    this.filterIncomingValuesToUpdate = memoize(this.filterIncomingValuesToUpdate);
-    this.updateValuesFromIncomingProps = memoize(this.updateValuesFromIncomingProps);
+
+    this._setStore(this.props.store);
+    this.store.initErrors([]);
+    this.store.initData(this.state.values || this.props.initialValues);
   }
 
   componentDidMount () {
     setTimeout(() => this.validate(false), 15);
   }
 
-  componentDidUpdate (props) {
-    if (this.props.shouldRespondToValuesUpdatedInProps) {
-      const fieldsToUpdate = this.filterIncomingValuesToUpdate(props.values, this.props.values);
-
-      if (fieldsToUpdate.length) this.updateValuesFromIncomingProps(fieldsToUpdate);
-    }
-  }
+  componentDidUpdate () {}
 
   componentWillUnmount () {
     // the timeout is a bit hacky, but our children components unmount hook
@@ -132,6 +126,16 @@ export default class Form extends React.Component {
     this.fieldsBlurred = uniq(fieldsBlurred.concat(name));
   }
 
+  _hasParentForm () {
+    if (typeof this.props.name === 'string') {
+      if (this.context.state.form instanceof Form) return true;
+
+      console.warn('form was given a "name" prop but could not find parent form');
+    }
+
+    return false;
+  }
+
   /**
    * _getErrors - Field.jsx should call this during render
    * @param  {string} name
@@ -162,6 +166,10 @@ export default class Form extends React.Component {
     const parser = this[`parseValueFor${pascalize(name)}`];
 
     return parser(getter(index));
+  }
+
+  _setStore (store) {
+    this.store = mergeStores(this, defaultStore, store);
   }
 
   /**
@@ -228,26 +236,6 @@ export default class Form extends React.Component {
     this.validate(false);
   }
 
-  /**
-   * filterIncomingValuesToUpdate - filter incoming values to remove ones that
-   * haven't changed from the last incoming value
-   * @param  {object} oldValues
-   * @param  {object} newValues
-   * @return {array} format as returned by Object.entries
-   */
-  filterIncomingValuesToUpdate (oldValues, newValues) {
-    // for each incoming form value
-    return Object
-      // convert to a list of map like arrays
-      .entries(newValues)
-      // filter out fields that haven't changed
-      .filter(([ name, value ]) => {
-        const oldVal = oldValues[name];
-
-        return oldVal !== value;
-      });
-  }
-
   getContextValue (values, errors) {
     return {
       actions: {
@@ -256,6 +244,7 @@ export default class Form extends React.Component {
       state: {
         form: this,
         errors,
+        isValid: this.isValid,
         values,
       },
     };
@@ -265,7 +254,7 @@ export default class Form extends React.Component {
    * @return {object} keyed by field name
    */
   getData () {
-    return this.state.values;
+    return this.store.getData();
   }
 
   /**
@@ -329,19 +318,7 @@ export default class Form extends React.Component {
    * @return {Promise}
    */
   setData (values) {
-    return new Promise(resolve => {
-      this.setState({ values }, resolve);
-
-      if (this.props.name) {
-        try {
-          // similar logic to what's found in ./fields/util/setValue.js
-          this.context.actions.setValue(this.props.name, this.parseValue(values), 'field', this.props.index);
-        }
-        catch (e) {
-          console.error('Form was assigned a "name" prop, but erred trying to update parent form', e);
-        }
-      }
-    });
+    return this.store.setData(values);
   }
 
   /**
@@ -366,16 +343,12 @@ export default class Form extends React.Component {
       });
   }
 
-  resetErrors () {
-    this.setState({ errors: emptyErrors });
-  }
-
   /**
    * setErrors - save errors for rendering
    * @param {array} errors
    */
   setErrors (errors) {
-    this.setState({ errors: errors.length ? errors : emptyErrors });
+    this.store.setErrors(errors);
   }
 
   /**
@@ -384,20 +357,22 @@ export default class Form extends React.Component {
    * @return {boolean} true = valid
    */
   validate (displayErrors = true) {
-    let state = {};
     // arrayify to  FormCollection
     const errors = validate(this.getData(), this.getValidations());
 
     // if there are any, form is invalid
-    const isValid = this.isValid = errors.length === 0;
+    this.isValid = errors.length === 0;
 
     // store errors for rendering
-    if (displayErrors) state.errors = errors.length ? errors : emptyErrors;
+    if (displayErrors) {
+      this.setErrors(errors);
 
-    this.setState({ ...state, isValid });
+      // NOTE: hacky way of guessing whether we just triggered a re-render
+      if (!this.state.errors) this.forceUpdate();
+    }
 
     // if there are no errors, form is valid
-    return isValid;
+    return this.isValid;
   }
 
   /**
@@ -411,23 +386,9 @@ export default class Form extends React.Component {
     const errors = this._validateField(name, index);
 
     // store errors for rendering
-    if (displayErrors) this.setState({ errors });
+    if (displayErrors) this.setErrors(errors);
 
     return errors.length === 0;
-  }
-
-  /**
-   * updateValuesFromIncomingProps - respond to updated incoming form values (side effects welcome)
-   * @param  {array[]} fieldsToUpdate - key, value arrays as Object.entries would return
-   * @return {Promise} resolves once all side effects are complete
-   */
-  updateValuesFromIncomingProps (fieldsToUpdate) {
-    // update each field
-    return Promise.all(fieldsToUpdate.map(([ name, value ]) => this.setValue(name, value, 'props')))
-      // with all fields updated, validate the form against updated values (show errors if previously shown)
-      .then(() => this.validate(this.getErrors().length > 0))
-      // publish a message for the completion of this process
-      .then(() => this.props.pubsub.trigger('valuesUpdatedFromProps'));
   }
 
   renderErrors (includeFieldErrors = false) {

@@ -1,17 +1,6 @@
 import React from 'react';
 import { Fields, Form, FormCollection, SubmitButton, util, validator } from '@curiouser/react-forms';
 
-const props = {
-  defaultValues: {
-    username: '',
-    password: '',
-  },
-  values: [{
-    username: 'chuck',
-    password: 'berry',
-  }],
-}
-
 export default class FormCollectionDirect extends React.Component {
   constructor (...args) {
     super(...args);
@@ -29,7 +18,7 @@ export default class FormCollectionDirect extends React.Component {
   render () {
     return (
       <div className="form form-collection-extended">
-        <FormCollection ref="collection" {...props} component={User} />
+        <FormCollection ref="collection" {...this.props} component={User} />
         <button onClick={this.handleClickAdd} type="button">Add</button>
         <button onClick={this.handleSubmit}>Check form state</button>
       </div>

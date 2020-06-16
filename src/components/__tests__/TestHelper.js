@@ -7,7 +7,7 @@ import bindMethods from '../../util/bindMethods.js';
 import { messages, tests } from '../../lib/validator';
 
 export default class F {
-  static simpleFormJsx = <Form formName="test" values={{ a: 'b' }} />;
+  static simpleFormJsx = <Form formName="test" initialValues={{ a: 'b' }} />;
   static extendForm (attributesAndMethods = {}) {
     return class extends Form {
       constructor (...args) {

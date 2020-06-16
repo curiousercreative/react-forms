@@ -7,6 +7,7 @@ import bindMethods from '../util/bindMethods.js';
 import { validate } from '../lib/validator';
 
 import getFieldTopic from './fields/util/getFieldTopic';
+import localStateStoreCollection from '../lib/form/stores/localStateStoreCollection.js';
 
 import FormContext from './config/FormContext';
 
@@ -39,7 +40,7 @@ export default class FormCollection extends Form {
   static defaultProps = {
     ...Form.defaultProps,
     defaultValues: {},
-    shouldRespondToValuesUpdatedInProps: true,
+    store: localStateStoreCollection,
     values: [],
   };
 
@@ -50,29 +51,42 @@ export default class FormCollection extends Form {
     super(...args);
     bindMethods(this);
 
-    this.state.values = this.state.values || this.props.values || [];
-    this.state.errors = [];
-
-    // populate our FormCollection with data
-    this.state.values = this.state.values.map(this.create);
-
-    // init any lists per collection item
-    this.state.values.forEach(() => {
-      this.fieldsBlurred.push([]);
-      this.state.errors.push([]);
-    });
-
     this._getData = memo(this._getData);
     this._getDataWithCid = memo(this._getDataWithCid);
+
+    const errors = [];
+    const values = this.store.getPersistentData()
+      .map(this.create);
+
+    // init any lists per collection item
+    values.forEach(() => {
+      this.fieldsBlurred.push([]);
+      errors.push([]);
+    });
+
+    this.store.initData(values);
+    this.store.initErrors(errors);
   }
 
   _getData (tempValues, persistentValues) {
-    const data = tempValues.map(temporaryData => {
-      const persistentData = persistentValues.find(({ id }) => id === temporaryData.id);
-      return { ...persistentData, ...temporaryData };
+    const list = [];
+    const set = new Set();
+
+    persistentValues.concat(tempValues).forEach(a => {
+      const key = this._primaryKeySelector(a);
+
+      // we already added a persistent item
+      if (key && set.has(key)) {
+        const i = list.findIndex(b => key === this._primaryKeySelector(b));
+        list[i] = { ...list[i], ...a };
+      }
+      else {
+        if (key) set.add(key);
+        list.push(a);
+      }
     });
 
-    return data;
+    return list;
   }
 
   _getDataWithCid (tempValues, persistentValues) {
@@ -81,6 +95,10 @@ export default class FormCollection extends Form {
     data.forEach(item => delete item.cid);
 
     return data;
+  }
+
+  _primaryKeySelector (a) {
+    return a.id;
   }
 
   /**
@@ -122,17 +140,17 @@ export default class FormCollection extends Form {
     let object = this.create(attr);
 
     // add a default object to the end of the collection
-    return new Promise(resolve => {
-      this.setState({
-        errors: [ ...this.getErrors(), [] ],
-        values: this.state.values.concat(object),
-      }, resolve);
-    }).then(() => {
-      // init lists for this new item
-      this.fieldsBlurred.push([]);
+    return Promise
+      .all([
+        this.store.setErrors([ ...this.getErrors(), [] ]),
+        this.store.setData(this.store.getData().concat(object)),
+      ])
+      .then(() => {
+        // init lists for this new item
+        this.fieldsBlurred.push([]);
 
-      this.onAdd();
-    });
+        this.onAdd();
+      });
   }
 
   /**
@@ -151,13 +169,10 @@ export default class FormCollection extends Form {
 
   /**
    * getData - merges persistent collection with temporary collection
-   * @param  {boolean} [omitCid = true]
    * @return {collection} merged collection
    */
-  getData (omitCid = true) {
-    return omitCid
-      ? this._getData(this.state.values, this.props.values)
-      : this._getDataWithCid(this.state.values, this.props.values);
+  getData () {
+    return this._getData(this.store.getData(), this.store.getPersistentData());
   }
 
   /**
@@ -166,8 +181,8 @@ export default class FormCollection extends Form {
    */
   getErrors (index) {
     const errors = Array.isArray(this.state.errors[index])
-      ? this.state.errors[index]
-      : this.state.errors;
+      ? this.store.getErrors()[index]
+      : this.store.getErrors();
 
     return errors || [];
   }
@@ -224,9 +239,7 @@ export default class FormCollection extends Form {
       ? dataOrCid
       : dataOrCid.cid;
 
-    this.setState({
-      values: this.state.values.filter(obj => obj.cid !== cid),
-    });
+    this.setData(this.getData().filter(obj => obj.cid !== cid));
   }
 
   /**
@@ -241,7 +254,7 @@ export default class FormCollection extends Form {
    */
   setValue (name, value, context, index) {
     // don't touch any values except for index requested
-    const values = this.state.values.map((v, i) => (
+    const values = this.getData().map((v, i) => (
       i === index
         ? { ...v, [name]: value }
         : v
@@ -265,21 +278,23 @@ export default class FormCollection extends Form {
    * @return {boolean} true = valid
    */
   validate (displayErrors = true) {
-    let state = {};
     // arrayify to  FormCollection
     const errors = this.getData()
       .map(data => validate(data, this.getValidations()));
 
     // if there are any, form is invalid
-    const isValid = this.isValid = !errors.some(eArr => eArr.length > 0);
+    this.isValid = !errors.some(eArr => eArr.length > 0);
 
     // store errors for rendering
-    if (displayErrors) state.errors = errors;
+    if (displayErrors) {
+      this.setErrors(errors);
 
-    this.setState({ ...state, isValid });
+      // NOTE: hacky way of guessing whether we just triggered a re-render
+      if (!this.state.errors) this.forceUpdate();
+    }
 
     // if there are no errors, form is valid
-    return isValid;
+    return this.isValid;
   }
 
   render (Component, componentProps) {
