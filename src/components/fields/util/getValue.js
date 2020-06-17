@@ -7,5 +7,5 @@
 export default function getValue (field) {
   const { index, name } = field.props;
 
-  return field.context.state.form._getValue(name, index);
+  return field.context.state.form.getValue(name, index);
 }

@@ -8,8 +8,6 @@ import omit from '../../../util/omit.js';
 export default function localStateStoreCollection (instance) {
   return {
     initData (values) {
-      instance.state = instance.state || {};
-
       // we only init data in state if we don't have a name
       if (!instance._hasParentForm()) {
         instance.state.values = values || instance.state.values || [];
