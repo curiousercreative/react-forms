@@ -13,8 +13,12 @@ export default function defaultModel (instance) {
     return formData;
   }
 
+  function cleanCollection (formData) {
+    return formData;
+  }
+
   /**
-   * cleanValue - transform a single form field value from user input
+   * cleanValue - transform a single form field value from user input before storing
    * @param {string} name
    * @param {string|any} value
    * @return {string|any}
@@ -33,6 +37,10 @@ export default function defaultModel (instance) {
    * @return {object}
    */
   function format (formData) {
+    return formData;
+  }
+
+  function formatCollection (formData) {
     return formData;
   }
 
@@ -57,8 +65,10 @@ export default function defaultModel (instance) {
 
   return {
     clean,
+    cleanCollection,
     cleanValue,
     format,
+    formatCollection,
     formatValue,
     getValidations,
     selectPrimaryKey,

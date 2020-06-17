@@ -5,6 +5,7 @@ import FormContext from './config/FormContext';
 import localStateStoreCollection from '../lib/form/stores/localStateStoreCollection.js';
 
 import bindMethods from '../util/bindMethods.js';
+import fromEntries from '../util/fromEntries.js';
 import omit from '../util/omit.js';
 import { validate } from '../lib/validator';
 
@@ -146,6 +147,18 @@ export default class FormCollection extends Form {
     return { ...this.props.defaultValues, cid: this.getCid(), ...attr };
   }
 
+  formatData () {
+    return this.store.values()
+      // run field level hooks
+      .map(obj => fromEntries(Object.entries(obj)
+        .map(([ name, val ]) => [ name, this.formatValue(name, val) ]))
+      )
+      // run model level hooks
+      .map(this.model.format)
+      // run collection model level hook
+      .map(this.model.formatCollection);
+  }
+
   getCid () {
     return `c${this.cid++}`;
   }
@@ -219,7 +232,7 @@ export default class FormCollection extends Form {
   }
 
   render (Component, componentProps) {
-    const formCollectionData = this.store.values();
+    const formCollectionData = this.formatData();
     Component = Component || this.props.component;
 
     return (

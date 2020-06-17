@@ -109,6 +109,8 @@ export default class Form extends React.Component {
     if (this.props.validateAsYouGo) this._validateOnChange(name, index);
 
     this._addFieldBlurred(name, index);
+
+    this.props.pubsub.trigger('field.blurred');
   }
 
   _onSetValue (name, value, context, index) {

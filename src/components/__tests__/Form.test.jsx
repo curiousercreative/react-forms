@@ -56,4 +56,7 @@ test('Nested form should use parent form as store', () => {
   child.setValue('child_field', 'a');
 });
 
+// initialValues show in getData
+
+
 // validateAsYouGo prop
