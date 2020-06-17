@@ -1,19 +1,21 @@
 import React from 'react';
 import memoize from 'memoize-one';
 
-import bindMethods from '../util/bindMethods.js';
-import debounce from '../util/debounce.js';
-import renderIf from '../util/renderIf.js';
-import uniq from '../util/uniq.js';
-
-import { Pubsub } from '../lib/pubsub';
-
+import FormContext from './config/FormContext';
 import defaultModel from '../lib/form/models/defaultModel.js';
 import getFieldTopic from './fields/util/getFieldTopic.js';
 import localStateStore from '../lib/form/stores/localStateStore.js';
 import { mergeObjects } from '../lib/form';
 
-import FormContext from './config/FormContext';
+import bindMethods from '../util/bindMethods.js';
+import debounce from '../util/debounce.js';
+import fromEntries from '../util/fromEntries.js';
+import renderIf from '../util/renderIf.js';
+import uniq from '../util/uniq.js';
+
+import { Pubsub } from '../lib/pubsub';
+import { pascalize } from '../lib/transformers';
+import { validate } from '../lib/validator';
 
 const CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD = 60;
 
@@ -53,6 +55,7 @@ export default class Form extends React.Component {
     validations: [],
   };
 
+  emptyValues = {};
   /** @property {array} fieldsBlurred - list of field names that have been blurred used for validating as you go */
   fieldsBlurred = [];
   /** @property {boolean} isValid - keep this instance flag to allow us immediate get/set  */
@@ -82,8 +85,9 @@ export default class Form extends React.Component {
   }
 
   componentDidUpdate () {
-    this._setModel(this.props.model);
-    this._setStore(this.props.store);
+    // TODO: how to best support changing model and store props?
+    // this._setModel(this.props.model);
+    // this._setStore(this.props.store);
   }
 
   componentWillUnmount () {
@@ -175,8 +179,39 @@ export default class Form extends React.Component {
     this.model = mergeObjects(this, defaultModel, model);
   }
 
-  _setStore (store) {
-    this.store = mergeObjects(this, defaultStore, store);
+  _setStore (...stores) {
+    this.store = mergeObjects(this, defaultStore, ...stores);
+  }
+
+  /**
+   * _validate - get validation results
+   * @return {array} [ boolean, object[] ]
+   */
+  _validate () {
+    const errors = validate(this.store.values(), this.getValidations());
+    const isValid = errors.length === 0;
+
+    return [ isValid, errors ];
+  }
+
+  /**
+   * _validateField - run validations for a single field and return next state of form errors
+   * @param  {string} name
+   * @param  {number} [index]
+   * @return {object[]} errors
+   */
+  _validateField (name, index) {
+    const data = { [name]: this.getValue(name, index) };
+
+    // validate just this field
+    const fieldErrors = validate(data, this.getValidations(), false);
+
+    return [
+      // keep the previous errors except for this field
+      ...this.getErrors(index).filter(e => e.name !== name),
+      // add the errors for just this field
+      ...fieldErrors,
+    ];
   }
 
   /**
@@ -192,10 +227,47 @@ export default class Form extends React.Component {
     this.validate(false);
   }
 
+  /**
+   * cleanValue - wrapper for transforming user input values on their way to store
+   * @param {string} name
+   * @param {string|any} value
+   * @return {string|any}
+   */
+  cleanValue (name, value) {
+    const methodName = `cleanValueFor${pascalize(name)}`;
+    // if we don't have a field specific cleaner, make one based on cleanValue
+    if (!this.model[methodName]) this.model[methodName] = this.model.cleanValue.bind(this.model, name);
+
+    return this.model[methodName](value);
+  }
+
+  formatData () {
+    // run field level hooks
+    const formattedValues = fromEntries(Object.entries(this.store.values())
+      .map(([ name, val ]) => [ name, this.formatValue(name, val) ]));
+
+    // run model level hook
+    return this.model.format(formattedValues);
+  }
+
+  /**
+   * formatValue - wrapper for transforming store values on their way to child components
+   * @param  {string} name
+   * @param  {string|any} value
+   * @return {string|any}
+   */
+  formatValue (name, value) {
+    const methodName = `formatValueFor${pascalize(name)}`;
+    // if we don't have a field specific parser, make one based on parse
+    if (!this.model[methodName]) this.model[methodName] = this.model.formatValue.bind(this.model, name);
+
+    return this.model[methodName](value);
+  }
+
   getContextValue (values, errors) {
     return {
       actions: {
-        setValue: this.setValue,
+        setValue: this.setValueFromField,
       },
       state: {
         form: this,
@@ -225,7 +297,7 @@ export default class Form extends React.Component {
    * @return {Validation[]} collection of validations
    */
   getValidations () {
-    return this.model.validations;
+    return this.model.getValidations();
   }
 
   /**
@@ -250,21 +322,6 @@ export default class Form extends React.Component {
   }
 
   /**
-   * setValue - Sets form field value in form state. Override me for side effects
-   * and still call me using super.setValue
-   * @param {string} name
-   * @param {string|any} value
-   * @param {string} context an identifier for where/why setValue is being called
-   * @param {number} [index]
-   * @returns {Promise}
-   */
-  setValue (name, value, context, index) {
-    return this.store.setValue(name, this.model.cleanValue(name, value), context, index)
-      // NOTE: overriding this method will require reimplementing this
-      .then(() => this._onSetValue(name, value, context, index));
-  }
-
-  /**
    * setErrors - save errors for rendering
    * @param {array} errors
    */
@@ -273,12 +330,45 @@ export default class Form extends React.Component {
   }
 
   /**
+   * setValue - Sets form field value in form state. Override me for side effects
+   * and still call me using super.setValue
+   * @param {string} name
+   * @param {string|any} value (already cleaned if coming from child form field)
+   * @param {string} context an identifier for where/why setValue is being called
+   * @param {number} [index]
+   * @returns {Promise}
+   */
+  setValue (name, value, context, index) {
+    return this.store.setValue(name, value, index)
+      // NOTE: overriding this method will require reimplementing this
+      .then(() => this._onSetValue(name, value, context, index));
+  }
+
+  setValueFromField (name, value, context, index) {
+    const cleanedVal = this.cleanValue(name, value);
+    return this.setValue(name, cleanedVal, context, index);
+  }
+
+  /**
    * validate - validate the entire form and render errors (unless disabled)
    * @param  {Boolean} [displayErrors=true] flag to disable error rendering
    * @return {boolean} true = valid
    */
   validate (displayErrors = true) {
-    return this.model.validate(displayErrors);
+    const [ isValid, errors ] = this._validate();
+
+    this.isValid = isValid;
+
+    // store errors for rendering
+    if (displayErrors) {
+      this.setErrors(errors);
+
+      // NOTE: hacky way of guessing whether we just triggered a re-render
+      if (!this.state.errors) this.forceUpdate();
+    }
+
+    // if there are no errors, form is valid
+    return this.isValid;
   }
 
   /**
@@ -289,7 +379,12 @@ export default class Form extends React.Component {
    * @return {boolean} true = valid
    */
   validateField (name, index, displayErrors = true) {
-    return this.model.validateField(name, index, displayErrors);
+    const errors = this._validateField(name, index);
+
+    // store errors for rendering
+    if (displayErrors) this.setErrors(errors);
+
+    return errors.length === 0;
   }
 
   renderErrors (includeFieldErrors = false) {
@@ -322,7 +417,7 @@ export default class Form extends React.Component {
     let classes = this.props.className.split(' ').concat('form');
 
     return (
-      <FormContext.Provider value={this.getContextValue(this.store.values(), this.getErrors())}>
+      <FormContext.Provider value={this.getContextValue(this.formatData(), this.getErrors())}>
         {renderIf(jsx, () => jsx, () => (
           <form className={classes.join(' ')}>
             {this.renderErrors()}

@@ -1,5 +1,6 @@
-import omit from '../../../util/omit.js';
+import exists from '../../../util/exists.js';
 
+const emptyErrors = [];
 /**
  * localStateStoreCollection
  * @param  {object} instance - Form component instance
@@ -7,24 +8,29 @@ import omit from '../../../util/omit.js';
  */
 export default function localStateStoreCollection (instance) {
   return {
-    initData (values) {
-      // we only init data in state if we don't have a name
-      if (!instance._hasParentForm()) {
-        instance.state.values = values || instance.state.values || [];
-      }
-
-      return Promise.resolve();
+    _getValue (name, index) {
+      return this.values()[index][name];
     },
 
-    parseData (data) {
-      return data.map(omit('cid'));
+    _setValue (name, value, index) {
+      // don't touch any values except for index requested
+      return this.setData(this.values().map((v, i) => (
+        i === index
+          ? { ...v, [name]: value }
+          : v
+      )));
     },
 
+    getErrors (index) {
+      const errors = exists(index)
+        ? instance.state.errors[index]
+        : instance.state.errors;
+
+      return errors.length ? errors : emptyErrors;
+    },
+
+    // TODO: how to manage incoming updates to persistent data?
     getPersistentData () {
-      if (instance._hasParentForm()) {
-        return instance.props.values || instance.context.state.values[instance.props.name];
-      }
-
       return instance.props.values;
     },
   };

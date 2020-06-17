@@ -1,3 +1,16 @@
+function bindMethods (source) {
+  const destination = {};
+
+  Object.entries(source)
+    .forEach(([ key, val ]) => {
+      destination[key] = typeof val === 'function'
+        ? val.bind(destination)
+        : val;
+    });
+
+  return destination;
+}
+
 /**
  * mergeObjects - merge stores, models, etc
  * @param  {Form} instance
@@ -5,15 +18,15 @@
  * @return {object}
  */
 export function mergeObjects (instance, ...objects) {
-  return objects.reduce((merged, obj) => Object.assign(merged, injectInstance(obj, instance)), {});
+  return bindMethods(objects.reduce((merged, obj) => Object.assign(merged, injectInstance(obj, instance)), {}));
 }
 
 /**
  * injectInstance - inject a Form instance into a model, store, etc
- * @param  {object} [_obj={}]
+ * @param  {object} [obj={}]
  * @param  {Form} instance
  * @return {object}
  */
-function injectInstance (_obj = {}, instance) {
-  return typeof _obj === 'function' ? _obj(instance) : _obj;
+function injectInstance (obj = {}, instance) {
+  return typeof obj === 'function' ? obj(instance) : obj;
 }

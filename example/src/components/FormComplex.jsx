@@ -22,6 +22,7 @@ export default class FormComplex extends Form {
 
     this.store.initData({
       cast: this.props.collectionProps.values || [],
+      director: {},
       native_select: '',
       tag_selector: [],
     });
@@ -32,7 +33,7 @@ export default class FormComplex extends Form {
 
     try {
       refsData = {
-        // cast: this.refs.cast.getData(),
+        director: this.refs.movie.getData().director,
         movie: this.refs.movie.getData(),
         user: this.refs.user.getData(),
       };
@@ -57,7 +58,15 @@ export default class FormComplex extends Form {
             <Fields.TextField label="Title" name="title" />
             <Fields.TextField label="Year" name="year" />
           </div>
+          <Form name="director">
+            <div className="form__fields">
+              <Fields.TextField label="Name" name="name" />
+              <Fields.TextField label="Age" name="age" />
+            </div>
+          </Form>
         </Form>
+
+
 
         <FormExtended ref="user" />
 

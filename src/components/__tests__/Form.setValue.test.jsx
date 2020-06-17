@@ -63,8 +63,9 @@ describe('setValue method', () => {
     const Component = F.extendForm();
     // mount component
     const form = F.render(<Component initialValues={{ first_name: 'BOB' }} model={model} />);
-    form.setValue('first_name', 'CHUCK');
-
-    expect(form.getValue('first_name')).toEqual('chuck');
+    return form.setValueFromField('first_name', 'CHUCK')
+      .then(() => {
+        expect(form.getValue('first_name')).toEqual('chuck');
+      });
   });
 });

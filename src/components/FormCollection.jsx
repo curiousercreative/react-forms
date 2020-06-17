@@ -1,15 +1,12 @@
 import React from 'react';
-import memo from 'memoize-one';
 
 import Form from './Form.jsx';
-
-import bindMethods from '../util/bindMethods.js';
-import { validate } from '../lib/validator';
-
-import getFieldTopic from './fields/util/getFieldTopic';
+import FormContext from './config/FormContext';
 import localStateStoreCollection from '../lib/form/stores/localStateStoreCollection.js';
 
-import FormContext from './config/FormContext';
+import bindMethods from '../util/bindMethods.js';
+import omit from '../util/omit.js';
+import { validate } from '../lib/validator';
 
 const defaultIsNew = data => !('id' in data);
 
@@ -40,19 +37,18 @@ export default class FormCollection extends Form {
   static defaultProps = {
     ...Form.defaultProps,
     defaultValues: {},
-    store: localStateStoreCollection,
     values: [],
   };
 
   /** @property {number} cid - client id, FormCollection managed index */
   cid = 0;
+  emptyValues = [];
 
   constructor (...args) {
     super(...args);
     bindMethods(this);
 
-    this._getData = memo(this._getData);
-    this._getDataWithCid = memo(this._getDataWithCid);
+    this._setStore(localStateStoreCollection, this.props.store);
 
     const errors = [];
     const values = this.store.getPersistentData()
@@ -61,44 +57,23 @@ export default class FormCollection extends Form {
     // init any lists per collection item
     values.forEach(() => {
       this.fieldsBlurred.push([]);
-      errors.push([]);
     });
 
     this.store.initData(values);
     this.store.initErrors(errors);
   }
 
-  _getData (tempValues, persistentValues) {
-    const list = [];
-    const set = new Set();
+  /**
+   * _validate - get validation results
+   * @return {array} [ boolean, object[] ]
+   */
+  _validate () {
+    // arrayify to  FormCollection
+    const errors = this.store.values().map(data => validate(data, this.getValidations()));
+    // if there are any, form is invalid
+    const isValid = !errors.some(eArr => eArr.length > 0);
 
-    persistentValues.concat(tempValues).forEach(a => {
-      const key = this._primaryKeySelector(a);
-
-      // we already added a persistent item
-      if (key && set.has(key)) {
-        const i = list.findIndex(b => key === this._primaryKeySelector(b));
-        list[i] = { ...list[i], ...a };
-      }
-      else {
-        if (key) set.add(key);
-        list.push(a);
-      }
-    });
-
-    return list;
-  }
-
-  _getDataWithCid (tempValues, persistentValues) {
-    const data = this._getData(tempValues, persistentValues);
-
-    data.forEach(item => delete item.cid);
-
-    return data;
-  }
-
-  _primaryKeySelector (a) {
-    return a.id;
+    return [ isValid, errors ];
   }
 
   /**
@@ -130,6 +105,14 @@ export default class FormCollection extends Form {
     this.remove(index);
   }
 
+  onAdd () {
+    this.props.pubsub.trigger('item.added');
+  }
+
+  onRemove () {
+    this.props.pubsub.trigger('item.removed');
+  }
+
   /**
    * add - create a new default object and add to collection
    * @param {object} [attr] - model attributes to merge in while adding
@@ -143,7 +126,7 @@ export default class FormCollection extends Form {
     return Promise
       .all([
         this.store.setErrors([ ...this.getErrors(), [] ]),
-        this.store.setData(this.store.getData().concat(object)),
+        this.store.setData(this.store.values().concat(object)),
       ])
       .then(() => {
         // init lists for this new item
@@ -167,38 +150,31 @@ export default class FormCollection extends Form {
     return `c${this.cid++}`;
   }
 
-  /**
-   * getData - merges persistent collection with temporary collection
-   * @return {collection} merged collection
-   */
   getData () {
-    return this._getData(this.store.getData(), this.store.getPersistentData());
+    const list = [];
+    const set = new Set();
+    const { selectPrimaryKey } = this.model;
+
+    this.store.getPersistentData().concat(this.store.values()).forEach(a => {
+      const key = selectPrimaryKey(a);
+
+      // we already added a persistent item
+      if (key && set.has(key)) {
+        const i = list.findIndex(b => key === selectPrimaryKey(b));
+        list[i] = { ...list[i], ...a };
+      }
+      else {
+        if (key) set.add(key);
+        list.push(a);
+      }
+    });
+
+    return this.parse(list);
   }
 
-  /**
-   * @param {number} [index]
-   * @return {Error[]} collection of errors (name, error) or potentially a list of these collections?
-   */
-  getErrors (index) {
-    const errors = Array.isArray(this.state.errors[index])
-      ? this.store.getErrors()[index]
-      : this.store.getErrors();
-
-    return errors || [];
-  }
-
-  // you can override me, especially if you want to read/write form state elsewhere
-  // you can also override me for side effects and still call me using super
-  getValue (name, index) {
-    return this.getData()[index][name];
-  }
-
-  onAdd () {
-    this.props.pubsub.trigger('item.added');
-  }
-
-  onRemove () {
-    this.props.pubsub.trigger('item.removed');
+  parse (collection) {
+    // by default, omit the cid for external consumers
+    return collection.map(omit('cid'));
   }
 
   /**
@@ -209,7 +185,7 @@ export default class FormCollection extends Form {
    */
   remove (dataOrIndex, isNew = defaultIsNew) {
     const data = typeof dataOrIndex === 'number'
-      ? this.getData()[dataOrIndex]
+      ? this.store.values()[dataOrIndex]
       : dataOrIndex;
 
     // if object is new, just handle in state
@@ -239,66 +215,11 @@ export default class FormCollection extends Form {
       ? dataOrCid
       : dataOrCid.cid;
 
-    this.setData(this.getData().filter(obj => obj.cid !== cid));
-  }
-
-  /**
-   * setValue - Sets form field value in form state. You can override me, especially
-   * if you want to read/write form state elsewhere. You can also override me for
-   * side effects and still call me using super.setValue
-   * @param {string} name
-   * @param {string|any} value
-   * @param {string} [context = 'field'] an identifier for where/why setValue is being called
-   * @param {number} index
-   * @returns {Promise}
-   */
-  setValue (name, value, context, index) {
-    // don't touch any values except for index requested
-    const values = this.getData().map((v, i) => (
-      i === index
-        ? { ...v, [name]: value }
-        : v
-    ));
-
-    return this.setData(values)
-      .then(() => {
-        // NOTE: overriding this method will require reimplementing this pubsub messga
-        // publish a message to let field respond to external update
-        let topic = `${getFieldTopic(name)}.updated`;
-        const data = [ name, value, context, index ];
-        if (context !== 'field') topic += '.fromAbove';
-        this.props.pubsub.trigger(topic, data);
-        this.props.pubsub.trigger('field.updated', data);
-      });
-  }
-
-  /**
-   * validate - validate the entire form and render errors (unless disabled)
-   * @param  {Boolean} [displayErrors=true] flag to disable error rendering
-   * @return {boolean} true = valid
-   */
-  validate (displayErrors = true) {
-    // arrayify to  FormCollection
-    const errors = this.getData()
-      .map(data => validate(data, this.getValidations()));
-
-    // if there are any, form is invalid
-    this.isValid = !errors.some(eArr => eArr.length > 0);
-
-    // store errors for rendering
-    if (displayErrors) {
-      this.setErrors(errors);
-
-      // NOTE: hacky way of guessing whether we just triggered a re-render
-      if (!this.state.errors) this.forceUpdate();
-    }
-
-    // if there are no errors, form is valid
-    return this.isValid;
+    this.setData(this.store.values().filter(obj => obj.cid !== cid));
   }
 
   render (Component, componentProps) {
-    const formCollectionData = this.getData(false);
+    const formCollectionData = this.store.values();
     Component = Component || this.props.component;
 
     return (
