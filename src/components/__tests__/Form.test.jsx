@@ -1,4 +1,5 @@
 import React from 'react';
+import renderer from 'react-test-renderer';
 
 import Form from '../Form.jsx';
 
@@ -24,6 +25,35 @@ test('Form._hasParentForm should return false by default', () => {
   const form = F.render(<Form initialValues={{ a: '' }} validations={F.getValidations()} />);
 
   expect(form._hasParentForm()).toBe(false);
+});
+
+test('Form._hasParentForm should return true for nested form', () => {
+  const testRenderer = renderer.create(
+    <Form>
+      <Form name="child" />
+    </Form>
+  );
+
+  const child = testRenderer.root.findByProps({ name: 'child' }).instance;
+
+  expect(child._hasParentForm()).toBe(true);
+});
+
+test('Nested form should use parent form as store', () => {
+  const testRenderer = renderer.create(
+    <Form initialValues={{ child_field: 'b' }}>
+      <Form name="child" />
+    </Form>
+  );
+
+  const form = testRenderer.getInstance();
+  const child = testRenderer.root.findByProps({ name: 'child' }).instance;
+
+  form.props.pubsub.on('field.name.updated', () => {
+    expect(form.getValue('child_field')).toBe('a');
+  });
+
+  child.setValue('child_field', 'a');
 });
 
 // validateAsYouGo prop
