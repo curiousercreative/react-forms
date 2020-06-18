@@ -5,8 +5,9 @@ const User = React.forwardRef(function User ({ index, handleClickRemove }, ref) 
   return (
     <div className="form-collection-extended__item">
       <div className="form__fields">
-        <Fields.TextField index={index} label="username" name="username" forwardedRef={ref} />
+        <Fields.TextField index={index} label="username" name="username" />
         <Fields.PasswordField index={index} label="password" name="password" />
+        <Fields.SelectField index={index} label="select" name="select" options={[{ label: '1', value: 1 }, { label: '2', value: 2 }]} forwardedRef={ref} />
         <button onClick={handleClickRemove} type="button" value={index}>remove</button>
       </div>
     </div>

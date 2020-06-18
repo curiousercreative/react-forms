@@ -161,6 +161,8 @@
   background: white;
   left: 0;
   top: calc(100% + 2px); /* for the border-bottom of parent */
+  max-height: 33vh;
+  overflow: auto;
 }
 .form__dropdown-wrapper--is_open .form__dropdown {
   display: block;

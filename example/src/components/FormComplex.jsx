@@ -75,7 +75,7 @@ export default class FormComplex extends Form {
         <div className="form__fields">
           <Fields.EmailField label="email" name="email" />
           <Fields.TextField label="extra text" name="extra_text" />
-          <Fields.SelectField label="extra select" name="extra_select" options={[{ label: 'Label', value: 'value' }]} />
+          <Fields.SelectField label="extra select" name="extra_select" options={OPTIONS} />
           <Fields.RadioField label="extra radio" name="extra_radio" value="radio on" />
           <Fields.CheckboxField label="extra checkbox" name="extra_checkbox" value="checkbox on" />
         </div>

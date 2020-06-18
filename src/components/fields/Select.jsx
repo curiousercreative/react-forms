@@ -5,6 +5,8 @@ import { findDOMNode } from 'react-dom';
 import bindMethods from '../../util/bindMethods.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
 
+const QUERY_KEY_WINDOW = 1000;
+
 let id = 0;
 /**
  * a custom dropdown/select input
@@ -31,6 +33,8 @@ export default class Select extends React.Component {
   id = `select${id++}`;
   inputRef = React.createRef();
   list = [];
+  query = '';
+  queryLastUpdated = 0;
   state = {
     highlightIndex: -1,
     isOpen: false,
@@ -42,13 +46,7 @@ export default class Select extends React.Component {
   }
 
   componentDidMount () {
-    const value = this.props.getValue();
-
-    // set initial value
-    if (value) findDOMNode(this).value = value;
-
     // listen to key presses
-
     addEventListener('keydown', this.handleKeys);
   }
 
@@ -75,7 +73,6 @@ export default class Select extends React.Component {
   // look into having the code shared?
   handleKeys (e) {
     const { highlightIndex } = this.state;
-
     // don't do anything if not focused
     if (this.props.hasFocus && this.list.length) {
       switch (e.which) {
@@ -92,8 +89,24 @@ export default class Select extends React.Component {
           // protect against out of bounds
           this.focusResult(highlightIndex < this.list.length - 1 ? highlightIndex + 1 : 0);
           break;
+        default: // alphanumeric
+          const key = e.key.toLowerCase();
+          if (key.match(/[a-z0-9]/)) this.onQueryKey(key);
       }
     }
+  }
+
+  onQueryKey (char) {
+    const now = Date.now();
+    this.query = now - this.queryLastUpdated <= QUERY_KEY_WINDOW
+      ? this.query + char
+      : char;
+
+    this.queryLastUpdated = now;
+
+    // focus on a result if possible
+    const index = this.props.options.findIndex(({ label }) => label.toLowerCase().startsWith(this.query));
+    if (index > -1) this.focusResult(index);
   }
 
   close () {
@@ -104,8 +117,10 @@ export default class Select extends React.Component {
   }
 
   focus () {
-    this.open();
     this.inputRef.current.focus();
+
+    // NOTE: async to band-aid a race condition between this and componentDidUpdate
+    setTimeout(() => this.open(), 60);
   }
 
   focusResult (highlightIndex) {
@@ -133,19 +148,17 @@ export default class Select extends React.Component {
   }
 
   open () {
-    const isOpen = !this.state.isOpen;
+    // short-circuit if already open
+    if (this.state.isOpen) return;
 
-    // if we're closing, the global click listener will handle
-    if (isOpen) {
-      this.setState({ isOpen }, () => {
-        setTimeout(() => {
-          // if our dropdown is opening, listen for clicks which should close it
-          // jquery one method will stop listening after the first click
-          // NOTE: this click handler is the main way the dropdown closes
-          addEventListener('click', this.close);
-        }, 0);
-      });
-    }
+    this.setState({ isOpen: true }, () => {
+      // NOTE: async to band-aid a race condition between this and componentDidUpdate
+      setTimeout(() => {
+        // if our dropdown is opening, listen for clicks which should close it
+        // NOTE: this click handler is the main way the dropdown closes
+        addEventListener('click', this.close);
+      }, 0);
+    });
   }
 
   renderOptions () {
