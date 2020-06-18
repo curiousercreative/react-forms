@@ -3,10 +3,9 @@ import { findDOMNode } from 'react-dom';
 
 import FormContext from '../config/FormContext';
 
-import { getValue, isChecked, setValue, toggleValue } from './util';
+import { getFieldTopic, getValue, isChecked, setValue, toggleValue } from './util';
 
 import bindMethods from '../../util/bindMethods.js';
-import callMe from '../../util/callMe.js';
 import omit from '../../util/omit.js';
 import renderIf from '../../util/renderIf.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
@@ -68,25 +67,26 @@ export default class Field extends React.Component {
   }
 
   onFocusIn (e) {
-    let field = findDOMNode(this);
+    const field = findDOMNode(this);
+    const { index, name } = this.props;
 
     if (field.contains(e.target)) {
       this.setState({ hasFocus: true });
-      callMe(this.context.state.form._onFieldFocus, { args: [ this.props.name, this.props.index ] });
-      console.log('focus in');
+      this.context.pubsub.trigger(getFieldTopic(name, 'focused'), { index, name });
     }
   }
 
   onFocusOut (e) {
     // async so that document.activeElement is updated
     this.timeout = setTimeout(() => {
-      let field = findDOMNode(this);
+      const field = findDOMNode(this);
+      const { index, name } = this.props;
 
       // check whether an element within this field is losing focus
       // but also check that this field doesn't still contain a focused element
       if (field.contains(e.target) && !field.contains(document.activeElement)) {
         this.setState({ hasFocus: false });
-        callMe(this.context.state.form._onFieldBlur, { args: [ this.props.name, this.props.index ] });
+        this.context.pubsub.trigger(getFieldTopic(name, 'blurred'), { index, name });
       }
     }, 0);
   }
@@ -96,7 +96,7 @@ export default class Field extends React.Component {
   }
 
   getErrors () {
-    return this.context.state.form._getFieldErrors(this.props.name, this.props.index);
+    return this.context.form._getFieldErrors(this.props.name, this.props.index);
   }
 
   getProps () {
@@ -151,7 +151,7 @@ export default class Field extends React.Component {
         'form__field',
         this.formatClassName('type', this.props.type),
         this.formatClassName('theme', this.props.theme),
-        `${this.context.state.form.props.formName}__${this.props.name}`,
+        `${this.context.form.props.formName}__${this.props.name}`,
       ])
       .concat(this.getWidthClassNames());
 

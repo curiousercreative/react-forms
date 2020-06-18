@@ -113,7 +113,7 @@ export default class FormCollection extends Form {
   }
 
   onAdd () {
-    this.props.pubsub.trigger('item.added');
+    this.pubsub.trigger('item.added');
 
     // attempt to focus on newly added item
     setTimeout(() => {
@@ -123,7 +123,7 @@ export default class FormCollection extends Form {
   }
 
   onRemove () {
-    this.props.pubsub.trigger('item.removed');
+    this.pubsub.trigger('item.removed');
   }
 
   /**

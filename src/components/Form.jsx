@@ -49,7 +49,6 @@ export default class Form extends React.Component {
     formName: 'form',
     initialValues: {},
     model: {},
-    pubsub: new Pubsub(),
     store: {},
     validateAsYouGo: true,
     validations: [],
@@ -68,6 +67,7 @@ export default class Form extends React.Component {
   constructor (...args) {
     super(...args);
     bindMethods(this);
+    this.pubsub = this.pubsub || new Pubsub();
 
     this._setModel = memoize(this._setModel);
     this._setStore = memoize(this._setStore);
@@ -82,12 +82,14 @@ export default class Form extends React.Component {
 
   componentDidMount () {
     setTimeout(() => this.validate(false), 15);
+    this.pubsub.on(getFieldTopic(null, 'blurred'), this._onFieldBlur);
   }
 
   componentDidUpdate () {
     // TODO: how to best support changing model and store props?
     // this._setModel(this.props.model);
     // this._setStore(this.props.store);
+    // if (this.pubsub) this.pubsub = this.pubsub;
   }
 
   componentWillUnmount () {
@@ -95,7 +97,7 @@ export default class Form extends React.Component {
     // gets called after the parent otherwise
     setTimeout(() => {
       // this should clear all subscriptions for all namespaces within this form
-      this.props.pubsub.off();
+      this.pubsub.off();
     }, 60);
   }
 
@@ -104,13 +106,11 @@ export default class Form extends React.Component {
    * @param  {string} name
    * @param  {number} [index]
    */
-  _onFieldBlur (name, index) {
+  _onFieldBlur ({ name, index }) {
     // validate if we're validating as we go
     if (this.props.validateAsYouGo) this._validateOnChange(name, index);
 
     this._addFieldBlurred(name, index);
-
-    this.props.pubsub.trigger('field.blurred');
   }
 
   _onSetValue (name, value, context, index) {
@@ -123,8 +123,8 @@ export default class Form extends React.Component {
     let topic = `${getFieldTopic(name)}.updated`;
     const data = [ name, value, context ];
     if (context !== 'field') topic += '.fromAbove';
-    this.props.pubsub.trigger(topic, data);
-    this.props.pubsub.trigger('field.updated', data);
+    this.pubsub.trigger(topic, data);
+    this.pubsub.trigger('field.updated', data);
   }
 
   /**
@@ -156,7 +156,7 @@ export default class Form extends React.Component {
 
   _hasParentForm () {
     if (typeof this.props.name === 'string') {
-      if (this.context.state.form instanceof Form) return true;
+      if (this.context.form instanceof Form) return true;
 
       if (!this.parentFormWarned) {
         console.warn('form was given a "name" prop but could not find parent form');
@@ -271,8 +271,9 @@ export default class Form extends React.Component {
       actions: {
         setValue: this.setValueFromField,
       },
+      form: this,
+      pubsub: this.pubsub,
       state: {
-        form: this,
         errors,
         isValid: this.isValid,
         values,

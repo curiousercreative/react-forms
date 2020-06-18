@@ -12,14 +12,14 @@ import FormContext from './config/FormContext';
  * @return {jsx} button[type=submit|button]
  */
 export default function SubmitButton ({ children, className = '', isLoading, onClick }) {
-  const { form, isValid } = useContext(FormContext).state;
+  const { form } = useContext(FormContext);
   isLoading = typeof isLoading === 'undefined' ? form.state.isLoading : isLoading;
   let classes = className.split(' ').concat('form__submit');
   if (isLoading) classes.push('form__submit--is_loading');
 
   let props = {
     className: classes.join(' '),
-    disabled: isLoading || !isValid,
+    disabled: isLoading || !form.isValid,
     type: onClick ? 'button' : 'submit',
   };
 

@@ -36,7 +36,7 @@ export default class Editable extends React.Component {
   handleClickDiscard () {
     return this.props.discard
       ? this.props.discard()
-      : this.context.state.form.resetTemporaryItem(this.getData());
+      : this.context.form.resetTemporaryItem(this.getData());
   }
 
   handleClickEdit () {
@@ -61,7 +61,7 @@ export default class Editable extends React.Component {
   }
 
   getData () {
-    const data = this.context.state.form.getData();
+    const data = this.context.form.getData();
 
     // handle differences between Form and FormCollection ancestors
     return isNaN(this.props.index) ? data : data[this.props.index];
