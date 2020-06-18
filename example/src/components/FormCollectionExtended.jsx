@@ -1,6 +1,18 @@
 import React from 'react';
 import { Fields, Form, FormCollection, SubmitButton, util, validator } from '@curiouser/react-forms';
 
+const User = React.forwardRef(function User ({ index, handleClickRemove }, ref) {
+  return (
+    <div className="form-collection-extended__item">
+      <div className="form__fields">
+        <Fields.TextField index={index} label="username" name="username" forwardedRef={ref} />
+        <Fields.PasswordField index={index} label="password" name="password" />
+        <button onClick={handleClickRemove} type="button" value={index}>remove</button>
+      </div>
+    </div>
+  );
+});
+
 export default class FormCollectionExtended extends FormCollection {
   static defaultProps = {
     ...FormCollection.defaultProps,
@@ -28,16 +40,4 @@ export default class FormCollectionExtended extends FormCollection {
       </div>
     );
   }
-}
-
-function User ({ index, handleClickRemove }) {
-  return (
-    <div className="form-collection-extended__item">
-      <div className="form__fields">
-        <Fields.TextField index={index} label="username" name="username" />
-        <Fields.PasswordField index={index} label="password" name="password" />
-        <button onClick={handleClickRemove} type="button" value={index}>remove</button>
-      </div>
-    </div>
-  );
 }

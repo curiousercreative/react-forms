@@ -25,6 +25,7 @@ const FIELD_TYPES_LABEL_AFTER_INPUT = [
  * Form field that adds nice form consistency, used to wrap around a form input
  * @class Field
  * @property {string} [className]
+ * @property {object} [forwardedRef]
  * @property {number} [index] - when used within FormCollection
  * @property {string} [label] - label text for this field
  * @property {string} name - form field name, will be key in form data
@@ -72,6 +73,7 @@ export default class Field extends React.Component {
     if (field.contains(e.target)) {
       this.setState({ hasFocus: true });
       callMe(this.context.state.form._onFieldFocus, { args: [ this.props.name, this.props.index ] });
+      console.log('focus in');
     }
   }
 
@@ -143,7 +145,7 @@ export default class Field extends React.Component {
 
   render () {
     const Input = this.props.component;
-    const { type } = this.props;
+    const { forwardedRef, type } = this.props;
     let classes = this.props.className.split(' ')
       .concat([
         'form__field',
@@ -165,7 +167,7 @@ export default class Field extends React.Component {
       <div className={classes.join(' ')}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.renderErrors()}
-        <Input {...this.getProps()} />
+        <Input ref={forwardedRef} {...this.getProps()} />
         {renderIf(FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.props.children}
       </div>

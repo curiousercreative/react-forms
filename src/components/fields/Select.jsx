@@ -29,6 +29,7 @@ let id = 0;
  */
 export default class Select extends React.Component {
   id = `select${id++}`;
+  inputRef = React.createRef();
   list = [];
   state = {
     highlightIndex: -1,
@@ -100,6 +101,10 @@ export default class Select extends React.Component {
       this.setState({ isOpen: false });
       removeEventListener('click', this.close);
     }
+  }
+
+  focus () {
+    this.inputRef.current.focus();
   }
 
   focusResult (highlightIndex) {
@@ -175,7 +180,7 @@ export default class Select extends React.Component {
     if (this.props.disabled) classes.push('form-select--disabled');
 
     return <div className={classes.join(' ')}>
-      <button className="form__btn-reset form-select__value" onClick={this.handleClick} type="button">
+      <button ref={this.inputRef} className="form__btn-reset form-select__value" onClick={this.handleClick} type="button">
         {this.getLabel()}
         <i className="icon icon-angle-down" />
       </button>

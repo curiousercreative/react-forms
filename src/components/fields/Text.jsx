@@ -20,6 +20,8 @@ export default class Text extends React.Component {
     type: 'text',
   };
 
+  inputRef = React.createRef();
+
   constructor (...args) {
     super(...args);
     bindMethods(this);
@@ -28,6 +30,10 @@ export default class Text extends React.Component {
   handleChange (e) {
     // handle a change to this field's value by user input
     this.props.setValue(e.target.value);
+  }
+
+  focus () {
+    this.inputRef.current.focus();
   }
 
   getInputMode () {

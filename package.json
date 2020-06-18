@@ -12,7 +12,7 @@
     "docs": "jsdoc -c ./jsdoc/conf.json -R ./jsdoc/README.md -r ./src",
     "prepare": "yarn build",
     "start": "yarn watch & (cd example && yarn install && yarn start)",
-    "test": "jest",
+    "test": "yarn install && jest",
     "watch": "yarn build --watch"
   },
   "peerDependencies": {

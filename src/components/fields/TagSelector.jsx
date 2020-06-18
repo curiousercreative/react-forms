@@ -85,8 +85,7 @@ export default class TagSelector extends React.Component {
   }
 
   handleFocus () {
-    // open the dropdown (and focus on our text input)
-    this.open();
+    this.focus();
   }
 
   // TODO: this and other methods are modified copies from SearchField.jsx
@@ -139,6 +138,11 @@ export default class TagSelector extends React.Component {
     this.setState({ isOpen: false });
     removeEventListener('click', this.handleWindowClick);
     removeEventListener('keydown', this.handleKeys);
+  }
+
+  focus () {
+    // open the dropdown (and focus on our text input)
+    this.open();
   }
 
   focusResult (highlightIndex) {

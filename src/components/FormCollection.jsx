@@ -5,6 +5,7 @@ import FormContext from './config/FormContext';
 import localStateStoreCollection from '../lib/form/stores/localStateStoreCollection.js';
 
 import bindMethods from '../util/bindMethods.js';
+import callMe from '../util/callMe.js';
 import fromEntries from '../util/fromEntries.js';
 import omit from '../util/omit.js';
 import { validate } from '../lib/validator';
@@ -43,6 +44,7 @@ export default class FormCollection extends Form {
 
   /** @property {number} cid - client id, FormCollection managed index */
   cid = 0;
+  collection = []; // used for refs
   emptyValues = [];
 
   constructor (...args) {
@@ -62,6 +64,10 @@ export default class FormCollection extends Form {
 
     this.store.initData(values);
     this.store.initErrors(errors);
+  }
+
+  _callbackRef (refInstance) {
+    this.collection.push(refInstance);
   }
 
   /**
@@ -108,6 +114,12 @@ export default class FormCollection extends Form {
 
   onAdd () {
     this.props.pubsub.trigger('item.added');
+
+    // attempt to focus on newly added item
+    setTimeout(() => {
+      const lastItem = this.collection[this.collection.length - 1];
+      callMe(lastItem.focus);
+    }, 0);
   }
 
   onRemove () {
@@ -234,6 +246,7 @@ export default class FormCollection extends Form {
   render (Component, componentProps) {
     const formCollectionData = this.formatData();
     Component = Component || this.props.component;
+    this.collection = [];
 
     return (
       <FormContext.Provider value={this.getContextValue(formCollectionData, this.getErrors())}>
@@ -242,7 +255,8 @@ export default class FormCollection extends Form {
           {...componentProps}
           handleClickRemove={this.handleClickRemove}
           index={i}
-          key={data.cid} />)}
+          key={data.cid}
+          ref={this._callbackRef} />)}
       </FormContext.Provider>
     );
   }
