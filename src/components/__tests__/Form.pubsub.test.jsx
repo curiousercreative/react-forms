@@ -6,7 +6,7 @@ import F from './TestHelper';
 
 describe('Form instance pubsub', () => {
   test('Form instance should have pubsub property', () => {
-    expect(F.render().props.pubsub).toBeInstanceOf(Pubsub);
+    expect(F.render().pubsub).toBeInstanceOf(Pubsub);
   });
 
   test('Form instance pubsubs should be discrete channels', () => {
@@ -14,10 +14,10 @@ describe('Form instance pubsub', () => {
     const form1 = F.render();
     const form2 = F.render();
 
-    form1.props.pubsub.on('event', () => {
+    form1.pubsub.on('event', () => {
       eventTriggered = true;
     });
-    form2.props.pubsub.trigger('event');
+    form2.pubsub.trigger('event');
 
     expect(eventTriggered).toBe(false);
   });
@@ -26,7 +26,7 @@ describe('Form instance pubsub', () => {
     let fieldUpdated = null;
     const form = F.render();
 
-    form.props.pubsub.on('field.updated', update => {
+    form.pubsub.on('field.updated', update => {
       [ fieldUpdated ] = update;
     });
 

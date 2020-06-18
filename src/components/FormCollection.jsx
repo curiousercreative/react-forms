@@ -66,6 +66,11 @@ export default class FormCollection extends Form {
     this.store.initErrors(errors);
   }
 
+  componentDidMount (...args) {
+    super.componentDidMount(...args);
+    this.pubsub.on('item.added', this.onAdd);
+  }
+
   _callbackRef (refInstance) {
     this.collection.push(refInstance);
   }
@@ -113,17 +118,11 @@ export default class FormCollection extends Form {
   }
 
   onAdd () {
-    this.pubsub.trigger('item.added');
-
     // attempt to focus on newly added item
     setTimeout(() => {
       const lastItem = this.collection[this.collection.length - 1];
-      callMe(lastItem.focus);
+      if (lastItem) callMe(lastItem.focus);
     }, 0);
-  }
-
-  onRemove () {
-    this.pubsub.trigger('item.removed');
   }
 
   /**
@@ -145,7 +144,7 @@ export default class FormCollection extends Form {
         // init lists for this new item
         this.fieldsBlurred.push([]);
 
-        this.onAdd();
+        this.pubsub.trigger('item.added');
       });
   }
 
@@ -222,7 +221,7 @@ export default class FormCollection extends Form {
     // object isn't new, pass it to the prop function
     return this.props.delete(data)
       .then(() => this.removeTemporaryItem(data))
-      .then(this.onRemove)
+      .then(() => this.pubsub.trigger('item.removed'))
       .catch(errors => {
         this.handleErrors(data, errors);
         // bubble up the rejection

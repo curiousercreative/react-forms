@@ -49,7 +49,7 @@ test('Nested form should use parent form as store', () => {
   const form = testRenderer.getInstance();
   const child = testRenderer.root.findByProps({ name: 'child' }).instance;
 
-  form.props.pubsub.on('field.name.updated', () => {
+  form.pubsub.on('field.name.updated', () => {
     expect(form.getValue('child_field')).toBe('a');
   });
 

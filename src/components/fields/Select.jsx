@@ -104,6 +104,7 @@ export default class Select extends React.Component {
   }
 
   focus () {
+    this.open();
     this.inputRef.current.focus();
   }
 

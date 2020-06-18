@@ -67,7 +67,7 @@ export default class Text extends React.Component {
       inputMode={this.getInputMode()}
       name={this.props.name}
       onChange={this.handleChange}
-      ref="input"
+      ref={this.inputRef}
       placeholder={this.props.placeholder}
       type={this.getType()}
       value={this.props.getValue() || ''} />;

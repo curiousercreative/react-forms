@@ -82,7 +82,8 @@ export default class Form extends React.Component {
 
   componentDidMount () {
     setTimeout(() => this.validate(false), 15);
-    this.pubsub.on(getFieldTopic(null, 'blurred'), this._onFieldBlur);
+    this.pubsub.on(getFieldTopic(null, 'updated'), this.onFieldUpdate);
+    this.pubsub.on(getFieldTopic(null, 'blurred'), this.onFieldBlur);
   }
 
   componentDidUpdate () {
@@ -99,32 +100,6 @@ export default class Form extends React.Component {
       // this should clear all subscriptions for all namespaces within this form
       this.pubsub.off();
     }, 60);
-  }
-
-  /**
-   * _onFieldBlur - Field.jsx should call this when a field blurs
-   * @param  {string} name
-   * @param  {number} [index]
-   */
-  _onFieldBlur ({ name, index }) {
-    // validate if we're validating as we go
-    if (this.props.validateAsYouGo) this._validateOnChange(name, index);
-
-    this._addFieldBlurred(name, index);
-  }
-
-  _onSetValue (name, value, context, index) {
-    // validate this field as the value changes if we're doing that
-    if (this.props.validateAsYouGo) {
-      // display field errors if it's been previously blurred
-      this._validateOnChange(name, index);
-    }
-    // publish a message to let field respond to external update
-    let topic = `${getFieldTopic(name)}.updated`;
-    const data = [ name, value, context ];
-    if (context !== 'field') topic += '.fromAbove';
-    this.pubsub.trigger(topic, data);
-    this.pubsub.trigger('field.updated', data);
   }
 
   /**
@@ -222,11 +197,29 @@ export default class Form extends React.Component {
    * @param {number} [index]
    */
   _validateOnChange (name, index) {
+    if (!this.props.validateAsYouGo) return;
+
+    // we want to render an error if this field has already been blurred
     const showError = this._hasFieldBlurred(name, index);
     // validate just the field that was changed
-    this.validateField(name, index, showError);
-    // validate entire form (hide new errors) to set isValid flag
-    this.validate(false);
+    const fieldValid = this.validateField(name, index, showError);
+
+    // update form valid flag
+    this.isValid = this.isValid && fieldValid;
+  }
+
+  /**
+   * onFieldBlur - Field.jsx should call this when a field blurs
+   * @param  {string} name
+   * @param  {number} [index]
+   */
+  onFieldBlur ({ name, index }) {
+    this._validateOnChange(name, index);
+    this._addFieldBlurred(name, index);
+  }
+
+  onFieldUpdate ({ name, value, context, index }) {
+    this._validateOnChange(name, index);
   }
 
   /**
@@ -344,7 +337,8 @@ export default class Form extends React.Component {
   setValue (name, value, context, index) {
     return this.store.setValue(name, value, index)
       // NOTE: overriding this method will require reimplementing this
-      .then(() => this._onSetValue(name, value, context, index));
+      // publish a message to let field respond to external update
+      .then(() => this.pubsub.trigger(getFieldTopic(name, 'updated'), { index, name, value, context }));
   }
 
   setValueFromField (name, value, context, index) {
