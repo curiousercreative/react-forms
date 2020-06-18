@@ -70,7 +70,6 @@
 }
 .form__label {
   display: inline-block;
-  color: #9b9b9b;
 }
 .form__field-error {
   color: red;
@@ -121,6 +120,9 @@
 }
 .form__input {
   width: 100%;
+}
+.form__input-placeholder {
+  opacity: 0.5;
 }
 .form__field--theme_default .form__input {
   font-size: 16px;
@@ -198,7 +200,11 @@
   color: #000;
   padding: 0.9375em 1.3125em 0.5625em;
 }
-
+.form-select--disabled .form-select__value {
+  opacity: 0.5;
+  background: #dedede;
+  cursor: not-allowed;
+}
 .form__field--theme_default .form-tag-selector__input-wrapper {
   display: flex;
   flex-wrap: wrap;

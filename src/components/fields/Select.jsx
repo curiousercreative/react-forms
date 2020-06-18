@@ -9,6 +9,7 @@ let id = 0;
 /**
  * a custom dropdown/select input
  * @class Select
+ * @property {boolean} [disabled]
  * @property {string} name
  * @property {object[]} options
  * @property {string} options[].label
@@ -60,7 +61,7 @@ export default class Select extends React.Component {
   }
 
   handleClick () {
-    this.open();
+    if (!this.props.disabled) this.open();
   }
 
   handleClickItem (e) {
@@ -120,7 +121,9 @@ export default class Select extends React.Component {
       catch (e) { console.warn('Select field mount with no options', e); }
     }
 
-    return opt ? opt.label : placeholder;
+    return opt
+      ? <span>{opt.label}</span>
+      : <span className="form__input-placeholder">{placeholder}</span>;
   }
 
   open () {
@@ -169,10 +172,11 @@ export default class Select extends React.Component {
     let classes = ['form__input', 'form__select', 'form-select', 'form__dropdown-wrapper'];
 
     if (this.state.isOpen) classes.push('form__dropdown-wrapper--is_open');
+    if (this.props.disabled) classes.push('form-select--disabled');
 
     return <div className={classes.join(' ')}>
       <button className="form__btn-reset form-select__value" onClick={this.handleClick} type="button">
-        <span>{this.getLabel()}</span>
+        {this.getLabel()}
         <i className="icon icon-angle-down" />
       </button>
       <ul className="form__ul-reset form__dropdown">
