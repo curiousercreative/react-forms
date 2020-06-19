@@ -188,7 +188,7 @@ export default class Select extends React.Component {
   }
 
   render () {
-    let classes = ['form__input', 'form__select', 'form-select', 'form__dropdown-wrapper'];
+    let classes = ['form__select', 'form-select', 'form__dropdown-wrapper'];
 
     if (this.state.isOpen) classes.push('form__dropdown-wrapper--is_open');
     if (this.props.disabled) classes.push('form-select--disabled');

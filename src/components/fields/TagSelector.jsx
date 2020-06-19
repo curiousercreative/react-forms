@@ -254,7 +254,7 @@ export default class TagSelector extends React.Component {
   }
 
   render () {
-    let classes = ['form__input', 'form__tag-selector', 'form-tag-selector', 'form__dropdown-wrapper'];
+    let classes = ['form__tag-selector', 'form-tag-selector', 'form__dropdown-wrapper'];
 
     if (this.state.isOpen) {
       classes.push('form-tag-selector--is_open');

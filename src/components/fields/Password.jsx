@@ -37,7 +37,7 @@ export default class Password extends React.Component {
         ref="input"
         type={type}
         value={this.props.getValue() || ''} />
-      <button className="form__btn-reset" onClick={this.handleClick} type="button" />
+      <button className="form__btn-reset" onClick={this.handleClick} type="button">{this.state.showPassword ? 'hide' : 'show'}</button>
     </div>);
   }
 }
