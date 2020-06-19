@@ -31,10 +31,10 @@ export default class Checkbox extends React.Component {
   }
 
   render () {
-    let classes = this.props.className.split(' ').concat('form__button');
+    let classes = this.props.className.split(' ').concat('form__checkbox');
     const checked = this.props.isChecked();
 
-    if (checked) classes.push('form__button--is_active');
+    if (checked) classes.push('form__checkbox--is_active');
 
     return <input
       defaultChecked={checked}
