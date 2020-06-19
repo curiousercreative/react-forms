@@ -6,6 +6,7 @@ export default function NativeDate ({ getValue, id, placeholder, setValue }) {
   }, [ setValue ]);
 
   return <input
+    className="form__input form__input--type_date"
     id={id}
     onChange={handleChange}
     placeholder={placeholder}
