@@ -55,7 +55,6 @@ export default function localStateStore (instance) {
 
   function setData (values) {
     return instance._hasParentForm()
-      // TODO: should we be parsing when stored in parent form :/
       ? instance.context.actions.setValue(instance.props.name, values, 'field', instance.props.index)
       : new Promise(resolve => instance.setState({ values }, resolve));
   }

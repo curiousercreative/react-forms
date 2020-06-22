@@ -66,11 +66,6 @@ export default class FormCollection extends Form {
     this.store.initErrors(errors);
   }
 
-  componentDidMount (...args) {
-    super.componentDidMount(...args);
-    this.pubsub.on('item.added', this.onAdd);
-  }
-
   _callbackRef (refInstance) {
     this.collection.push(refInstance);
   }
@@ -108,21 +103,20 @@ export default class FormCollection extends Form {
   }
 
   handleClickAdd () {
-    this.add();
+    this.add()
+      .then(() => {
+        // attempt to focus on newly added item
+        setTimeout(() => {
+          const lastItem = this.collection[this.collection.length - 1];
+          if (lastItem) callMe(lastItem.focus);
+        }, 0);
+      });
   }
 
   handleClickRemove (e) {
     const index = Number(e.target.value);
 
     this.remove(index);
-  }
-
-  onAdd () {
-    // attempt to focus on newly added item
-    setTimeout(() => {
-      const lastItem = this.collection[this.collection.length - 1];
-      if (lastItem) callMe(lastItem.focus);
-    }, 0);
   }
 
   /**

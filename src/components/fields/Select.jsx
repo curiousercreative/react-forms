@@ -1,6 +1,5 @@
 import React from 'react';
 import exists from '../../util/exists.js';
-import { findDOMNode } from 'react-dom';
 
 import bindMethods from '../../util/bindMethods.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
@@ -16,6 +15,7 @@ let id = 0;
  * @property {object[]} options
  * @property {string} options[].label
  * @property {string} options[].value
+ * @property {function} [optionKeySelector]
  * @property {string} [placeholder]
  *
  * TEST CASES:
@@ -30,6 +30,12 @@ let id = 0;
  * Given dropdown is visible, pressing escape should hide dropdown
  */
 export default class Select extends React.Component {
+  static defaultProps = {
+    optionKeySelector (option) {
+      return option.value;
+    },
+  }
+
   id = `select${id++}`;
   inputRef = React.createRef();
   list = [];
@@ -170,13 +176,14 @@ export default class Select extends React.Component {
     this.list = [];
     const ref = el => el && this.list.push(el);
 
-    return this.props.options.map(({ label, value }) => {
+    return this.props.options.map(opt => {
+      const { label, value } = opt;
       let classes = [ 'form__li-reset', 'form__dropdown-item' ];
 
       if (value === this.props.getValue()) classes.push('form__dropdown-item--is_selected');
 
       return (
-        <li className={classes.join(' ')} key={value}>
+        <li className={classes.join(' ')} key={this.props.optionKeySelector(opt)}>
           <button
             className="form__btn-reset form__dropdown-item-btn"
             onClick={this.handleClickItem}

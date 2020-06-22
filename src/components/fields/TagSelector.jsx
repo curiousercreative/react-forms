@@ -1,6 +1,6 @@
 import React from 'react';
 import { findDOMNode } from 'react-dom';
-import memo from 'memoize-one';
+
 import exists from '../../util/exists.js';
 import renderIf from '../../util/renderIf.js';
 
@@ -17,6 +17,7 @@ let id = 0;
  * @property {object[]} options
  * @property {string} options[].label
  * @property {string} options[].value
+ * @property {function} [optionKeySelector]
  * @property {string} [placeholder]
  *
  * TEST CASES:
@@ -31,6 +32,12 @@ let id = 0;
  * Given dropdown is visible, pressing escape should hide dropdown
  */
 export default class TagSelector extends React.Component {
+  static defaultProps = {
+    optionKeySelector (option) {
+      return option.value;
+    },
+  }
+
   id = `tag-selector${id++}`;
   list = [];
   options = {};
@@ -216,13 +223,14 @@ export default class TagSelector extends React.Component {
         {this.getOptionsWithIndexes(this.props.options)
           // if a query has been entered, filter the options!
           .filter(({ label }) => !query || label.toLowerCase().includes(query))
-          .map(({ label, i, value }) => {
+          .map(opt => {
+            const { label, i, value } = opt;
             let classes = [ 'form__li-reset', 'form__dropdown-item' ];
 
             if (selectedIndexes.includes(i)) classes.push('form__dropdown-item--is_selected');
 
             return (
-              <li className={classes.join(' ')} key={value}>
+              <li className={classes.join(' ')} key={this.props.optionKeySelector(opt)}>
                 <button
                   className="form__btn-reset"
                   onClick={this.handleClickItem}
@@ -243,7 +251,7 @@ export default class TagSelector extends React.Component {
           const opt = this.props.options[i];
 
           return (
-            <li className="form__li-reset form-tag-selector__tag" key={opt.value}>
+            <li className="form__li-reset form-tag-selector__tag" key={this.props.optionKeySelector(opt)}>
               {opt.label}
               <button className="form__btn-reset form-tag-selector__tag-remove" onClick={this.handleClickTagRemove} type="button" value={i}>X</button>
             </li>
