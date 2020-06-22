@@ -7,7 +7,7 @@ import { pascalize } from '../../transformers';
  */
 export default function defaultModel (instance) {
   function cleanCollection (formData) {
-    return formData;
+    return formData.map(this.cleanModel);
   }
 
   /**

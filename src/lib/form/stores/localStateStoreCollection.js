@@ -12,6 +12,10 @@ export default function localStateStoreCollection (instance) {
       return this.values()[index][name];
     },
 
+    _setData (values) {
+      return this.setData(this.toStore(instance.model.cleanCollection(values)));
+    },
+
     _setValue (name, value, index) {
       // don't touch any values except for index requested
       return this._setData(this.values().map((v, i) => (
