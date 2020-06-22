@@ -9,16 +9,17 @@ const emptyErrors = [];
  */
 export default function localStateStore (instance) {
   /**
-   * clean - transform external data for store
+   * fromStore - transform data read from store, perhaps the store only accepts
+   * strings or some other encoding requirement
    * @param {object|object[]} data
    * @return {object|object[]}
    */
-  function clean (data) {
+  function fromStore (data) {
     return data;
   }
 
   function getData () {
-    return this.parse(this.values());
+    return this.values();
   }
 
   function getErrors () {
@@ -40,7 +41,7 @@ export default function localStateStore (instance) {
   function initData (values) {
     // we only init data in state if we don't have a name
     if (!instance._hasParentForm()) {
-      instance.state.values = this.clean(values || instance.state.values || instance.emptyValues);
+      instance.state.values = this.toStore(values || instance.state.values || instance.emptyValues);
     }
   }
 
@@ -48,19 +49,14 @@ export default function localStateStore (instance) {
     instance.state.errors = errors || instance.state.errors || emptyErrors;
   }
 
-  /**
-   * parse - transform form data before sending to external sources
-   * @param  {object|object[]} data
-   * @return {object|object[]}
-   */
-  function parse (data) {
-    return data;
+  function _setData (values) {
+    return this.setData(this.toStore(instance.model.cleanModel(values)));
   }
 
   function setData (values) {
     return instance._hasParentForm()
       // TODO: should we be parsing when stored in parent form :/
-      ? instance.context.actions.setValue(instance.props.name, this.parse(values), 'field', instance.props.index)
+      ? instance.context.actions.setValue(instance.props.name, values, 'field', instance.props.index)
       : new Promise(resolve => instance.setState({ values }, resolve));
   }
 
@@ -71,7 +67,7 @@ export default function localStateStore (instance) {
   }
 
   function _setValue (name, value) {
-    return this.setData({ ...this.values(), [name]: value });
+    return this._setData({ ...this.values(), [name]: value });
   }
 
   function setValue (name, value, index) {
@@ -82,7 +78,16 @@ export default function localStateStore (instance) {
     return this[methodName](value, index);
   }
 
-  function values () {
+  /**
+   * toStore - transform form data before writing to store
+   * @param  {object|object[]} data
+   * @return {object|object[]}
+   */
+  function toStore (data) {
+    return data;
+  }
+
+  function _values () {
     const values = instance._hasParentForm()
       ? instance.context.state.values[instance.props.name]
       : instance.state.values;
@@ -90,19 +95,25 @@ export default function localStateStore (instance) {
     return values || instance.emptyValues;
   }
 
+  function values () {
+    return this.fromStore(_values());
+  }
+
   return {
     _getValue,
+    _setData,
     _setValue,
-    clean,
+    _values,
+    fromStore,
     getData,
     getErrors,
     getValue,
     initData,
     initErrors,
-    parse,
     setData,
     setErrors,
     setValue,
+    toStore,
     values,
   };
 }

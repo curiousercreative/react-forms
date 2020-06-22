@@ -159,15 +159,13 @@ export default class FormCollection extends Form {
   }
 
   formatData () {
-    return this.store.values()
+    return this.model.formatCollection(this.store.values()
       // run field level hooks
       .map(obj => fromEntries(Object.entries(obj)
-        .map(([ name, val ]) => [ name, this.formatValue(name, val) ]))
+        .map(([ name, val ]) => [ name, this.model.formatValue(name, val) ]))
       )
       // run model level hooks
-      .map(this.model.format)
-      // run collection model level hook
-      .map(this.model.formatCollection);
+      .map(this.model.formatModel));
   }
 
   getCid () {

@@ -1,46 +1,62 @@
+import { pascalize } from '../../transformers';
+
 /**
  * localStateStore
  * @param  {object} instance - Form component instance
  * @return {object}
  */
 export default function defaultModel (instance) {
-  /**
-   * clean - clean a full model instance, future use?
-   * @param  {object} formData
-   * @return {object}
-   */
-  function clean (formData) {
-    return formData;
-  }
-
   function cleanCollection (formData) {
     return formData;
   }
 
   /**
-   * cleanValue - transform a single form field value from user input before storing
+   * cleanModel - clean a full model instance before writing to st
+   * @param  {object} formData
+   * @return {object}
+   */
+  function cleanModel (formData) {
+    return formData;
+  }
+
+  /**
+   * _cleanValue - transform a single form field value from user input before storing
+   * @param {string} name
+   * @param {string|any} value
+   * @return {string|any}
+   */
+  function _cleanValue (name, value) {
+    return value;
+  }
+
+  /**
+   * cleanValue - wrapper for transforming user input values on their way to store
    * @param {string} name
    * @param {string|any} value
    * @return {string|any}
    */
   function cleanValue (name, value) {
-    return value;
+    const methodName = `cleanValueFor${pascalize(name)}`;
+    // if we don't have a field specific cleaner, make one based on cleanValue
+    if (!this[methodName]) this[methodName] = this._cleanValue.bind(this, name);
+
+    return this[methodName](value);
   }
 
   function getValidations () {
     return this.validations;
   }
 
-  /**
-   * format - prepare entire form data for form field view components
-   * @param  {object} formData
-   * @return {object}
-   */
-  function format (formData) {
+  function formatCollection (formData) {
     return formData;
   }
 
-  function formatCollection (formData) {
+  /**
+   * formatModel - prepare entire form data for form field view components
+   * @param  {object} formData
+   * @return {object}
+   */
+  function formatModel (formData) {
     return formData;
   }
 
@@ -50,8 +66,22 @@ export default function defaultModel (instance) {
    * @param  {string|any} value
    * @return {string|any}
    */
-  function formatValue (name, value) {
+  function _formatValue (name, value) {
     return value;
+  }
+
+  /**
+   * formatValue - wrapper for transforming form values for use by view components
+   * @param {string} name
+   * @param {string|any} value
+   * @return {string|any}
+   */
+  function formatValue (name, value) {
+    const methodName = `formatValueFor${pascalize(name)}`;
+    // if we don't have a field specific cleaner, make one based on cleanValue
+    if (!this[methodName]) this[methodName] = this._formatValue.bind(this, name);
+
+    return this[methodName](value);
   }
 
   /**
@@ -64,11 +94,13 @@ export default function defaultModel (instance) {
   }
 
   return {
-    clean,
+    _cleanValue,
+    _formatValue,
     cleanCollection,
+    cleanModel,
     cleanValue,
-    format,
     formatCollection,
+    formatModel,
     formatValue,
     getValidations,
     selectPrimaryKey,

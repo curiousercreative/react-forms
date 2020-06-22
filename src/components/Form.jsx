@@ -14,7 +14,6 @@ import renderIf from '../util/renderIf.js';
 import uniq from '../util/uniq.js';
 
 import { Pubsub } from '../lib/pubsub';
-import { pascalize } from '../lib/transformers';
 import { validate } from '../lib/validator';
 
 const CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD = 60;
@@ -39,7 +38,7 @@ const defaultStore = localStateStore;
  *   names: ['username', 'password'],
  *   tests: [[ tests.required, messages.required ]]
  * }]
- * @return {jsx} form.form, though this class is frequently extended rather than
+ * @return {jsx} .form, though this class is frequently extended rather than
  * used directly and the render method is overriden
  */
 export default class Form extends React.Component {
@@ -222,41 +221,13 @@ export default class Form extends React.Component {
     this._validateOnChange(name, index);
   }
 
-  /**
-   * cleanValue - wrapper for transforming user input values on their way to store
-   * @param {string} name
-   * @param {string|any} value
-   * @return {string|any}
-   */
-  cleanValue (name, value) {
-    const methodName = `cleanValueFor${pascalize(name)}`;
-    // if we don't have a field specific cleaner, make one based on cleanValue
-    if (!this.model[methodName]) this.model[methodName] = this.model.cleanValue.bind(this.model, name);
-
-    return this.model[methodName](value);
-  }
-
   formatData () {
     // run field level hooks
     const formattedValues = fromEntries(Object.entries(this.store.values())
-      .map(([ name, val ]) => [ name, this.formatValue(name, val) ]));
+      .map(([ name, val ]) => [ name, this.model.formatValue(name, val) ]));
 
     // run model level hook
-    return this.model.format(formattedValues);
-  }
-
-  /**
-   * formatValue - wrapper for transforming store values on their way to child components
-   * @param  {string} name
-   * @param  {string|any} value
-   * @return {string|any}
-   */
-  formatValue (name, value) {
-    const methodName = `formatValueFor${pascalize(name)}`;
-    // if we don't have a field specific parser, make one based on parse
-    if (!this.model[methodName]) this.model[methodName] = this.model.formatValue.bind(this.model, name);
-
-    return this.model[methodName](value);
+    return this.model.formatModel(formattedValues);
   }
 
   getContextValue (values, errors) {
@@ -305,7 +276,7 @@ export default class Form extends React.Component {
    * @return {string|any}
    */
   getValue (name, index) {
-    return this.model.formatValue(name, this.store.getValue(name, index));
+    return this.store.getValue(name, index);
   }
 
   /**
@@ -342,7 +313,7 @@ export default class Form extends React.Component {
   }
 
   setValueFromField (name, value, context, index) {
-    const cleanedVal = this.cleanValue(name, value);
+    const cleanedVal = this.model.cleanValue(name, value);
     return this.setValue(name, cleanedVal, context, index);
   }
 
@@ -416,10 +387,10 @@ export default class Form extends React.Component {
     return (
       <FormContext.Provider value={this.getContextValue(this.formatData(), this.getErrors())}>
         {renderIf(jsx, () => jsx, () => (
-          <form className={classes.join(' ')}>
+          <div className={classes.join(' ')}>
             {this.renderErrors()}
             {this.props.children}
-          </form>
+          </div>
         ))}
       </FormContext.Provider>
     );

@@ -14,7 +14,7 @@ export default function localStateStoreCollection (instance) {
 
     _setValue (name, value, index) {
       // don't touch any values except for index requested
-      return this.setData(this.values().map((v, i) => (
+      return this._setData(this.values().map((v, i) => (
         i === index
           ? { ...v, [name]: value }
           : v
