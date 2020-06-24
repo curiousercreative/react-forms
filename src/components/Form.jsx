@@ -71,6 +71,7 @@ export default class Form extends React.Component {
     this._setModel = memoize(this._setModel);
     this._setStore = memoize(this._setStore);
     this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, false);
+    this.formatData = memoize(this.formatData);
     this.getContextValue = memoize(this.getContextValue);
 
     this._setModel(this.props.model);
@@ -221,9 +222,9 @@ export default class Form extends React.Component {
     this._validateOnChange(name, index);
   }
 
-  formatData () {
+  formatData (data) {
     // run field level hooks
-    const formattedValues = fromEntries(Object.entries(this.store.values())
+    const formattedValues = fromEntries(Object.entries(data)
       .map(([ name, val ]) => [ name, this.model.formatValue(name, val) ]));
 
     // run model level hook
@@ -385,7 +386,7 @@ export default class Form extends React.Component {
     let classes = this.props.className.split(' ').concat('form');
 
     return (
-      <FormContext.Provider value={this.getContextValue(this.formatData(), this.getErrors())}>
+      <FormContext.Provider value={this.getContextValue(this.formatData(this.store.values()), this.getErrors())}>
         {renderIf(jsx, () => jsx, () => (
           <div className={classes.join(' ')}>
             {this.renderErrors()}

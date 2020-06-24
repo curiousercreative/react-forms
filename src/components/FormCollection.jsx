@@ -6,6 +6,7 @@ import localStateStoreCollection from '../lib/form/stores/localStateStoreCollect
 
 import bindMethods from '../util/bindMethods.js';
 import callMe from '../util/callMe.js';
+import curry from '../util/curry.js';
 import fromEntries from '../util/fromEntries.js';
 import omit from '../util/omit.js';
 import { validate } from '../lib/validator';
@@ -64,6 +65,8 @@ export default class FormCollection extends Form {
 
     this.store.initData(values);
     this.store.initErrors(errors);
+
+    this.renderItem = curry(this.renderItem);
   }
 
   _callbackRef (refInstance) {
@@ -152,14 +155,15 @@ export default class FormCollection extends Form {
     return { ...this.props.defaultValues, cid: this.getCid(), ...attr };
   }
 
-  formatData () {
-    return this.model.formatCollection(this.store.values()
+  formatData (data) {
+    return this.model.formatCollection(data
       // run field level hooks
       .map(obj => fromEntries(Object.entries(obj)
         .map(([ name, val ]) => [ name, this.model.formatValue(name, val) ]))
       )
       // run model level hooks
-      .map(this.model.formatModel));
+      .map(this.model.formatModel)
+    );
   }
 
   getCid () {
@@ -186,6 +190,10 @@ export default class FormCollection extends Form {
     });
 
     return this.parse(list);
+  }
+
+  getItemProps (data) {
+    return { data };
   }
 
   parse (collection) {
@@ -234,20 +242,25 @@ export default class FormCollection extends Form {
     this.setData(this.store.values().filter(obj => obj.cid !== cid));
   }
 
+  renderItem (Component, componentProps, item, index) {
+    return <Component
+      {...this.getItemProps(item)}
+      {...componentProps}
+      handleClickRemove={this.handleClickRemove}
+      index={index}
+      key={item.cid}
+      ref={this._callbackRef} />;
+  }
+
   render (Component, componentProps) {
-    const formCollectionData = this.formatData();
+    const formCollectionData = this.formatData(this.store.values());
     Component = Component || this.props.component;
+    const itemRenderer = this.renderItem(Component, componentProps);
     this.collection = [];
 
     return (
       <FormContext.Provider value={this.getContextValue(formCollectionData, this.getErrors())}>
-        {formCollectionData.map((data, i) => <Component
-          {...data}
-          {...componentProps}
-          handleClickRemove={this.handleClickRemove}
-          index={i}
-          key={data.cid}
-          ref={this._callbackRef} />)}
+        {formCollectionData.map(itemRenderer)}
       </FormContext.Provider>
     );
   }

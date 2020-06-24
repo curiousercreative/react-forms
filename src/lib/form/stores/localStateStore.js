@@ -95,6 +95,7 @@ export default function localStateStore (instance) {
   }
 
   function values () {
+    // TODO: consider moving this fromStore to Form.formatData to improve memoization
     return this.fromStore(_values());
   }
 

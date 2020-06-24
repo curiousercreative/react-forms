@@ -36,6 +36,6 @@ describe('getValue method', () => {
     const form = F.render(<Component initialValues={{ first_name: 'david' }} model={model} />);
 
     // expect that our getData
-    expect(form.formatData().first_name).toEqual('DAVID');
+    expect(form.formatData(form.store.values()).first_name).toEqual('DAVID');
   });
 });
