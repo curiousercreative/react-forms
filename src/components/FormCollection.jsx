@@ -242,20 +242,19 @@ export default class FormCollection extends Form {
     this.setData(this.store.values().filter(obj => obj.cid !== cid));
   }
 
-  renderItem (Component, componentProps, item, index) {
+  renderItem (Component, item, index) {
     return <Component
       {...this.getItemProps(item)}
-      {...componentProps}
       handleClickRemove={this.handleClickRemove}
       index={index}
       key={item.cid}
       ref={this._callbackRef} />;
   }
 
-  render (Component, componentProps) {
+  render (Component) {
     const formCollectionData = this.formatData(this.store.values());
     Component = Component || this.props.component;
-    const itemRenderer = this.renderItem(Component, componentProps);
+    const itemRenderer = this.renderItem(Component);
     this.collection = [];
 
     return (
