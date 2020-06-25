@@ -189,10 +189,9 @@
 .form-tag-selector__value {
   width: 100%;
   text-align: left;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .form-select--disabled .form-select__value,
 .form-tag-selector--disabled .form-tag-selector__value {
@@ -208,18 +207,24 @@
 }
 .form-tag-selector__input {
   height: 100%;
+  flex-grow: 1;
 }
 .form-tag-selector__tags {
   display: flex;
   flex-wrap: wrap;
-  height: 100%;
+  min-height: 100%;
 }
 .form-tag-selector__tag {
   background: #dedede;
   padding: 0 0.5em;
-  margin: 0 0.25em;
+  margin: 0 0.25em 0.1667em;
   border-radius: 0.25em;
   font-size: 0.75em;
+  line-height: 1.5em;
+}
+.form-tag-selector__tag-remove {
+  display: inline-block;
+  margin-left: 0.25em;
 }
 
 .form-password {

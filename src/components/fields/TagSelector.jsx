@@ -290,7 +290,7 @@ export default class TagSelector extends React.Component {
           onClick={this.handleClickOpen}
           onFocus={this.handleFocus}
           type="button">
-          <span>{this.getLabel()}</span>
+          {this.getLabel()}
         </button>
       ))}
       {renderIf(this.state.isOpen, this.renderOptions)}
