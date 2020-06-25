@@ -59,14 +59,14 @@ export default class TagSelector extends React.Component {
     // this.getSelectedIndexes = memo(this.getSelectedIndexes);
   }
 
-  componentDidUpdate (props) {
-    // if we lost focus and we're open, close
-    if (!this.props.hasFocus && props.hasFocus) this.close();
+  componentDidMount () {
+    addEventListener('focusin', this.handleWindowClickOrFocus);
   }
 
   componentWillUnmount () {
     removeEventListener('keydown', this.handleKeys);
-    removeEventListener('click', this.handleWindowClick);
+    removeEventListener('click', this.handleWindowClickOrFocus);
+    removeEventListener('focusin', this.handleWindowClickOrFocus);
   }
 
   handleChange (e) {
@@ -134,17 +134,15 @@ export default class TagSelector extends React.Component {
     if (!this.state.query && value.length && e.which === 8) this.popTag();
   }
 
-  handleWindowClick (nativeEvent) {
-    if (!findDOMNode(this).contains(nativeEvent.target)) this.close();
-    // if (findDOMNode(this).contains(e.target)) this.open();
-    // else this.close();
+  handleWindowClickOrFocus (nativeEvent) {
+    if (this.state.isOpen && !findDOMNode(this).contains(nativeEvent.target)) this.close();
   }
 
   close () {
     if (!this.state.isOpen) return;
 
     this.setState({ isOpen: false });
-    removeEventListener('click', this.handleWindowClick);
+    removeEventListener('click', this.handleWindowClickOrFocus);
     removeEventListener('keydown', this.handleKeys);
   }
 
@@ -189,7 +187,7 @@ export default class TagSelector extends React.Component {
       .then(() => {
         // NOTE: this click handler is the main way the dropdown closes
         // add event listeners
-        addEventListener('click', this.handleWindowClick);
+        addEventListener('click', this.handleWindowClickOrFocus);
         addEventListener('keydown', this.handleKeys);
 
         // focus on the actual text input
@@ -225,7 +223,7 @@ export default class TagSelector extends React.Component {
           // if a query has been entered, filter the options!
           .filter(({ label }) => !query || label.toLowerCase().includes(query))
           .map(opt => {
-            const { label, i, value } = opt;
+            const { label, i } = opt;
             let classes = [ 'form__li-reset', 'form__dropdown-item' ];
 
             if (selectedIndexes.includes(i)) classes.push('form__dropdown-item--is_selected');
