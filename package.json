@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "source": "src/index.js",
   "scripts": {
-    "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --ignore './src/**/__mocks__/' --source-maps --keep-file-extension --copy-files",
+    "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --ignore './src/**/__mocks__/' --source-maps inline --keep-file-extension --copy-files",
     "docs": "jsdoc -c ./jsdoc/conf.json -R ./jsdoc/README.md -r ./src",
     "prepare": "yarn build",
     "start": "yarn watch & (cd example && yarn install && yarn start)",

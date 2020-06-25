@@ -8,6 +8,7 @@ const User = React.forwardRef(function User ({ index, handleClickRemove }, ref) 
         <Fields.TextField index={index} label="username" name="username" />
         <Fields.PasswordField index={index} label="password" name="password" />
         <Fields.SelectField index={index} label="select" name="select" options={[{ label: '1', value: 1 }, { label: '2', value: 2 }]} forwardedRef={ref} />
+        <Fields.TagSelectorField index={index} label="tag select" name="tag" options={[{ label: '1', value: 1 }, { label: '2', value: 2 }]} />
         <button onClick={handleClickRemove} type="button" value={index}>remove</button>
       </div>
     </div>
@@ -20,13 +21,10 @@ export default class FormCollectionExtended extends FormCollection {
     defaultValues: {
       username: '',
       password: '',
+      select: '',
+      tag: [],
     },
   };
-
-  constructor (...args) {
-    super(...args);
-    util.bindMethods(this);
-  }
 
   handleSubmit () {
     alert(`form state: ${JSON.stringify(this.getData())}`);

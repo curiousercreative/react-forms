@@ -38,6 +38,7 @@ class App extends React.Component {
       defaultValues: {
         username: '',
         password: '',
+        tag: [],
       },
       delete: this.deleteCollectionItem,
       values: this.state.collectionValues,

@@ -38,11 +38,14 @@ export default function localStateStore (instance) {
     return this[methodName](index);
   }
 
-  function initData (values) {
+  function initData (_values) {
+    const values = this.toStore(_values || instance.state.values || instance.emptyValues);
+
     // we only init data in state if we don't have a name
-    if (!instance._hasParentForm()) {
-      instance.state.values = this.toStore(values || instance.state.values || instance.emptyValues);
+    if (instance._hasParentForm()) {
+      instance.context.actions.setValue(instance.props.name, values, 'field', instance.props.index);
     }
+    else instance.state.values = this.toStore(values);
   }
 
   function initErrors (errors) {
@@ -62,7 +65,10 @@ export default function localStateStore (instance) {
   function setErrors (_errors) {
     const errors = _errors.length ? _errors : emptyErrors;
 
-    return new Promise(resolve => instance.setState({ errors }, resolve));
+    // no need to set state if no change
+    return instance.state.errors === errors
+      ? Promise.resolve()
+      : new Promise(resolve => instance.setState({ errors }, resolve));
   }
 
   function _setValue (name, value) {

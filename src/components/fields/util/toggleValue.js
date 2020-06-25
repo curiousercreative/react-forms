@@ -30,5 +30,5 @@ export default function toggleValue (field, value) {
       : value;
   }
 
-  return field.context.actions.setValue(name, toggledVal, index);
+  return field.context.actions.setValue(name, toggledVal, 'field', index);
 }

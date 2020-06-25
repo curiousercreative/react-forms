@@ -21,7 +21,7 @@ export default class FormComplex extends Form {
     util.bindMethods(this);
 
     this.store.initData({
-      cast: this.props.collectionProps.values || [],
+      cast: [],
       director: {},
       native_select: '',
       tag_selector: [],
