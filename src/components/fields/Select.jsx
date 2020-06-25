@@ -148,9 +148,7 @@ export default class Select extends React.Component {
       catch (e) { console.warn('Select field mount with no options', e); }
     }
 
-    return opt
-      ? <span>{opt.label}</span>
-      : <span className="form__input-placeholder">{placeholder}</span>;
+    return opt ? opt.label : placeholder;
   }
 
   open () {
@@ -202,7 +200,7 @@ export default class Select extends React.Component {
 
     return <div className={classes.join(' ')}>
       <button ref={this.inputRef} className="form__btn-reset form-select__value" onClick={this.handleClick} type="button">
-        {this.getLabel()}
+        <span>{this.getLabel()}</span>
         <i className="icon icon-angle-down" />
       </button>
       <ul className="form__ul-reset form__dropdown">

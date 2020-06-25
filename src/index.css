@@ -121,9 +121,6 @@
 .form__input {
   width: 100%;
 }
-.form__input-placeholder {
-  opacity: 0.5;
-}
 .form__field--has_focus .form__input {
   border-color: #17419b;
 }
@@ -192,6 +189,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.form__field--no_value .form-select__value,
+.form__field--no_value .form-tag-selector__value {
+  opacity: 0.5;
 }
 .form-select--disabled .form-select__value,
 .form-tag-selector--disabled .form-tag-selector__value {

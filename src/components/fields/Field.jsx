@@ -126,6 +126,23 @@ export default class Field extends React.Component {
     }
   }
 
+  hasValue () {
+    const value = getValue(this);
+
+    switch (typeof value) {
+      case 'object':
+        if (Array.isArray(value)) return value.length > 0;
+        if (value === null) return false;
+        return true;
+      case 'string':
+        return value.length > 0;
+      case 'undefined':
+        return false;
+      default:
+        return true;
+    }
+  }
+
   renderErrors () {
     const errors = this.getErrors(this.props.index);
     if (!errors.length) return;
@@ -157,6 +174,9 @@ export default class Field extends React.Component {
 
     // add focus class
     if (this.state.hasFocus) classes.push(this.formatClassName('has', 'focus'));
+
+    if (this.hasValue()) classes.push(this.formatClassName('has', 'value'));
+    else classes.push(this.formatClassName('no', 'value'));
 
     // add errors class
     if (this.getErrors().length) classes.push(this.formatClassName('has', 'errors'));
