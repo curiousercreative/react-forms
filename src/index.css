@@ -194,7 +194,8 @@
   align-items: center;
   white-space: nowrap;
 }
-.form-select--disabled .form-select__value {
+.form-select--disabled .form-select__value,
+.form-tag-selector--disabled .form-tag-selector__value {
   opacity: 0.5;
   background: #dedede;
   cursor: not-allowed;

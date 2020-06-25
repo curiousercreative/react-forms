@@ -83,6 +83,7 @@ export default class FormComplex extends Form {
         <Fields.NativeSelectField label="native select" name="native_select" options={[{ label: 'Something something', value: 'yes' }, { label: 'and another', value: 'no' }]} placeholder="select one..." />
         <Fields.NativeDateField label="native date" name="native_date" placeholder="YYYY-MM-DD" />
         <Fields.TagSelectorField label="tag selector" name="tag_selector" options={OPTIONS} placeholder="Select your favorite fruits!" />
+        <Fields.TagSelectorField disabled label="tag selector" name="tag_selector" options={OPTIONS} placeholder="Select your favorite fruits!" />
         <SubmitButton onClick={this.handleSubmit.bind(this)}>Check form state</SubmitButton>
       </div>
     );

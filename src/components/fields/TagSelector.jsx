@@ -13,6 +13,7 @@ let id = 0;
 /**
  * a custom dropdown/select input
  * @class TagSelector
+ * @property {boolean} [disabled]
  * @property {string} name
  * @property {object[]} options
  * @property {string} options[].label
@@ -268,6 +269,7 @@ export default class TagSelector extends React.Component {
       classes.push('form-tag-selector--is_open');
       classes.push('form__dropdown-wrapper--is_open');
     }
+    if (this.props.disabled) classes.push('form-tag-selector--disabled');
 
     return <div className={classes.join(' ')}>
       {renderIf(this.state.isOpen, () => (
@@ -282,7 +284,12 @@ export default class TagSelector extends React.Component {
             value={this.state.query} />
         </div>
       ), () => (
-        <button className="form__btn-reset form-tag-selector__value" onClick={this.handleClickOpen} onFocus={this.handleFocus} type="button">
+        <button
+          className="form__btn-reset form-tag-selector__value"
+          disabled={this.props.disabled}
+          onClick={this.handleClickOpen}
+          onFocus={this.handleFocus}
+          type="button">
           <span>{this.getLabel()}</span>
         </button>
       ))}
