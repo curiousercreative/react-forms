@@ -16,9 +16,32 @@ const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9
  * @function
  * @param  {any} value
  * @return {boolean}
+ * @example 'aj@ajm.com' => true
+ * @example '2ajs12x@ajm.co' => true
+ * @example 'aj@ajm' => false
+ * @example 'aj@ajm.m' => false
  */
 export function email (value) {
   return passIfEmpty(value, value => !!String(value).match(EMAIL_REGEX));
+}
+
+/**
+ * @function
+ * @param  {any} value
+ * @return {boolean}
+ * @example '0' => true
+ * @example 0 => true
+ * @example 213 => true
+ * @example '' => true
+ * @example null => true
+ * @example x.a => true
+ * @example 2.13 => false
+ * @example '2e2' => false
+ * @example '2a' => false
+ * @example 'asdf' => false
+ */
+export function integer (value) {
+  return passIfEmpty(value, value => !!String(value).match(/^[0-9]+$/));
 }
 
 /**
@@ -27,8 +50,11 @@ export function email (value) {
  * @param  {number} length - maximum length (inclusive)
  * @param  {array|string} value - if not an array, will be type cast as string
  * @return {boolean}
- * @example 'hi', 3 => true
- * @example 'hello', 3 => false
+ * @example (5, 'hello') => true
+ * @example (5, 'hey') => true
+ * @example (5, ['a', 'b', 'c') => true
+ * @example (5, ['a', 'b', 'c', 'd', 'e', 'f') => false
+ * @example (5, 'hello! my darling') => false
  */
 export function maxLength (length, value) {
   const val = Array.isArray(value) ? value : String(value);
@@ -42,8 +68,12 @@ export function maxLength (length, value) {
  * @param  {number} length - minimum length (inclusive)
  * @param  {array|string} value - if not an array, will be type cast as string
  * @return {boolean}
- * @example 'hi', 2 => true
- * @example [], 2 => false
+ * @example (3, 'hello') => true
+ * @example (3, 'hey') => true
+ * @example (3, ['a', 'b', 'c']) => true
+ * @example (3, ['a', 'b', 'c', 'd']) => true
+ * @example (3, 'hi') => false
+ * @example (3, ['a', 'b' ]) => false
  */
 export function minLength (length, value) {
   const val = Array.isArray(value) ? value : String(value);
@@ -55,6 +85,14 @@ export function minLength (length, value) {
  * @function
  * @param  {any} value
  * @return {boolean}
+ * @example '+01-800-570-3355 ext718' => true
+ * @example '+01-800-570-3355x23' => true
+ * @example '+1-800-570-3355' => true
+ * @example '1-800-570-3355' => true
+ * @example '800-570-3355' => true
+ * @example '8005703355' => true
+ * @example '5703355' => false
+ * @example 'aj@ajm.com' => false
  */
 export function phone (value) {
   return passIfEmpty(value, value => {
@@ -71,9 +109,19 @@ export function phone (value) {
  * @function
  * @param  {any} value
  * @return {boolean}
+ * @example '0' => true
+ * @example 0 => true
+ * @example 213 => true
+ * @example 2.13 => true
+ * @example '2e2' => true
+ * @example '' => true
+ * @example null => true
+ * @example undefined => true
+ * @example '2a' => false
+ * @example 'asdf' => false
  */
-export function integer (value) {
-  return passIfEmpty(value, value => !!String(value).match(/^[0-9]+$/));
+export function numeric (value) {
+  return passIfEmpty(value, value => !isNaN(Number(value)));
 }
 
 /**
@@ -101,6 +149,11 @@ export function required (value) {
  * @param  {function} test - test function to call and return value of if not empty
  * @return {boolean}
  */
-function passIfEmpty (value, test) {
-  return !exists(value) || !value.length || test(value);
+export function passIfEmpty (value, test) {
+  // pass null or undefined
+  return !exists(value)
+    // pass empty strings
+    || (typeof value === 'string' && !value.length)
+    // otherwise, test and return the result
+    || test(value);
 }

@@ -24,7 +24,7 @@ export function email (name) {
  * @return {boolean}
  */
 export function integer (name) {
-  return `${humanize(name)} must consist of numbers only`;
+  return `${humanize(name)} must consist of integers only`;
 }
 
 /**
@@ -45,6 +45,15 @@ export function maxLength (length, name) {
  */
 export function minLength (length, name) {
   return `${humanize(name)} must be at least ${length} characters`;
+}
+
+/**
+ * @function
+ * @param  {string} name
+ * @return {boolean}
+ */
+export function numeric (name) {
+  return `${humanize(name)} must consist of numbers only`;
 }
 
 /**
