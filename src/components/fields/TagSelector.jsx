@@ -1,10 +1,12 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import memo from 'memoize-one';
 
+import curry from '../../util/curry.js';
 import exists from '../../util/exists.js';
 import renderIf from '../../util/renderIf.js';
 
-import AutosizeInput from './AutosizeInput.jsx';
+import AutosizeInput from './components/AutosizeInput.jsx';
+import DropdownWrapper from './components/DropdownWrapper.jsx';
 
 import bindMethods from '../../util/bindMethods.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
@@ -34,16 +36,12 @@ let id = 0;
  */
 export default class TagSelector extends React.Component {
   static defaultProps = {
-    optionKeySelector (option) {
-      return option.value;
-    },
-  }
+    optionKeySelector: opt => opt.value,
+  };
 
   id = `tag-selector${id++}`;
-  list = [];
-  options = {};
+  inputRef = React.createRef();
   state = {
-    highlightIndex: -1,
     isOpen: false,
     query: '',
   };
@@ -54,9 +52,7 @@ export default class TagSelector extends React.Component {
 
     this.state.isOpen = !exists(this.props.getValue());
 
-    // TODO: figure out why these memoized functions don't update with incoming props
-    // this.getOptionsWithIndexes = memo(this.getOptionsWithIndexes);
-    // this.getSelectedIndexes = memo(this.getSelectedIndexes);
+    this.prepareOptions = memo(curry(this.prepareOptions));
   }
 
   componentDidMount () {
@@ -75,12 +71,6 @@ export default class TagSelector extends React.Component {
     this.setState({ query: value });
   }
 
-  handleClickItem (e) {
-    const opt = this.props.options[Number(e.target.value)];
-
-    this.props.toggleValue(opt.value);
-  }
-
   handleClickOpen () {
     this.open();
   }
@@ -96,54 +86,39 @@ export default class TagSelector extends React.Component {
     this.focus();
   }
 
-  // TODO: this and other methods are modified copies from SearchField.jsx
-  // look into having the code shared?
   handleKeys (e) {
-    const { highlightIndex, query } = this.state;
+    const { query } = this.state;
     const value = this.props.getValue();
 
     // don't do anything if not focused
     if (!this.state.isOpen) return;
 
-    if (this.list.length) {
-      switch (e.which) {
-        case 27: // escape
-          // if search was entered, clear it and refocus on the input to allow
-          // a new search
-          if (query) {
-            this.setState({ query: '' });
-            this.refs.input.focus();
-          }
-          // no search, close everything
-          else this.close();
-          break;
-        case 38: // up
-          e.preventDefault();
-          // protect against out of bounds
-          this.focusResult(highlightIndex > 0 ? highlightIndex - 1 : this.list.length - 1);
-          break;
-        case 40: // down
-          e.preventDefault();
-          // protect against out of bounds
-          this.focusResult(highlightIndex < this.list.length - 1 ? highlightIndex + 1 : 0);
-          break;
-      }
+    switch (e.which) {
+      case 8: // backspace
+        // if our query is empty, we've got tags and user is backspacing...
+        if (!this.state.query && value.length) this.popTag();
+        break;
+      case 27: // escape
+        // if search was entered, clear it and refocus on the input to allow
+        // a new search
+        if (query) {
+          this.setState({ query: '' });
+          this.inputRef.current.focus();
+
+          // this is an attempt to block DropdownWrapper from closing as part of its
+          // key listener
+          e.stopImmediatePropagation();
+        }
+        break;
     }
-
-    // if our query is empty, we've got tags and user is backspacing...
-    if (!this.state.query && value.length && e.which === 8) this.popTag();
-  }
-
-  handleWindowClickOrFocus (nativeEvent) {
-    if (this.state.isOpen && !findDOMNode(this).contains(nativeEvent.target)) this.close();
   }
 
   close () {
     if (!this.state.isOpen) return;
 
-    this.setState({ isOpen: false });
-    removeEventListener('click', this.handleWindowClickOrFocus);
     removeEventListener('keydown', this.handleKeys);
+
+    this.setState({ isOpen: false });
   }
 
   focus () {
@@ -185,13 +160,9 @@ export default class TagSelector extends React.Component {
       this.setState({ isOpen: true }, () => setTimeout(resolve, 0));
     })
       .then(() => {
-        // NOTE: this click handler is the main way the dropdown closes
-        // add event listeners
-        addEventListener('click', this.handleWindowClickOrFocus);
         addEventListener('keydown', this.handleKeys);
-
         // focus on the actual text input
-        if (this.refs.input) this.refs.input.focus();
+        if (this.inputRef.current) this.inputRef.current.focus();
       });
   }
 
@@ -205,42 +176,13 @@ export default class TagSelector extends React.Component {
     this.props.toggleValue(option.value);
   }
 
-  renderOptions () {
-    if (!Array.isArray(this.props.options)) {
-      console.warn('No options were supplied to Select.');
-      return;
-    }
+  prepareOptions (query, options) {
+    // if a query has been entered, filter the options!
+    return options.filter(({ label }) => !query || label.toLowerCase().includes(query));
+  }
 
-    this.list = [];
-    const ref = el => el && this.list.push(el);
-
-    const query = this.state.query.toLowerCase();
-    const selectedIndexes = this.getSelectedIndexes(this.props.getValue());
-
-    return (
-      <ul className="form__ul-reset form__dropdown">
-        {this.getOptionsWithIndexes(this.props.options)
-          // if a query has been entered, filter the options!
-          .filter(({ label }) => !query || label.toLowerCase().includes(query))
-          .map(opt => {
-            const { label, i } = opt;
-            let classes = [ 'form__li-reset', 'form__dropdown-item' ];
-
-            if (selectedIndexes.includes(i)) classes.push('form__dropdown-item--is_selected');
-
-            return (
-              <li className={classes.join(' ')} key={this.props.optionKeySelector(opt)}>
-                <button
-                  className="form__btn-reset"
-                  onClick={this.handleClickItem}
-                  ref={ref}
-                  type="button"
-                  value={i}>{label}</button>
-              </li>);
-          })
-        }
-      </ul>
-    );
+  setIsOpen (isOpen) {
+    if (isOpen !== this.state.isOpen) this.setState({ isOpen });
   }
 
   renderTags () {
@@ -261,37 +203,41 @@ export default class TagSelector extends React.Component {
   }
 
   render () {
-    let classes = ['form__tag-selector', 'form-tag-selector', 'form__dropdown-wrapper'];
+    let classes = ['form__tag-selector', 'form-tag-selector'];
 
-    if (this.state.isOpen) {
-      classes.push('form-tag-selector--is_open');
-      classes.push('form__dropdown-wrapper--is_open');
-    }
     if (this.props.disabled) classes.push('form-tag-selector--disabled');
 
-    return <div className={classes.join(' ')}>
-      {renderIf(this.state.isOpen, () => (
-        <div className="form-tag-selector__input-wrapper">
-          {renderIf(this.props.getValue().length, this.renderTags)}
-          <AutosizeInput
-            className="form__input-reset form-tag-selector__input"
-            onChange={this.handleChange}
-            placeholder="Type to filter..."
-            ref="input"
-            type="text"
-            value={this.state.query} />
-        </div>
-      ), () => (
-        <button
-          className="form__btn-reset form-tag-selector__value"
-          disabled={this.props.disabled}
-          onClick={this.handleClickOpen}
-          onFocus={this.handleFocus}
-          type="button">
-          {this.getLabel()}
-        </button>
-      ))}
-      {renderIf(this.state.isOpen, this.renderOptions)}
-    </div>;
+    return (
+      <DropdownWrapper
+        className={classes.join(' ')}
+        isOpen={this.state.isOpen}
+        onSelect={this.props.toggleValue}
+        options={this.props.options}
+        prepareOptions={this.prepareOptions(this.state.query)}
+        setIsOpen={this.setIsOpen}
+        value={this.props.getValue()}>
+        {renderIf(this.state.isOpen, () => (
+          <div className="form-tag-selector__input-wrapper">
+            {renderIf(this.props.getValue().length, this.renderTags)}
+            <AutosizeInput
+              className="form__input-reset form-tag-selector__input"
+              onChange={this.handleChange}
+              placeholder="Type to filter..."
+              ref={this.inputRef}
+              type="text"
+              value={this.state.query} />
+          </div>
+        ), () => (
+          <button
+            className="form__btn-reset form-tag-selector__value"
+            disabled={this.props.disabled}
+            onClick={this.handleClickOpen}
+            onFocus={this.handleFocus}
+            type="button">
+            {this.getLabel()}
+          </button>
+        ))}
+      </DropdownWrapper>
+    );
   }
 }
