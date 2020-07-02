@@ -134,8 +134,7 @@ export default class TagSelector extends React.Component {
   getSelectedIndexes (values) {
     return values
       .map(v => this.props.options.findIndex(o => o.value === v))
-      .filter(i => i > -1)
-      .sort();
+      .filter(i => i > -1);
   }
 
   /**
@@ -172,16 +171,18 @@ export default class TagSelector extends React.Component {
   renderTags () {
     return (
       <ul className="form__ul-reset form-tag-selector__tags">
-        {this.getSelectedIndexes(this.props.getValue()).map(i => {
-          const opt = this.props.options[i];
-
-          return (
+        {this.getSelectedIndexes(this.props.getValue())
+          // map to options with indexes
+          .map(i => ({ ...this.props.options[i], i }))
+          // sort on label
+          .sort((a, b) => a.label > b.label ? 1 : -1)
+          .map(opt => (
             <li className="form__li-reset form-tag-selector__tag" key={this.props.optionKeySelector(opt)}>
               {opt.label}
-              <button className="form__btn-reset form-tag-selector__tag-remove" onClick={this.handleClickTagRemove} type="button" value={i}>X</button>
+              <button className="form__btn-reset form-tag-selector__tag-remove" onClick={this.handleClickTagRemove} type="button" value={opt.i}>X</button>
             </li>
-          );
-        })}
+          ))
+        }
       </ul>
     );
   }

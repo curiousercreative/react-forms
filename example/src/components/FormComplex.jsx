@@ -6,8 +6,8 @@ import FormCollectionExtended from './FormCollectionExtended.jsx';
 import FormExtended from './FormExtended.jsx';
 
 const OPTIONS = [
-  { label: 'apple', value: 'apple' },
-  { label: 'banana', value: 'banana' },
+  { label: 'apple', value: 'japple' },
+  { label: 'banana', value: 'zbanana' },
   { label: 'pear', value: 'pear' },
   { label: 'cantelope', value: 'cantelope' },
   { label: 'grapes', value: 'grapes' },
