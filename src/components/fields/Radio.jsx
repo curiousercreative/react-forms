@@ -32,10 +32,10 @@ export default class Radio extends React.Component {
   }
 
   render () {
-    let classes = this.props.className.split(' ').concat('form__button');
+    let classes = this.props.className.split(' ').concat('form__radio');
     const checked = this.props.isChecked();
 
-    if (checked) classes.push('form__button--is_active');
+    if (checked) classes.push('form__radio--is_active');
 
     return <input
       defaultChecked={checked}
@@ -43,6 +43,7 @@ export default class Radio extends React.Component {
       id={this.props.id}
       name={this.props.name}
       onClick={this.handleClick}
+      ref={this.props.forwardedRef}
       type="radio"
       value={this.props.value} />;
   }

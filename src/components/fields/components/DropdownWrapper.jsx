@@ -1,8 +1,8 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
 import memo from 'memoize-one';
 
 import bindMethods from '../../../util/bindMethods.js';
+import exists from '../../../util/exists.js';
 import renderIf from '../../../util/renderIf.js';
 
 const QUERY_KEY_REGEX = /[a-z0-9]/;
@@ -11,6 +11,8 @@ const QUERY_KEY_WINDOW = 1000;
 /**
  * @class DropdownWrapper
  * @property {string} [className]
+ * @property {boolean} [focusOnOpen = true]
+ * @property {boolean} [hasFocus]
  * @property {boolean} isOpen
  * @property {function} onSelect
  * @property {object[]} options
@@ -24,25 +26,52 @@ const QUERY_KEY_WINDOW = 1000;
 export default class DropdownWrapper extends React.Component {
   static defaultProps = {
     className: '',
+    focusOnOpen: true,
     optionKeySelector: opt => opt.value,
     prepareOptions: opts => opts,
   };
 
+  hasFocus = false;
   highlightIndex = -1;
   list = [];
   query = '';
   queryLastUpdated = 0;
+  timeout;
 
   constructor (...args) {
     super(...args);
     bindMethods(this);
 
+    this.getFocusHandlers = memo(this.getFocusHandlers);
     this.getOptions = memo(this.getOptions);
+    this.updateHasFocus = memo(this.updateHasFocus);
     this.updateIsOpen = memo(this.updateIsOpen);
   }
 
+  componentDidMount () {
+    addEventListener('keydown', this.handleKeys);
+  }
+
   componentDidUpdate () {
-    this.updateIsOpen(this.props.isOpen);
+    const { hasFocus, isOpen } = this.props;
+
+    // isOpen is always managed by parent, respond to updates
+    this.updateIsOpen(isOpen);
+
+    // if hasFocus exists, our parent is managing focus and we need to respond to updates
+    if (exists(hasFocus)) this.updateHasFocus(hasFocus);
+  }
+
+  componentWillUnmount () {
+    removeEventListener('keydown', this.handleKeys);
+  }
+
+  handleBlur () {
+    // wait a tick to allow our focus handler to cancel us as described here:
+    // https://medium.com/@jessebeach/dealing-with-focus-and-blur-in-a-composite-widget-in-react-90d3c3b49a9b
+    // NOTE: for the future: alternatively and more expensively, we can wait the
+    // tick and check whether ReactDOM.findDOMNode(this).contains(document.activeElement)
+    this.timeout = setTimeout(() => this.updateHasFocus(false), 0);
   }
 
   handleClickItem (e) {
@@ -51,10 +80,15 @@ export default class DropdownWrapper extends React.Component {
     this.props.onSelect(opt.value);
   }
 
+  handleFocus () {
+    this.updateHasFocus(true);
+    clearTimeout(this.timeout);
+  }
+
   handleKeys (e) {
     const { highlightIndex, list } = this;
 
-    // don't do anything if not open with options
+    // dropdown is open with options
     if (this.props.isOpen && list.length) {
       switch (e.which) {
         case 27: // escape
@@ -79,21 +113,31 @@ export default class DropdownWrapper extends React.Component {
           }
       }
     }
+    // key bindings for dropdown closed but field focused
+    else if (!this.props.isOpen && this.hasFocus) {
+      switch (e.which) {
+        case 13: // enter
+        case 32: // space
+        case 38: // up
+        case 40: // down
+          e.preventDefault();
+          this.open();
+      }
+    }
   }
 
-  handleWindowClickOrFocus (nativeEvent) {
-    if (this.props.isOpen && !findDOMNode(this).contains(nativeEvent.target)) this.close();
-  }
-
-  onClose () {
-    removeEventListener('click', this.handleWindowClickOrFocus);
-    removeEventListener('keydown', this.handleKeys);
-  }
+  onClose () {}
 
   onOpen () {
-    // add event listeners
-    addEventListener('click', this.handleWindowClickOrFocus);
-    addEventListener('keydown', this.handleKeys);
+    if (this.props.focusOnOpen) {
+      const selectedIndexes = this.getSelectedIndexes(this.props.value);
+      const highlightIndex = selectedIndexes.length === 1
+        ? selectedIndexes[0]
+        : 0;
+
+      // upon opening, focus on the only selected option or the first option
+      this.focusResult(highlightIndex);
+    }
   }
 
   onQueryKey (char) {
@@ -118,6 +162,17 @@ export default class DropdownWrapper extends React.Component {
     this.list[highlightIndex].focus();
   }
 
+  /**
+   * @param  {boolean} hasFocus - if this doesn't exist, then we need to manage
+   * it locally
+   * @return {object} blur and focus handlers
+   */
+  getFocusHandlers (hasFocus) {
+    return exists(hasFocus)
+      ? {}
+      : { onBlur: this.handleBlur, onFocus: this.handleFocus };
+  }
+
   getOptions (options, prepare) {
     return prepare(this.getOptionsWithIndexes(options));
   }
@@ -136,6 +191,15 @@ export default class DropdownWrapper extends React.Component {
 
   open () {
     this.props.setIsOpen(true);
+  }
+
+  updateHasFocus (hasFocus) {
+    this.hasFocus = hasFocus;
+
+    // if we gained focus and we're not already open
+    if (hasFocus && !this.props.isOpen) this.open();
+    // if we lost focus and we're open
+    if (!hasFocus && this.props.isOpen) this.close();
   }
 
   updateIsOpen (isOpen) {
@@ -182,7 +246,9 @@ export default class DropdownWrapper extends React.Component {
 
     if (this.props.isOpen) classes.push('form__dropdown-wrapper--is_open');
 
-    return <div className={classes.join(' ')}>
+    return <div
+      className={classes.join(' ')}
+      {...this.getFocusHandlers(this.props.hasFocus)}>
       {this.props.children}
       {renderIf(this.props.isOpen, this.renderOptions)}
     </div>;

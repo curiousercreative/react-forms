@@ -9,5 +9,5 @@ import TagSelector from './TagSelector';
  * @return {jsx} Field
  */
 export default function TagSelectorField (props) {
-  return <Field {...props} component={TagSelector} type="tag-selector" />;
+  return <Field {...props} ref={props.forwardedRef} component={TagSelector} type="tag-selector" />;
 }

@@ -9,5 +9,5 @@ import Checkbox from './Checkbox';
  * @return {jsx} Field
  */
 export default function CheckboxField (props) {
-  return <Field {...props} component={Checkbox} type="checkbox" />;
+  return <Field {...props} ref={props.forwardedRef} component={Checkbox} type="checkbox" />;
 }

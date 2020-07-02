@@ -30,7 +30,6 @@ let id = 0;
  */
 export default class Select extends React.Component {
   id = `select${id++}`;
-  inputRef = React.createRef();
 
   state = {
     isOpen: false,
@@ -41,19 +40,8 @@ export default class Select extends React.Component {
     bindMethods(this);
   }
 
-  handleClick () {
-    if (!this.props.disabled) this.open();
-  }
-
-  close () {
-    this.setIsOpen(false);
-  }
-
-  focus () {
-    this.inputRef.current.focus();
-
-    // NOTE: async to band-aid a race condition between this and componentDidUpdate
-    setTimeout(() => this.open(), 60);
+  handleFocus () {
+    this.setIsOpen(true);
   }
 
   getLabel () {
@@ -72,12 +60,10 @@ export default class Select extends React.Component {
     return opt ? opt.label : placeholder;
   }
 
-  open () {
-    this.setIsOpen(true);
-  }
-
   setIsOpen (isOpen) {
-    this.setState({ isOpen });
+    return isOpen === this.state.isOpen
+      ? Promise.resolve()
+      : new Promise(resolve => this.setState({ isOpen }, () => setTimeout(resolve, 0)));
   }
 
   render () {
@@ -88,12 +74,17 @@ export default class Select extends React.Component {
     return (
       <DropdownWrapper
         className={classes.join(' ')}
+        hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
         onSelect={this.props.setValue}
         options={this.props.options}
         setIsOpen={this.setIsOpen}
         value={this.props.getValue()}>
-        <button ref={this.inputRef} className="form__btn-reset form-select__value" onClick={this.handleClick} type="button">
+        <button
+          className="form__btn-reset form-select__value"
+          onFocus={this.handleFocus}
+          ref={this.props.forwardedRef}
+          type="button">
           <span>{this.getLabel()}</span>
           <i className="icon icon-angle-down" />
         </button>

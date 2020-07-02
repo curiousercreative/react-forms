@@ -9,5 +9,5 @@ import Radio from './Radio';
  * @return {jsx} Field
  */
 export default function RadioField (props) {
-  return <Field {...props} component={Radio} type="radio" />;
+  return <Field {...props} ref={props.forwardedRef} component={Radio} type="radio" />;
 }

@@ -10,11 +10,11 @@ import { util } from '@curiouser/react-forms';
  * @param       {function}  setValue
  * @returns     {jsx}       select
  */
-export default function NativeSelect ({ getValue, id, options, placeholder, required = true, setValue }) {
+export default function NativeSelect ({ forwardedRef, getValue, id, options, placeholder, required = true, setValue }) {
   const handleChange = React.useCallback((e) => setValue(e.target.value), [ setValue ]);
 
   return (
-    <select id={id} onChange={handleChange} value={getValue()}>
+    <select id={id} onChange={handleChange} ref={forwardedRef} value={getValue()}>
       {util.renderIf(placeholder, () => (
         <option disabled={required} value="">{placeholder}</option>
       ))}

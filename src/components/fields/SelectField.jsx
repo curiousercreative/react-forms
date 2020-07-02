@@ -9,5 +9,5 @@ import Select from './Select';
  * @return {jsx} Field
  */
 export default function SelectField (props) {
-  return <Field {...props} component={Select} type="select" />;
+  return <Field {...props} ref={props.forwardedRef} component={Select} type="select" />;
 }

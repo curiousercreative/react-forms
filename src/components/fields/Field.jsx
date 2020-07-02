@@ -1,5 +1,5 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import memo from 'memoize-one';
 
 import FormContext from '../config/FormContext';
 
@@ -8,10 +8,8 @@ import { getFieldTopic, getValue, isChecked, setValue, toggleValue } from './uti
 import bindMethods from '../../util/bindMethods.js';
 import omit from '../../util/omit.js';
 import renderIf from '../../util/renderIf.js';
-import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
 
-// use this for identifying a field since we'll be setting some global listeners
-// that we'll want to namespace uniquely
+// for generating a global namespace to allow for event listeners and HTMLLabelElement.for attribute
 let id = 0;
 
 // some field types prefer a label after the input
@@ -40,7 +38,9 @@ export default class Field extends React.Component {
   static contextType = FormContext;
   static defaultProps = { className: '', theme: 'default' };
 
+  fieldRef = React.createRef();
   id = `field${id++}`;
+  inputRef = React.createRef();
   state = {
     hasFocus: false,
   };
@@ -49,46 +49,42 @@ export default class Field extends React.Component {
   constructor (...args) {
     super(...args);
     bindMethods(this);
+
+    this.updateHasFocus = memo(this.updateHasFocus);
   }
 
   componentDidMount () {
-    // listen for focus events
-    // TODO: refactor to not require jquery
-    // TODO: there's currently an oddity with SlickCarousel where it's preventing
-    // focus from bubbling up, so this may not always fire :(
-    addEventListener('focusin', this.onFocusIn);
-    addEventListener('focusout', this.onFocusOut);
+    addEventListener('focusin', this.handleFocusIn);
+    addEventListener('focusout', this.handleFocusOut);
   }
 
   componentWillUnmount () {
-    removeEventListener('focusin', this.onFocusIn);
-    removeEventListener('focusout', this.onFocusOut);
+    removeEventListener('focusin', this.handleFocusIn);
+    removeEventListener('focusout', this.handleFocusOut);
     clearTimeout(this.timeout);
   }
 
-  onFocusIn (e) {
-    const field = findDOMNode(this);
-    const { index, name } = this.props;
-
-    if (field.contains(e.target)) {
-      this.setState({ hasFocus: true });
-      this.context.pubsub.trigger(getFieldTopic(name, 'focused'), { index, name });
-    }
+  handleFocusIn () {
+    clearTimeout(this.timeout);
+    this.updateHasFocus(this.hasFocus());
   }
 
-  onFocusOut (e) {
-    // async so that document.activeElement is updated
-    this.timeout = setTimeout(() => {
-      const field = findDOMNode(this);
-      const { index, name } = this.props;
+  handleFocusOut () {
+    // wait a tick to allow document.activeElement to update
+    // alternative method described below is wonky when focused elements are unmounted (no blur event triggered)
+    // https://medium.com/@jessebeach/dealing-with-focus-and-blur-in-a-composite-widget-in-react-90d3c3b49a9b
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => this.updateHasFocus(this.hasFocus()), 0);
+  }
 
-      // check whether an element within this field is losing focus
-      // but also check that this field doesn't still contain a focused element
-      if (field.contains(e.target) && !field.contains(document.activeElement)) {
-        this.setState({ hasFocus: false });
-        this.context.pubsub.trigger(getFieldTopic(name, 'blurred'), { index, name });
-      }
-    }, 0);
+  focus () {
+    this.updateHasFocus(true);
+
+    try {
+      this.inputRef.current.focus();
+    } catch (e) {
+      console.warn(`Unable to focus form field ${this.props.name}${this.props.index}`);
+    }
   }
 
   formatClassName (modifierKey, modifierVal) {
@@ -100,6 +96,7 @@ export default class Field extends React.Component {
   }
 
   getProps () {
+    // TODO: look into render optimization (memoization or otherwise)
     return {
       ...omit('className', this.props),
       getValue: () => getValue(this),
@@ -126,6 +123,12 @@ export default class Field extends React.Component {
     }
   }
 
+  hasFocus () {
+    const field = this.fieldRef.current;
+
+    return field.contains(document.activeElement);
+  }
+
   hasValue () {
     const value = getValue(this);
 
@@ -141,6 +144,20 @@ export default class Field extends React.Component {
       default:
         return true;
     }
+  }
+
+  updateHasFocus (hasFocus) {
+    // short circuit if values already match (necessary for first memoized call)
+    if (this.state.hasFocus === hasFocus) return;
+
+    const { index, name } = this.props;
+    const topicVerb = hasFocus ? 'focused' : 'blurred';
+
+    // console.log(`${name}${index} ${topicVerb}`);
+
+    this.setState({ hasFocus });
+    // publish a message for any interested parties
+    this.context.pubsub.trigger(getFieldTopic(name, topicVerb), { index, name });
   }
 
   renderErrors () {
@@ -162,7 +179,7 @@ export default class Field extends React.Component {
 
   render () {
     const Input = this.props.component;
-    const { forwardedRef, type } = this.props;
+    const { type } = this.props;
     let classes = this.props.className.split(' ')
       .concat([
         'form__field',
@@ -184,10 +201,10 @@ export default class Field extends React.Component {
 
     // TODO: add modifiers for things like has_value, etc
     return (
-      <div className={classes.join(' ')}>
+      <div className={classes.join(' ')} ref={this.fieldRef}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.renderErrors()}
-        <Input ref={forwardedRef} {...this.getProps()} />
+        <Input forwardedRef={this.inputRef} {...this.getProps()} />
         {renderIf(FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.props.children}
       </div>

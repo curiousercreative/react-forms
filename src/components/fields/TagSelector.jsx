@@ -16,12 +16,14 @@ let id = 0;
  * a custom dropdown/select input
  * @class TagSelector
  * @property {boolean} [disabled]
+ * @property {boolean} [hasFocus]
  * @property {string} name
  * @property {object[]} options
  * @property {string} options[].label
  * @property {string} options[].value
  * @property {function} [optionKeySelector]
  * @property {string} [placeholder]
+ * @property {boolean} [resetOnSelect]
  *
  * TEST CASES:
  * Given the dropdown is hidden, dropdown should display when "value" is clicked
@@ -37,10 +39,10 @@ let id = 0;
 export default class TagSelector extends React.Component {
   static defaultProps = {
     optionKeySelector: opt => opt.value,
+    resetOnSelect: false,
   };
 
   id = `tag-selector${id++}`;
-  inputRef = React.createRef();
   state = {
     isOpen: false,
     query: '',
@@ -50,19 +52,15 @@ export default class TagSelector extends React.Component {
     super(...args);
     bindMethods(this);
 
-    this.state.isOpen = !exists(this.props.getValue());
-
     this.prepareOptions = memo(curry(this.prepareOptions));
   }
 
   componentDidMount () {
-    addEventListener('focusin', this.handleWindowClickOrFocus);
+    addEventListener('keydown', this.handleKeys);
   }
 
   componentWillUnmount () {
     removeEventListener('keydown', this.handleKeys);
-    removeEventListener('click', this.handleWindowClickOrFocus);
-    removeEventListener('focusin', this.handleWindowClickOrFocus);
   }
 
   handleChange (e) {
@@ -71,8 +69,11 @@ export default class TagSelector extends React.Component {
     this.setState({ query: value });
   }
 
-  handleClickOpen () {
-    this.open();
+  handleFocus () {
+    this.setIsOpen(true).then(() => {
+      // focus on the actual text input
+      this.props.forwardedRef.current.focus();
+    });
   }
 
   handleClickTagRemove (e) {
@@ -82,16 +83,12 @@ export default class TagSelector extends React.Component {
     this.props.toggleValue(opt.value);
   }
 
-  handleFocus () {
-    this.focus();
-  }
-
   handleKeys (e) {
-    const { query } = this.state;
-    const value = this.props.getValue();
-
     // don't do anything if not focused
     if (!this.state.isOpen) return;
+
+    const { query } = this.state;
+    const value = this.props.getValue();
 
     switch (e.which) {
       case 8: // backspace
@@ -102,8 +99,7 @@ export default class TagSelector extends React.Component {
         // if search was entered, clear it and refocus on the input to allow
         // a new search
         if (query) {
-          this.setState({ query: '' });
-          this.inputRef.current.focus();
+          this.resetQuery();
 
           // this is an attempt to block DropdownWrapper from closing as part of its
           // key listener
@@ -113,21 +109,7 @@ export default class TagSelector extends React.Component {
     }
   }
 
-  close () {
-    if (!this.state.isOpen) return;
-
-    removeEventListener('keydown', this.handleKeys);
-
-    this.setState({ isOpen: false });
-  }
-
-  focus () {
-    // open the dropdown (and focus on our text input)
-    this.open();
-  }
-
   focusResult (highlightIndex) {
-    // this.open();
     this.setState({ highlightIndex });
     this.list[highlightIndex].focus();
   }
@@ -153,19 +135,6 @@ export default class TagSelector extends React.Component {
       .sort();
   }
 
-  open () {
-    return new Promise(resolve => {
-      if (this.state.isOpen) return resolve();
-
-      this.setState({ isOpen: true }, () => setTimeout(resolve, 0));
-    })
-      .then(() => {
-        addEventListener('keydown', this.handleKeys);
-        // focus on the actual text input
-        if (this.inputRef.current) this.inputRef.current.focus();
-      });
-  }
-
   /**
    * removes the (visually) last tag
    */
@@ -181,8 +150,20 @@ export default class TagSelector extends React.Component {
     return options.filter(({ label }) => !query || label.toLowerCase().includes(query));
   }
 
+  resetQuery () {
+    this.setState({ query: '' });
+    this.props.forwardedRef.current.focus();
+  }
+
+  select (value) {
+    this.props.toggleValue(value);
+    if (this.props.resetOnSelect) this.resetQuery();
+  }
+
   setIsOpen (isOpen) {
-    if (isOpen !== this.state.isOpen) this.setState({ isOpen });
+    return isOpen === this.state.isOpen
+      ? Promise.resolve()
+      : new Promise(resolve => this.setState({ isOpen }, () => setTimeout(resolve, 0)));
   }
 
   renderTags () {
@@ -210,8 +191,10 @@ export default class TagSelector extends React.Component {
     return (
       <DropdownWrapper
         className={classes.join(' ')}
+        focusOnOpen={false}
+        hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
-        onSelect={this.props.toggleValue}
+        onSelect={this.select}
         options={this.props.options}
         prepareOptions={this.prepareOptions(this.state.query)}
         setIsOpen={this.setIsOpen}
@@ -223,7 +206,7 @@ export default class TagSelector extends React.Component {
               className="form__input-reset form-tag-selector__input"
               onChange={this.handleChange}
               placeholder="Type to filter..."
-              ref={this.inputRef}
+              ref={this.props.forwardedRef}
               type="text"
               value={this.state.query} />
           </div>
@@ -231,8 +214,8 @@ export default class TagSelector extends React.Component {
           <button
             className="form__btn-reset form-tag-selector__value"
             disabled={this.props.disabled}
-            onClick={this.handleClickOpen}
             onFocus={this.handleFocus}
+            ref={this.props.forwardedRef}
             type="button">
             {this.getLabel()}
           </button>

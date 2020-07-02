@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function NativeDate ({ getValue, id, placeholder, setValue }) {
+export default function NativeDate ({ forwardedRef, getValue, id, placeholder, setValue }) {
   const handleChange = React.useCallback(e => {
     setValue(e.target.value);
   }, [ setValue ]);
@@ -10,6 +10,7 @@ export default function NativeDate ({ getValue, id, placeholder, setValue }) {
     id={id}
     onChange={handleChange}
     placeholder={placeholder}
+    ref={forwardedRef}
     type="date"
     value={getValue() || ''} />;
 }

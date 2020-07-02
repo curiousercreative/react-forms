@@ -42,6 +42,7 @@ export default class Checkbox extends React.Component {
       id={this.props.id}
       name={this.props.name}
       onClick={this.handleClick}
+      ref={this.props.forwardedRef}
       type="checkbox"
       value={this.props.value} />;
   }

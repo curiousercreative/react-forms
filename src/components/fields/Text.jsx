@@ -10,6 +10,8 @@ const TYPE_MODE_MAP = {
 /**
  * As basic as it gets, a text input
  * @class Text
+ * @property {React.Ref} [forwardedRef]
+ * @property {boolean} [hasFocus]
  * @property {string} id
  * @property {string} name
  * @property {string} type - supply a type to hint device's virtual keyboard
@@ -20,8 +22,6 @@ export default class Text extends React.Component {
     type: 'text',
   };
 
-  inputRef = React.createRef();
-
   constructor (...args) {
     super(...args);
     bindMethods(this);
@@ -30,10 +30,6 @@ export default class Text extends React.Component {
   handleChange (e) {
     // handle a change to this field's value by user input
     this.props.setValue(e.target.value);
-  }
-
-  focus () {
-    this.inputRef.current.focus();
   }
 
   getInputMode () {
@@ -67,7 +63,7 @@ export default class Text extends React.Component {
       inputMode={this.getInputMode()}
       name={this.props.name}
       onChange={this.handleChange}
-      ref={this.inputRef}
+      ref={this.props.forwardedRef}
       placeholder={this.props.placeholder}
       type={this.getType()}
       value={this.props.getValue() || ''} />;

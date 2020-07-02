@@ -11,5 +11,5 @@ import Text from './Text';
 export default function TextField (props) {
   let type = props.type || 'text';
 
-  return <Field {...props} component={Text} type={type} />;
+  return <Field {...props} ref={props.forwardedRef} component={Text} type={type} />;
 }

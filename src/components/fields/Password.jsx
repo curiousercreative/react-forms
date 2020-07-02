@@ -34,7 +34,7 @@ export default class Password extends React.Component {
         className="form__input form__input--type_password"
         name={this.props.name}
         onChange={this.handleChange}
-        ref="input"
+        ref={this.props.forwardedRef}
         type={type}
         value={this.props.getValue() || ''} />
       <button className="form__btn-reset" onClick={this.handleClick} type="button">{this.state.showPassword ? 'hide' : 'show'}</button>

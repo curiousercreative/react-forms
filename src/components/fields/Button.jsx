@@ -55,6 +55,7 @@ export default class Button extends React.Component {
       className={classes.join(' ')}
       name={this.props.name}
       onClick={this.handleClick}
+      ref={this.props.forwardedRef}
       type="button"
       value={this.props.value}>
       {this.props.children}

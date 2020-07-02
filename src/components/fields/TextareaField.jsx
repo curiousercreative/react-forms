@@ -9,5 +9,5 @@ import Textarea from './Textarea';
  * @return {jsx} Field
  */
 export default function TextareaField (props) {
-  return <Field {...props} component={Textarea} type="textarea" />;
+  return <Field {...props} ref={props.forwardedRef} component={Textarea} type="textarea" />;
 }

@@ -9,5 +9,5 @@ import Text from './Text';
  * @return {jsx} Field
  */
 export default function EmailField (props) {
-  return <Field {...props} component={Text} type="email" />;
+  return <Field {...props} ref={props.forwardedRef} component={Text} type="email" />;
 }

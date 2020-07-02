@@ -26,6 +26,7 @@ export default class Textarea extends React.Component {
       className="form__input form__input--type_textarea"
       onChange={this.handleChange}
       name={this.props.name}
+      ref={this.props.forwardedRef}
       value={this.props.getValue() || ''} />;
   }
 }

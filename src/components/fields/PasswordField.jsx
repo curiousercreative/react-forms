@@ -9,5 +9,5 @@ import Password from './Password';
  * @return {jsx} Field
  */
 export default function PasswordField (props) {
-  return <Field {...props} component={Password} type="password" />;
+  return <Field {...props} ref={props.forwardedRef} component={Password} type="password" />;
 }
