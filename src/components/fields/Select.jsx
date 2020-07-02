@@ -10,6 +10,7 @@ let id = 0;
  * a custom dropdown/select input
  * @class Select
  * @property {boolean} [disabled]
+ * @property {boolean} [closeOnSelect = true]
  * @property {string} name
  * @property {object[]} options
  * @property {string} options[].label
@@ -29,6 +30,10 @@ let id = 0;
  * Given dropdown is visible, pressing escape should hide dropdown
  */
 export default class Select extends React.Component {
+  static defaultProps = {
+    closeOnSelect: true,
+  };
+
   id = `select${id++}`;
 
   state = {
@@ -60,6 +65,11 @@ export default class Select extends React.Component {
     return opt ? opt.label : placeholder;
   }
 
+  select (value) {
+    this.props.toggleValue(value);
+    if (this.props.closeOnSelect) this.setIsOpen(false);
+  }
+
   setIsOpen (isOpen) {
     return isOpen === this.state.isOpen
       ? Promise.resolve()
@@ -76,7 +86,7 @@ export default class Select extends React.Component {
         className={classes.join(' ')}
         hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
-        onSelect={this.props.setValue}
+        onSelect={this.select}
         options={this.props.options}
         setIsOpen={this.setIsOpen}
         value={this.props.getValue()}>

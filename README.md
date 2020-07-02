@@ -68,7 +68,7 @@ import Field from 'form/dist/components/fields/Field.jsx';
 import NativeSelect from './NativeSelect.jsx';
 
 export default function NativeSelectField (props) {
-  return <Field {...props} component={NativeSelect} type="select" />
+  return <Field {...props} ref={props.forwardedRef} component={NativeSelect} type="select" />
 }
 ```
 
@@ -77,11 +77,11 @@ export default function NativeSelectField (props) {
 import React from 'react';
 import { util } from '@curiouser/react-forms';
 
-export default function NativeSelect ({ getValue, id, options, placeholder, required = true, setValue }) {
+export default function NativeSelect ({ forwardedRef, getValue, id, options, placeholder, required = true, setValue }) {
   const handleChange = React.useCallback((e) => setValue(e.target.value), [ setValue ]);
 
   return (
-    <select id={id} onChange={handleChange} value={getValue()}>
+    <select id={id} onChange={handleChange} ref={forwardedRef} value={getValue()}>
       {util.renderIf(placeholder, () => (
         <option disabled={required} value="">{placeholder}</option>
       ))}

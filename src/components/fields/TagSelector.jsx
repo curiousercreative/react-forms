@@ -84,34 +84,33 @@ export default class TagSelector extends React.Component {
   }
 
   handleKeys (e) {
-    // don't do anything if not focused
+    // window event listener, be careful to only respond to keys when focused/open
     if (!this.state.isOpen) return;
 
-    const { query } = this.state;
-    const value = this.props.getValue();
-
     switch (e.which) {
-      case 8: // backspace
-        // if our query is empty, we've got tags and user is backspacing...
-        if (!this.state.query && value.length) this.popTag();
-        break;
       case 27: // escape
-        // if search was entered, clear it and refocus on the input to allow
-        // a new search
-        if (query) {
+        // if search was entered, reset and refocus for next query
+        if (this.state.query) {
           this.resetQuery();
 
-          // this is an attempt to block DropdownWrapper from closing as part of its
-          // key listener
+          // this prevents DropdownWrapper from closing as part of its key listener
           e.stopImmediatePropagation();
         }
         break;
     }
   }
 
-  focusResult (highlightIndex) {
-    this.setState({ highlightIndex });
-    this.list[highlightIndex].focus();
+  handleQueryKeys (e) {
+    switch (e.which) {
+      case 8: // backspace
+        // if our query is empty, we've got tags and user is backspacing...
+        if (!this.state.query && this.props.getValue().length) this.popTag();
+        break;
+      case 13: // enter
+        // select first option
+        this.select(this.getOptions()[0].value);
+        break;
+    }
   }
 
   getLabel () {
@@ -122,6 +121,10 @@ export default class TagSelector extends React.Component {
       .join(', ');
 
     return label || this.props.placeholder || '';
+  }
+
+  getOptions () {
+    return this.prepareOptions(this.state.query, this.props.options);
   }
 
   getOptionsWithIndexes (options) {
@@ -205,6 +208,7 @@ export default class TagSelector extends React.Component {
             <AutosizeInput
               className="form__input-reset form-tag-selector__input"
               onChange={this.handleChange}
+              onKeyDown={this.handleQueryKeys}
               placeholder="Type to filter..."
               ref={this.props.forwardedRef}
               type="text"
