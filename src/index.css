@@ -246,6 +246,13 @@
 .form__button {
   font-family: inherit;
 }
+.form__checkbox,
+.form__radio,
+.form__button,
+.form__field--type_checkbox .form__label,
+.form__field--type_radio .form__label {
+  cursor: pointer;
+}
 
 .form__submit {
   position: relative;
