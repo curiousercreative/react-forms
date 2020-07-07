@@ -5,7 +5,7 @@ let i = 1;
 
 /**
  * a simple wrapper around a popular publish/subscribe npm package https://github.com/mroderick/PubSubJS
- * all we're doing here is aliasing it's methods with shorter names
+ * we've aliased it's methods with shorter names and added channel isolation
  * @module
  * @example
  * import pubsub from 'lib/pubsub';

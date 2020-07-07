@@ -1,17 +1,25 @@
+/** @module lib/form/models/defaultModel */
 import { pascalize } from '../../transformers';
 
 /**
- * localStateStore
+ * @function defaultModel
  * @param  {object} instance - Form component instance
- * @return {object}
+ * @return {FormModel}
  */
 export default function defaultModel (instance) {
+  /**
+   * cleanCollection
+   * @description transform an entire collection before storing
+   * @param {object[]} formData
+   * @return {object[]}
+   */
   function cleanCollection (formData) {
     return formData.map(this.cleanModel);
   }
 
   /**
-   * cleanModel - clean a full model instance before writing to st
+   * cleanModel
+   * @description transform an entire model before storing
    * @param  {object} formData
    * @return {object}
    */
@@ -20,7 +28,8 @@ export default function defaultModel (instance) {
   }
 
   /**
-   * _cleanValue - transform a single form field value from user input before storing
+   * _cleanValue
+   * @description generic transform for any single form field value from user input before storing
    * @param {string} name
    * @param {string|any} value
    * @return {string|any}
@@ -30,7 +39,8 @@ export default function defaultModel (instance) {
   }
 
   /**
-   * cleanValue - wrapper for transforming user input values on their way to store
+   * cleanValue
+   * @description wrapper for transforming user input values on their way to store
    * @param {string} name
    * @param {string|any} value
    * @return {string|any}
@@ -43,16 +53,27 @@ export default function defaultModel (instance) {
     return this[methodName](value);
   }
 
+  /**
+   * getValidations
+   * @return {object[]} validations
+   */
   function getValidations () {
     return this.validations;
   }
 
+  /**
+   * formatCollection
+   * @description transform entire collection of data for view consumption
+   * @param  {object[]} formData
+   * @return {object[]}
+   */
   function formatCollection (formData) {
     return formData;
   }
 
   /**
-   * formatModel - prepare entire form data for form field view components
+   * formatModel
+   * @description prepare entire form data for form field view components
    * @param  {object} formData
    * @return {object}
    */
@@ -61,7 +82,8 @@ export default function defaultModel (instance) {
   }
 
   /**
-   * formatValue - transform a single field for view components
+   * _formatValue
+   * @description generic transform for any single field for view components
    * @param  {string} name
    * @param  {string|any} value
    * @return {string|any}
@@ -71,7 +93,8 @@ export default function defaultModel (instance) {
   }
 
   /**
-   * formatValue - wrapper for transforming form values for use by view components
+   * formatValue
+   * @description wrapper for transforming form values for use by view components
    * @param {string} name
    * @param {string|any} value
    * @return {string|any}
@@ -86,6 +109,8 @@ export default function defaultModel (instance) {
 
   /**
    * selectPrimaryKey
+   * @description selector function for identifying data, helpful for merging
+   * temporary and persistent data
    * @param  {object} modelInstance
    * @return {string|number|any} primary key
    */

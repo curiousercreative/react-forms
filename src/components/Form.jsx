@@ -1,3 +1,4 @@
+/** @module components/Form */
 import React from 'react';
 import memoize from 'memoize-one';
 
@@ -53,20 +54,26 @@ export default class Form extends React.Component {
     validations: [],
   };
 
+  /** @property {object} emptyValues */
   emptyValues = {};
   /** @property {array} fieldsBlurred - list of field names that have been blurred used for validating as you go */
   fieldsBlurred = [];
   /** @property {boolean} isValid - keep this instance flag to allow us immediate get/set  */
   isValid;
+  /** @property {object} model - set of functions that are generally specific to a data model */
   model = {};
+  /** @property {boolean} parentFormWarned - a flag to prevent repeating warning message */
   parentFormWarned = false;
+  /** @property {object} pubsub - a Pubsub instance for messaging. Defaults to a 1:1 relationship with Form instance, but can be a shared Pubsub instance provided via props */
+  pubsub = {};
   state = {};
+  /** @property {object} store - set of functions that are generally specific to a data store (redux, another component's state, etc) */
   store = {};
 
   constructor (...args) {
     super(...args);
     bindMethods(this);
-    this.pubsub = this.pubsub || new Pubsub();
+    this.pubsub = this.props.pubsub || new Pubsub();
 
     this._setModel = memoize(this._setModel);
     this._setStore = memoize(this._setStore);

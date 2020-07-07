@@ -1,15 +1,17 @@
+/** @module lib/form/stores/localStateStore */
 import { pascalize } from '../../transformers';
 
 const emptyErrors = [];
 
 /**
- * localStateStore
+ * @function localStateStore
  * @param  {object} instance - Form component instance
- * @return {object}
+ * @return {FormStore}
  */
 export default function localStateStore (instance) {
   /**
-   * fromStore - transform data read from store, perhaps the store only accepts
+   * fromStore
+   * @description transform data read from store, perhaps the store only accepts
    * strings or some other encoding requirement
    * @param {object|object[]} data
    * @return {object|object[]}
@@ -18,18 +20,42 @@ export default function localStateStore (instance) {
     return data;
   }
 
+  /**
+   * getData
+   * @description read values from store
+   * @return {object}
+   */
   function getData () {
     return this.values();
   }
 
+  /**
+   * getErrors
+   * @description read errors from store
+   * @return {object[]}
+   */
   function getErrors () {
     return instance.state.errors;
   }
 
+  /**
+   * _getValue
+   * @description generic value getter describing how any value should be retrieved
+   * @param  {string} name
+   * @return {any}
+   */
   function _getValue (name) {
     return this.values()[name];
   }
 
+  /**
+   * getValue
+   * @description value getter wrapping function, determines which field specific
+   * getter to use and call
+   * @param  {string} name
+   * @param  {number} [index]
+   * @return {any}
+   */
   function getValue (name, index) {
     const methodName = `getValueFor${pascalize(name)}`;
     // if we don't have a field specific getter, make one based on _getValue
@@ -38,6 +64,13 @@ export default function localStateStore (instance) {
     return this[methodName](index);
   }
 
+  /**
+   * initData
+   * @description write data to store during Form instance construction phase
+   * this is necessary for React Components where writing to state must be done differently
+   * before the component has been mounted
+   * @param  {object} _values - raw values that may be transformed for the store
+   */
   function initData (_values) {
     const values = this.toStore(_values || instance.state.values || instance.emptyValues);
 
@@ -48,20 +81,45 @@ export default function localStateStore (instance) {
     else instance.state.values = this.toStore(values);
   }
 
+  /**
+   * initErrors
+   * @description write errors to store during Form instance construction phase
+   * @param  {object[]} errors
+   */
   function initErrors (errors) {
     instance.state.errors = errors || instance.state.errors || emptyErrors;
   }
 
-  function _setData (values) {
-    return this.setData(this.toStore(instance.model.cleanModel(values)));
+  /**
+   * _setData
+   * @description wrapper for providing the store with complete data. this method
+   * currently assumes data is user entered
+   * @param       {object} _values - raw values that may be cleaned by model before
+   * being transformed for store
+   * @return {Promise}
+   */
+  function _setData (_values) {
+    return this.setData(this.toStore(instance.model.cleanModel(_values)));
   }
 
+  /**
+   * setData
+   * @description writes entire data to Form state or parent Form state
+   * @param       {object} values
+   * @return {Promise}
+   */
   function setData (values) {
     return instance._hasParentForm()
       ? instance.context.actions.setValue(instance.props.name, values, 'field', instance.props.index)
       : new Promise(resolve => instance.setState({ values }, resolve));
   }
 
+  /**
+   * setErrors
+   * @description write errors to state
+   * @param       {object[]} _errors
+   * @return {Promise}
+   */
   function setErrors (_errors) {
     const errors = _errors.length ? _errors : emptyErrors;
 
@@ -71,10 +129,26 @@ export default function localStateStore (instance) {
       : new Promise(resolve => instance.setState({ errors }, resolve));
   }
 
+  /**
+   * _setValue
+   * @description generic value setter describing how any value should be set
+   * @param  {string} name
+   * @param  {any} value
+   * @return {Promise}
+   */
   function _setValue (name, value) {
     return this._setData({ ...this.values(), [name]: value });
   }
 
+  /**
+   * setValue
+   * @description value setter wrapping function, determines which field specific
+   * setter to use and call it
+   * @param  {string} name
+   * @param  {any} value
+   * @param  {number} [index]
+   * @return {Promise}
+   */
   function setValue (name, value, index) {
     const methodName = `setValueFor${pascalize(name)}`;
     // if we don't have a field specific setter, make one based on setValue
@@ -84,7 +158,8 @@ export default function localStateStore (instance) {
   }
 
   /**
-   * toStore - transform form data before writing to store
+   * toStore
+   * @description transform form data before writing to store, currently a placeholder
    * @param  {object|object[]} data
    * @return {object|object[]}
    */
@@ -92,6 +167,11 @@ export default function localStateStore (instance) {
     return data;
   }
 
+  /**
+   * _values
+   * @description retrieves full data from Form state or parent Form state
+   * @return      {object|object[]}
+   */
   function _values () {
     const values = instance._hasParentForm()
       ? instance.context.state.values[instance.props.name]
@@ -100,6 +180,11 @@ export default function localStateStore (instance) {
     return values || instance.emptyValues;
   }
 
+  /**
+   * values
+   * @description wrapper function for transforming store data for view or app consumption
+   * @return {object|object[]}
+   */
   function values () {
     // TODO: consider moving this fromStore to Form.formatData to improve memoization
     return this.fromStore(_values());

@@ -2,6 +2,7 @@ import React from 'react';
 import { util } from '@curiouser/react-forms';
 
 /**
+ * @class NativeSelect
  * @param       {function}  getValue
  * @param       {string}    id
  * @param       {object[]}  options

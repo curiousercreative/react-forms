@@ -1,6 +1,7 @@
 import React from 'react';
 
 /**
+ * @class Fields
  * @param       {React.Children} children
  * @param       {string} [className='']
  * @param       {boolean} [equalWidth = true] - whether to allocate equal width for each field

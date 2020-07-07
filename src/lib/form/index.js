@@ -1,3 +1,10 @@
+/** @module lib/form */
+
+/**
+ * @function bindMethods
+ * @param  {object} source
+ * @return {object} a new object with methods bound
+ */
 function bindMethods (source) {
   const destination = {};
 
@@ -12,19 +19,19 @@ function bindMethods (source) {
 }
 
 /**
- * mergeObjects - merge stores, models, etc
+ * @function mergeObjects
  * @param  {Form} instance
- * @param  {object[]} objects
- * @return {object}
+ * @param  {object[]} objects - for merging
+ * @return {object} merged
  */
 export function mergeObjects (instance, ...objects) {
   return bindMethods(objects.reduce((merged, obj) => Object.assign(merged, injectInstance(obj, instance)), {}));
 }
 
 /**
- * injectInstance - inject a Form instance into a model, store, etc
- * @param  {object} [obj={}]
- * @param  {Form} instance
+ * @function injectInstance
+ * @param  {object} [obj={}] models, stores, etc for injecting a Form instance into
+ * @param  {Form} instance Form instance
  * @return {object}
  */
 function injectInstance (obj = {}, instance) {

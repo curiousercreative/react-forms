@@ -1,3 +1,4 @@
+/** @module components/FormCollection */
 import React from 'react';
 
 import Form from './Form.jsx';
@@ -67,10 +68,6 @@ export default class FormCollection extends Form {
     this.store.initErrors(errors);
 
     this.renderItem = curry(this.renderItem);
-  }
-
-  _callbackRef (refInstance) {
-    this.collection.push(refInstance);
   }
 
   /**
@@ -170,6 +167,10 @@ export default class FormCollection extends Form {
     return `c${this.cid++}`;
   }
 
+  /**
+   * getData - get data for external consumption, merges temporary data atop permanent data
+   * @return {object[]}
+   */
   getData () {
     const list = [];
     const set = new Set();
@@ -248,7 +249,7 @@ export default class FormCollection extends Form {
       handleClickRemove={this.handleClickRemove}
       index={index}
       key={item.cid}
-      ref={this._callbackRef} />;
+      ref={el => el && this.collection.push(el)} />;
   }
 
   render (Component) {

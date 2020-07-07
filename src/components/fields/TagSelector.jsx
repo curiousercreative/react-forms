@@ -13,7 +13,7 @@ import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
 
 let id = 0;
 /**
- * a custom dropdown/select input
+ * a custom dropdown + text input for filtering dropdown options
  * @class TagSelector
  * @property {boolean} [disabled]
  * @property {boolean} [hasFocus]
@@ -26,15 +26,14 @@ let id = 0;
  * @property {boolean} [resetOnSelect]
  *
  * TEST CASES:
- * Given the dropdown is hidden, dropdown should display when "value" is clicked
- * Given the dropdown is visible, dropdown should hide when "value" is clicked
- * Given the dropdown is visible, dropdown should hide when any item from dropdown is clicked
- * Given the dropdown is visible, dropdown should hide when user clicks outside of dropdown
- * Given the dropdown is visible, dropdown should hide when user focus leaves component
- * Given dropdown is visible, "value" should update when user selects any item from dropdown
- * Given dropdown is visible, up and down keys should navigate dropdown items
- * Given dropdown is visible, pressing enter should select dropdown item
- * Given dropdown is visible, pressing escape should hide dropdown
+ * Given the dropdown is closed, field should display labels of selected options
+ * Given the dropdown is open, dropdown should close when user clicks outside of field
+ * Given the dropdown is open, dropdown should close when user focus leaves component
+ * Given the dropdown is open, "value" should be toggled when user selects item from dropdown
+ * Given the dropdown is open, up and down keys should navigate dropdown items
+ * Given the dropdown is open, pressing enter/space should select dropdown item
+ * Given the dropdown is open, with query text entered, pressing escape should reset query text
+ * Given the dropdown is open, without query text entered, pressing escape should hide dropdown
  */
 export default class TagSelector extends React.Component {
   static defaultProps = {

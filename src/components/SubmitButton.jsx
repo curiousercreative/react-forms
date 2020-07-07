@@ -1,10 +1,11 @@
+/** @module components/SubmitButton */
 import React, { useContext } from 'react';
 
 import FormContext from './config/FormContext';
 
 /**
  * button to submit a form, shows a loading spinner during loading
- * @class SubmitButton
+ * @function SubmitButton
  * @param {string} [className = '']
  * @param {jsx} children
  * @param {boolean} [isLoading] will derive from parent form state if not provided

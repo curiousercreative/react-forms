@@ -15,7 +15,7 @@ export { messages, tests };
  * validations definition collection
  * @typedef {object[]} Validations
  * @property {array} Validations[].names - names of fields to perform validation on
- * @property {tuple[]} Validations[].tests - first item in tuple is a test function,
+ * @property {entries} Validations[].tests - first item in tuple is a test function,
  * second is message generator
  * @example
  * [{
