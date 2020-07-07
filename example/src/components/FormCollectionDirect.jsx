@@ -29,10 +29,10 @@ export default class FormCollectionDirect extends React.Component {
 function User ({ index, username, password }) {
   return (
     <div className="form-collection-extended__item" key={index}>
-      <div className="form__fields">
+      <Fields.Fields>
         <Fields.TextField index={index} label="username" name="username" />
         <Fields.PasswordField index={index} label="password" name="password" />
-      </div>
+      </Fields.Fields>
     </div>
   );
 }

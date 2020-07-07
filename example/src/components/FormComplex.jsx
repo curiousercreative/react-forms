@@ -72,13 +72,13 @@ export default class FormComplex extends Form {
 
         <FormCollectionExtended name="cast" />
 
-        <div className="form__fields">
+        <Fields.Fields>
           <Fields.EmailField label="email" name="email" />
           <Fields.TextField label="extra text" name="extra_text" />
           <Fields.SelectField label="extra select" name="extra_select" options={OPTIONS} />
           <Fields.RadioField label="extra radio" name="extra_radio" value="radio on" />
           <Fields.CheckboxField label="extra checkbox" name="extra_checkbox" value="checkbox on" />
-        </div>
+        </Fields.Fields>
         <Fields.TextareaField label="extra textarea" name="extra_textarea" />
         <Fields.NativeSelectField label="native select" name="native_select" options={[{ label: 'Something something', value: 'yes' }, { label: 'and another', value: 'no' }]} placeholder="select one..." />
         <Fields.NativeDateField label="native date" name="native_date" placeholder="YYYY-MM-DD" />

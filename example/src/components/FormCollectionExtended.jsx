@@ -1,16 +1,26 @@
 import React from 'react';
 import { Fields, Form, FormCollection, SubmitButton, util, validator } from '@curiouser/react-forms';
 
+const FRUITS = [
+  { label: 'apple', value: 'japple' },
+  { label: 'banana', value: 'zbanana' },
+  { label: 'pear', value: 'pear' },
+  { label: 'cantelope', value: 'cantelope' },
+  { label: 'grapes', value: 'grapes' },
+  { label: 'peach', value: 'peach' },
+  { label: 'grapefruit', value: 'grapefruit' },
+];
+
 const User = React.forwardRef(function User ({ index, handleClickRemove }, ref) {
   return (
     <div className="form-collection-extended__item">
-      <div className="form__fields">
+      <Fields.Fields>
         <Fields.TextField index={index} label="username" name="username" />
         <Fields.PasswordField index={index} label="password" name="password" />
         <Fields.SelectField index={index} label="select" name="select" options={[{ label: '1', value: 1 }, { label: '2', value: 2 }]} forwardedRef={ref} />
-        <Fields.TagSelectorField index={index} label="tag select" name="tag" options={[{ label: '1', value: 1 }, { label: '2', value: 2 }]} />
+        <Fields.TagSelectorField index={index} label="tag select" name="tag" options={FRUITS} />
         <button onClick={handleClickRemove} type="button" value={index}>remove</button>
-      </div>
+      </Fields.Fields>
     </div>
   );
 });

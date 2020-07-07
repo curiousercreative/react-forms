@@ -57,11 +57,21 @@
   flex-basis: 100%;
   margin-bottom: 1em;
 }
+
+/* TODO: choose between defaulting to field gaps or not */
+/* TODO: somehow support both field gaps and gapless via a prop */
+.form__fields .form__field + .form__field {
+  margin-left: 1rem;
+}
+
 /* border-collapsing of adjacent fields */
-/* .form__field--no_errors + .form__field--no_errors .form__input, */
+/* .form__field--no_errors + .form__field--no_errors .form__input,
 .form__field--has_errors + .form__field--has_errors .form__input {
   border-left-color: transparent;
 }
+/*
+
+ */
 .form__label,
 .form__field-error {
   font-size: 13px;
@@ -117,6 +127,39 @@
   .form__field--nd_50 { flex-basis: 50%; }
   .form__field--nd_75 { flex-basis: 75%; }
   .form__field--nd_100 { flex-basis: 100%; }
+}
+.form__fields--count_2 .form__field {
+  max-width: calc((100% - 1rem) / 2);
+}
+.form__fields--count_3 .form__field {
+  max-width: calc((100% - 2rem) / 3);
+}
+.form__fields--count_4 .form__field {
+  max-width: calc((100% - 3rem) / 4);
+}
+.form__fields--count_5 .form__field {
+  max-width: calc((100% - 4rem) / 5);
+}
+.form__fields--count_6 .form__field {
+  max-width: calc((100% - 5rem) / 6);
+}
+.form__fields--count_7 .form__field {
+  max-width: calc((100% - 6rem) / 7);
+}
+.form__fields--count_8 .form__field {
+  max-width: calc((100% - 7rem) / 8);
+}
+.form__fields--count_9 .form__field {
+  max-width: calc((100% - 8rem) / 9);
+}
+.form__fields--count_10 .form__field {
+  max-width: calc((100% - 9rem) / 10);
+}
+.form__fields--count_11 .form__field {
+  max-width: calc((100% - 10rem) / 11);
+}
+.form__fields--count_12 .form__field {
+  max-width: calc((100% - 11rem) / 12);
 }
 .form__input {
   width: 100%;

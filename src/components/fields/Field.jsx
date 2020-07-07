@@ -30,6 +30,8 @@ const FIELD_TYPES_LABEL_AFTER_INPUT = [
  * @property {string} name - form field name, will be key in form data
  * @property {collection} [options] - for selectField or anything else that accepts
  * a predefined list of options to select from
+ * @property {boolean} [retainsFocus = false] whether to consider this field to still
+ * be active after blur if nothing else has acquired focus
  * @property {string} [theme] - defaults to "default", will generate class formatted
  * as form__field--theme_default
  * @property {string} type
@@ -38,7 +40,11 @@ const FIELD_TYPES_LABEL_AFTER_INPUT = [
  */
 export default class Field extends React.Component {
   static contextType = FormContext;
-  static defaultProps = { className: '', theme: 'default' };
+  static defaultProps = {
+    className: '',
+    retainsFocus: false,
+    theme: 'default',
+  };
 
   id = `field${id++}`;
   inputRef = React.createRef();
@@ -62,9 +68,9 @@ export default class Field extends React.Component {
     // wait a tick to allow our focus handler to cancel us as described here:
     // https://medium.com/@jessebeach/dealing-with-focus-and-blur-in-a-composite-widget-in-react-90d3c3b49a9b
     this.timeout = setTimeout(() => {
-      // if we were blurred but nothing else was focused
+      // if we were blurred but nothing else was focused and we're flagged to retain focus
       // don't release focus, instead attempt to refocus
-      if (document.activeElement === document.body) this.focus();
+      if (this.props.retainsFocus && document.activeElement === document.body) this.focus();
       else this.updateHasFocus(false);
     }, 0);
   }
