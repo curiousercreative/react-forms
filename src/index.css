@@ -155,8 +155,14 @@
   max-height: 33vh;
   overflow: auto;
 }
+.form__dropdown--no_results {
+  padding: 0.33em 1em;
+}
 .form__dropdown-wrapper--is_open .form__dropdown {
   display: block;
+}
+.form__dropdown-wrapper--is_open .form-tag-selector__value {
+  display: none;
 }
 .form__dropdown-item {
   line-height: 1.8em;

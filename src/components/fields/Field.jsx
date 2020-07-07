@@ -9,6 +9,8 @@ import bindMethods from '../../util/bindMethods.js';
 import omit from '../../util/omit.js';
 import renderIf from '../../util/renderIf.js';
 
+// for tracking which field has focus since we aren't strictly using document.activeElement
+let activeField;
 // for generating a global namespace to allow for event listeners and HTMLLabelElement.for attribute
 let id = 0;
 
@@ -19,7 +21,7 @@ const FIELD_TYPES_LABEL_AFTER_INPUT = [
 ];
 
 /**
- * Form field that adds nice form consistency, used to wrap around a form input
+ * Form field that adds nice form consistency and focus managementused to wrap around a form input
  * @class Field
  * @property {string} [className]
  * @property {object} [forwardedRef]
@@ -38,7 +40,6 @@ export default class Field extends React.Component {
   static contextType = FormContext;
   static defaultProps = { className: '', theme: 'default' };
 
-  fieldRef = React.createRef();
   id = `field${id++}`;
   inputRef = React.createRef();
   state = {
@@ -57,17 +58,20 @@ export default class Field extends React.Component {
     clearTimeout(this.timeout);
   }
 
-  handleFocusIn () {
-    clearTimeout(this.timeout);
-    this.updateHasFocus(true);
-  }
-
-  handleFocusOut () {
+  handleBlur () {
     // wait a tick to allow our focus handler to cancel us as described here:
     // https://medium.com/@jessebeach/dealing-with-focus-and-blur-in-a-composite-widget-in-react-90d3c3b49a9b
     this.timeout = setTimeout(() => {
-      this.updateHasFocus(false);
+      // if we were blurred but nothing else was focused
+      // don't release focus, instead attempt to refocus
+      if (document.activeElement === document.body) this.focus();
+      else this.updateHasFocus(false);
     }, 0);
+  }
+
+  handleFocus () {
+    clearTimeout(this.timeout);
+    this.updateHasFocus(true);
   }
 
   focus () {
@@ -116,12 +120,6 @@ export default class Field extends React.Component {
     }
   }
 
-  hasFocus () {
-    const field = this.fieldRef.current;
-
-    return field.contains(document.activeElement);
-  }
-
   hasValue () {
     const value = getValue(this);
 
@@ -142,6 +140,14 @@ export default class Field extends React.Component {
   updateHasFocus (hasFocus) {
     // short circuit if values already match (necessary for first memoized call)
     if (this.state.hasFocus === hasFocus) return;
+
+    if (hasFocus) {
+      // notify previously activeField they are no longer active
+      if (activeField && activeField !== this) activeField.updateHasFocus(false);
+
+      // point activeField to this field
+      activeField = this; // eslint-disable-line consistent-this
+    }
 
     const { index, name } = this.props;
     const topicVerb = hasFocus ? 'focused' : 'blurred';
@@ -194,7 +200,7 @@ export default class Field extends React.Component {
 
     // TODO: add modifiers for things like has_value, etc
     return (
-      <div className={classes.join(' ')} onFocus={this.handleFocusIn} onBlur={this.handleFocusOut} ref={this.fieldRef}>
+      <div className={classes.join(' ')} onBlur={this.handleBlur} onFocus={this.handleFocus}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.renderErrors()}
         <Input {...this.getProps()} forwardedRef={this.inputRef} />

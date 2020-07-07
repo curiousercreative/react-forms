@@ -7,7 +7,6 @@ import renderIf from '../../../util/renderIf.js';
 import timeoutPromise from '../../../util/timeoutPromise.js';
 import { addEventListener, removeEventListener } from '../../../lib/domEvents.js';
 
-const EVENT_TIMEOUT = 0;
 const QUERY_KEY_REGEX = /[a-z0-9]/;
 const QUERY_KEY_WINDOW = 1000;
 
@@ -15,9 +14,9 @@ const QUERY_KEY_WINDOW = 1000;
  * @class DropdownWrapper
  * @property {string} [className]
  * @property {boolean} [focusOnOpen = true]
- * @property {object} [focusRef] React ref to DOM element to receive focus
  * @property {boolean} [hasFocus]
  * @property {boolean} isOpen
+ * @property {function} [noOptions]
  * @property {function} onSelect
  * @property {object[]} options
  * @property {string} options[].label
@@ -31,6 +30,7 @@ export default class DropdownWrapper extends React.Component {
   static defaultProps = {
     className: '',
     focusOnOpen: true,
+    noOptions: () => 'No options were found',
     optionKeySelector: opt => opt.value,
     prepareOptions: opts => opts,
   };
@@ -49,6 +49,7 @@ export default class DropdownWrapper extends React.Component {
 
     this.getFocusHandlers = memo(this.getFocusHandlers);
     this.getOptions = memo(this.getOptions);
+    this.updateHasFocus = memo(this.updateHasFocus);
     this.updateIsOpen = memo(this.updateIsOpen);
   }
 
@@ -57,38 +58,26 @@ export default class DropdownWrapper extends React.Component {
   }
 
   componentDidUpdate () {
-    const { isOpen } = this.props;
+    const { hasFocus, isOpen } = this.props;
 
     // isOpen is always managed by parent, respond to updates
     this.updateIsOpen(isOpen);
+
+    // if hasFocus exists, our parent is managing focus and we need to respond to updates
+    if (exists(hasFocus)) this.updateHasFocus(hasFocus);
   }
 
   componentWillUnmount () {
     removeEventListener('keydown', this.handleKeys);
   }
 
-  handleBlur (e) {
-    // below, we dispatch an untrusted event that we don't want to handle
-    if (!e.isTrusted) return;
-
-    // stop the bubble as we're managing focus for ourselves and don't want Field.jsx
-    // conflicting
-    e.stopPropagation();
-
+  handleBlur () {
     // wait a tick to allow our focus handler to cancel us as described here:
     // https://medium.com/@jessebeach/dealing-with-focus-and-blur-in-a-composite-widget-in-react-90d3c3b49a9b
     this.timeout = setTimeout(() => {
-      // close the dropdown
       this.close();
-
-      // if we were blurred but nothing else was focused, don't proceed to release focus
-      if (document.activeElement === document.body) return;
-
-      // create a synthetic "blur" event that bubbles and dispatch
-      const blurEvent = new Event('blur', { bubbles: true });
-      this.ref.current.dispatchEvent(blurEvent);
-      this.hasFocus = false;
-    }, EVENT_TIMEOUT);
+      this.updateHasFocus(document.activeElement === document.body);
+    }, 0);
   }
 
   handleClickItem (e) {
@@ -97,14 +86,10 @@ export default class DropdownWrapper extends React.Component {
     this.props.onSelect(opt.value);
   }
 
-  handleFocus (e) {
-    // no need to bubble if focus remain within our control
-    if (this.hasFocus) e.stopPropagation();
-
+  handleFocus () {
     // cancel our blur handler since another target within our control received focus
     clearTimeout(this.timeout);
-
-    this.hasFocus = true;
+    this.updateHasFocus(true);
   }
 
   handleKeys (e) {
@@ -114,7 +99,7 @@ export default class DropdownWrapper extends React.Component {
     if (this.props.isOpen && list.length) {
       switch (e.which) {
         case 27: // escape
-          this.close(true);
+          this.close();
           break;
         case 38: // up
           e.preventDefault();
@@ -162,10 +147,6 @@ export default class DropdownWrapper extends React.Component {
     }
   }
 
-  onOptionRef (el) {
-    if (el) this.list.push(el);
-  }
-
   onQueryKey (char) {
     const now = Date.now();
     this.query = now - this.queryLastUpdated <= QUERY_KEY_WINDOW
@@ -179,9 +160,7 @@ export default class DropdownWrapper extends React.Component {
     if (index > -1) this.focusResult(index);
   }
 
-  close (holdFieldFocus = false) {
-    if (holdFieldFocus && this.props.focusRef) this.props.focusRef.current.focus();
-    else this.hasFocus = false;
+  close () {
     this.props.setIsOpen(false);
   }
 
@@ -210,6 +189,13 @@ export default class DropdownWrapper extends React.Component {
     this.props.setIsOpen(true);
   }
 
+  updateHasFocus (hasFocus) {
+    this.hasFocus = hasFocus;
+
+    // if we lost focus and we're open
+    if (!hasFocus && this.props.isOpen) this.close();
+  }
+
   updateIsOpen (isOpen) {
     return isOpen ? this.onOpen() : this.onClose();
   }
@@ -221,31 +207,30 @@ export default class DropdownWrapper extends React.Component {
     }
 
     this.list = [];
+    const options = this.getOptions(this.props.options, this.props.prepareOptions);
     const selectedIndexes = this.getSelectedIndexes(this.props.value);
 
-    return (
+    return options.length ? (
       <ul className="form__ul-reset form__dropdown">
-        {this.getOptions(this.props.options, this.props.prepareOptions)
-          .map(opt => {
-            const { label, i } = opt;
-            let classes = [ 'form__li-reset', 'form__dropdown-item' ];
+        {options.map(opt => {
+          const { label, i } = opt;
+          let classes = [ 'form__li-reset', 'form__dropdown-item' ];
 
-            if (selectedIndexes.includes(i)) classes.push('form__dropdown-item--is_selected');
+          if (selectedIndexes.includes(i)) classes.push('form__dropdown-item--is_selected');
 
-            return (
-              <li className={classes.join(' ')} key={this.props.optionKeySelector(opt)}>
-                <button
-                  className="form__btn-reset"
-                  onClick={this.handleClickItem}
-                  ref={this.onOptionRef}
-                  tabIndex="-1"
-                  type="button"
-                  value={i}>{label}</button>
-              </li>);
-          })
-        }
+          return (
+            <li className={classes.join(' ')} key={this.props.optionKeySelector(opt)}>
+              <button
+                className="form__btn-reset"
+                onClick={this.handleClickItem}
+                ref={el => el && this.list.push(el)}
+                tabIndex="-1"
+                type="button"
+                value={i}>{label}</button>
+            </li>);
+        })}
       </ul>
-    );
+    ) : <div className="form__dropdown form__dropdown--no_results">{this.props.noOptions()}</div>;
   }
 
   render () {

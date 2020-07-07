@@ -42,8 +42,8 @@ export default class TagSelector extends React.Component {
     resetOnSelect: false,
   };
 
-  focusRef = React.createRef();
   id = `tag-selector${id++}`;
+  inputRef = React.createRef();
   state = {
     isOpen: false,
     query: '',
@@ -116,11 +116,6 @@ export default class TagSelector extends React.Component {
     }
   }
 
-  onRef (el) {
-    this.focusRef.current = el;
-    this.props.forwardedRef.current = el;
-  }
-
   getLabel () {
     const label = this.getSelectedIndexes(this.props.getValue())
       .map(i => this.props.options[i])
@@ -162,7 +157,7 @@ export default class TagSelector extends React.Component {
 
   resetQuery () {
     this.setState({ query: '' });
-    this.props.forwardedRef.current.focus();
+    this.inputRef.current.focus();
   }
 
   select (value) {
@@ -176,7 +171,7 @@ export default class TagSelector extends React.Component {
     // return new Promise(resolve => this.setState({ isOpen }, () => setTimeout(resolve, 0)))
     return new Promise(resolve => this.setState({ isOpen }, resolve))
       // focus on our query text input when opening
-      .then(() => isOpen && this.props.forwardedRef.current.focus());
+      .then(() => isOpen && this.inputRef.current.focus());
   }
 
   updateHasFocus (hasFocus) {
@@ -212,7 +207,6 @@ export default class TagSelector extends React.Component {
       <DropdownWrapper
         className={classes.join(' ')}
         focusOnOpen={false}
-        focusRef={this.focusRef}
         hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
         onSelect={this.select}
@@ -228,7 +222,7 @@ export default class TagSelector extends React.Component {
               onChange={this.handleChange}
               onKeyDown={this.handleQueryKeys}
               placeholder="Type to filter..."
-              ref={this.props.forwardedRef}
+              ref={this.inputRef}
               type="text"
               value={this.state.query} />
           </div>
@@ -237,7 +231,7 @@ export default class TagSelector extends React.Component {
           className="form__btn-reset form-tag-selector__value"
           disabled={this.props.disabled}
           onClick={this.handleClick}
-          ref={this.onRef}
+          ref={this.props.forwardedRef}
           tabIndex={this.state.isOpen ? '-1' : 0}
           type="button">
           {this.getLabel()}

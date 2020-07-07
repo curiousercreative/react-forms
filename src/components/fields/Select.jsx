@@ -88,7 +88,6 @@ export default class Select extends React.Component {
     return (
       <DropdownWrapper
         className={classes.join(' ')}
-        focusRef={this.props.forwardedRef}
         hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
         onSelect={this.select}
