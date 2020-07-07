@@ -53,28 +53,21 @@ export default class Field extends React.Component {
     this.updateHasFocus = memo(this.updateHasFocus);
   }
 
-  componentDidMount () {
-    addEventListener('focusin', this.handleFocusIn);
-    addEventListener('focusout', this.handleFocusOut);
-  }
-
   componentWillUnmount () {
-    removeEventListener('focusin', this.handleFocusIn);
-    removeEventListener('focusout', this.handleFocusOut);
     clearTimeout(this.timeout);
   }
 
   handleFocusIn () {
     clearTimeout(this.timeout);
-    this.updateHasFocus(this.hasFocus());
+    this.updateHasFocus(true);
   }
 
   handleFocusOut () {
-    // wait a tick to allow document.activeElement to update
-    // alternative method described below is wonky when focused elements are unmounted (no blur event triggered)
+    // wait a tick to allow our focus handler to cancel us as described here:
     // https://medium.com/@jessebeach/dealing-with-focus-and-blur-in-a-composite-widget-in-react-90d3c3b49a9b
-    clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => this.updateHasFocus(this.hasFocus()), 0);
+    this.timeout = setTimeout(() => {
+      this.updateHasFocus(false);
+    }, 0);
   }
 
   focus () {
@@ -201,10 +194,10 @@ export default class Field extends React.Component {
 
     // TODO: add modifiers for things like has_value, etc
     return (
-      <div className={classes.join(' ')} ref={this.fieldRef}>
+      <div className={classes.join(' ')} onFocus={this.handleFocusIn} onBlur={this.handleFocusOut} ref={this.fieldRef}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.renderErrors()}
-        <Input forwardedRef={this.inputRef} {...this.getProps()} />
+        <Input {...this.getProps()} forwardedRef={this.inputRef} />
         {renderIf(FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.props.children}
       </div>

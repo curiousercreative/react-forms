@@ -45,7 +45,7 @@ export default class Select extends React.Component {
     bindMethods(this);
   }
 
-  handleFocus () {
+  handleClick () {
     this.setIsOpen(true);
   }
 
@@ -67,13 +67,17 @@ export default class Select extends React.Component {
 
   select (value) {
     this.props.toggleValue(value);
-    if (this.props.closeOnSelect) this.setIsOpen(false);
+    if (this.props.closeOnSelect) {
+      // restore focus before closing dropdown
+      this.props.forwardedRef.current.focus();
+      this.setIsOpen(false);
+    }
   }
 
   setIsOpen (isOpen) {
-    return isOpen === this.state.isOpen
-      ? Promise.resolve()
-      : new Promise(resolve => this.setState({ isOpen }, () => setTimeout(resolve, 0)));
+    if (isOpen === this.state.isOpen) return Promise.resolve();
+
+    return new Promise(resolve => this.setState({ isOpen }, resolve));
   }
 
   render () {
@@ -84,6 +88,7 @@ export default class Select extends React.Component {
     return (
       <DropdownWrapper
         className={classes.join(' ')}
+        focusRef={this.props.forwardedRef}
         hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
         onSelect={this.select}
@@ -92,7 +97,7 @@ export default class Select extends React.Component {
         value={this.props.getValue()}>
         <button
           className="form__btn-reset form-select__value"
-          onFocus={this.handleFocus}
+          onClick={this.handleClick}
           ref={this.props.forwardedRef}
           type="button">
           <span>{this.getLabel()}</span>
