@@ -233,7 +233,7 @@ export default class TagSelector extends React.Component {
           ref={this.props.forwardedRef}
           tabIndex={this.state.isOpen ? '-1' : 0}
           type="button">
-          {this.getLabel()}
+          <span>{this.getLabel()}</span>
         </button>
       </DropdownWrapper>
     );

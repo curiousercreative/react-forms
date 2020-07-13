@@ -238,6 +238,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  justify-content: space-between;
+}
+.form-select__value::after,
+.form-tag-selector__value::after {
+  content: "\02C5";
+  font-size: 0.75em;
+  transform: scaleX(1.5);
 }
 .form__field--no_value .form-select__value,
 .form__field--no_value .form-tag-selector__value {

@@ -68,6 +68,7 @@ export default class DropdownWrapper extends React.Component {
   }
 
   componentWillUnmount () {
+    removeEventListener('click', this.handleWindowClick);
     removeEventListener('keydown', this.handleKeys);
   }
 
@@ -133,7 +134,15 @@ export default class DropdownWrapper extends React.Component {
     }
   }
 
-  onClose () {}
+  handleWindowClick (nativeEvent) {
+    console.log('click');
+    if (this.props.isOpen && !this.ref.current.contains(nativeEvent.target)) this.close();
+  }
+
+  onClose () {
+    console.log('remove listener');
+    removeEventListener('click', this.handleWindowClick);
+  }
 
   onOpen () {
     if (this.props.focusOnOpen) {
@@ -145,6 +154,9 @@ export default class DropdownWrapper extends React.Component {
       // upon opening, focus on the only selected option or the first option
       this.focusResult(highlightIndex);
     }
+
+    console.log('add listener');
+    addEventListener('click', this.handleWindowClick);
   }
 
   onQueryKey (char) {

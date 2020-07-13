@@ -100,7 +100,6 @@ export default class Select extends React.Component {
           ref={this.props.forwardedRef}
           type="button">
           <span>{this.getLabel()}</span>
-          <i className="icon icon-angle-down" />
         </button>
       </DropdownWrapper>
     );
