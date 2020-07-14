@@ -1,6 +1,7 @@
 /** @module components/Form */
 import React from 'react';
 import memoize from 'memoize-one';
+import { unstable_batchedUpdates } from 'react-dom';
 
 import FormContext from './config/FormContext';
 import defaultModel from '../lib/form/models/defaultModel.js';
@@ -58,8 +59,6 @@ export default class Form extends React.Component {
   emptyValues = {};
   /** @property {array} fieldsBlurred - list of field names that have been blurred used for validating as you go */
   fieldsBlurred = [];
-  /** @property {boolean} isValid - keep this instance flag to allow us immediate get/set  */
-  isValid;
   /** @property {object} model - set of functions that are generally specific to a data model */
   model = {};
   /** @property {boolean} parentFormWarned - a flag to prevent repeating warning message */
@@ -208,11 +207,11 @@ export default class Form extends React.Component {
 
     // we want to render an error if this field has already been blurred
     const showError = this._hasFieldBlurred(name, index);
-    // validate just the field that was changed
-    const fieldValid = this.validateField(name, index, showError);
+    // validate just the field that was changed (but returns all form errors)
+    const isValid = this.validateField(name, index, showError);
 
     // update form valid flag
-    this.isValid = this.isValid && fieldValid;
+    this.setState({ isValid });
   }
 
   /**
@@ -247,7 +246,6 @@ export default class Form extends React.Component {
       pubsub: this.pubsub,
       state: {
         errors,
-        isValid: this.isValid,
         values,
       },
     };
@@ -301,6 +299,10 @@ export default class Form extends React.Component {
    * @param {array} errors
    */
   setErrors (errors) {
+    // NOTE: may require refactor, this is to overcome our valid state not being
+    // stored in state and triggering a re-render
+    if (errors.length !== this.getErrors().length) this.forceUpdate();
+
     this.store.setErrors(errors);
   }
 
@@ -333,18 +335,16 @@ export default class Form extends React.Component {
   validate (displayErrors = true) {
     const [ isValid, errors ] = this._validate();
 
-    this.isValid = isValid;
+    // NOTE: might need to unwrap this for React v17
+    unstable_batchedUpdates(() => {
+      this.setState({ isValid });
 
-    // store errors for rendering
-    if (displayErrors) {
-      this.setErrors(errors);
-
-      // NOTE: hacky way of guessing whether we just triggered a re-render
-      if (!this.state.errors) this.forceUpdate();
-    }
+      // store errors for rendering
+      if (displayErrors) this.setErrors(errors);
+    });
 
     // if there are no errors, form is valid
-    return this.isValid;
+    return isValid;
   }
 
   /**

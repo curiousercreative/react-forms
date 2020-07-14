@@ -40,6 +40,6 @@ describe('validate method', () => {
     const form = F.render(<Form initialValues={{ a: '' }} model={model} />);
     form.validate();
 
-    expect(form.isValid).toBe(false);
+    expect(form.state.isValid).toBe(false);
   });
 });

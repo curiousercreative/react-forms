@@ -3,6 +3,8 @@ import React, { useContext } from 'react';
 
 import FormContext from './config/FormContext';
 
+import exists from '../util/exists.js';
+
 /**
  * button to submit a form, shows a loading spinner during loading
  * @function SubmitButton
@@ -14,13 +16,13 @@ import FormContext from './config/FormContext';
  */
 export default function SubmitButton ({ children, className = '', isLoading, onClick }) {
   const { form } = useContext(FormContext);
-  isLoading = typeof isLoading === 'undefined' ? form.state.isLoading : isLoading;
+  isLoading = exists(isLoading) ? isLoading : form.state.isLoading;
   let classes = className.split(' ').concat('form__submit');
   if (isLoading) classes.push('form__submit--is_loading');
 
   let props = {
     className: classes.join(' '),
-    disabled: isLoading || !form.isValid,
+    disabled: isLoading || !form.state.isValid,
     type: onClick ? 'button' : 'submit',
   };
 
