@@ -241,6 +241,11 @@
   display: flex;
   justify-content: space-between;
 }
+.form-select__value > *,
+.form-tag-selector__value > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .form-select__value::after,
 .form-tag-selector__value::after {
   content: "\02C5";

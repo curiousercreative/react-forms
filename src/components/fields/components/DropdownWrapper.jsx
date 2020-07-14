@@ -135,12 +135,10 @@ export default class DropdownWrapper extends React.Component {
   }
 
   handleWindowClick (nativeEvent) {
-    console.log('click');
     if (this.props.isOpen && !this.ref.current.contains(nativeEvent.target)) this.close();
   }
 
   onClose () {
-    console.log('remove listener');
     removeEventListener('click', this.handleWindowClick);
   }
 
@@ -155,7 +153,6 @@ export default class DropdownWrapper extends React.Component {
       this.focusResult(highlightIndex);
     }
 
-    console.log('add listener');
     addEventListener('click', this.handleWindowClick);
   }
 
@@ -179,6 +176,12 @@ export default class DropdownWrapper extends React.Component {
   focusResult (highlightIndex) {
     this.highlightIndex = highlightIndex;
     this.list[highlightIndex].focus();
+  }
+
+  getHandlers () {
+    return exists(this.props.hasFocus)
+      ? { onBlur: this.handleBlur, onFocus: this.handleFocus }
+      : {};
   }
 
   getOptions (options, prepare) {
@@ -251,9 +254,8 @@ export default class DropdownWrapper extends React.Component {
     if (this.props.isOpen) classes.push('form__dropdown-wrapper--is_open');
 
     return <div
+      {...this.getHandlers()}
       className={classes.join(' ')}
-      onBlur={this.handleBlur}
-      onFocus={this.handleFocus}
       ref={this.ref}>
       {this.props.children}
       {renderIf(this.props.isOpen, this.renderOptions)}
