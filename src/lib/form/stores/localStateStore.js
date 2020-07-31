@@ -110,7 +110,7 @@ export default function localStateStore (instance) {
    */
   function setData (values) {
     return instance._hasParentForm()
-      ? instance.context.actions.setValue(instance.props.name, values, 'field', instance.props.index)
+      ? instance.context.form.setValue(instance.props.name, values, 'field', instance.props.index)
       : new Promise(resolve => instance.setState({ values }, resolve));
   }
 
@@ -174,7 +174,7 @@ export default function localStateStore (instance) {
    */
   function _values () {
     const values = instance._hasParentForm()
-      ? instance.context.state.values[instance.props.name]
+      ? instance.context.form.getValue(instance.props.name, instance.props.index)
       : instance.state.values;
 
     return values || instance.emptyValues;

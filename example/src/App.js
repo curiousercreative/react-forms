@@ -5,6 +5,7 @@ import FormCollectionExtended from './components/FormCollectionExtended.jsx';
 import FormComplex from './components/FormComplex.jsx';
 import FormDirect from './components/FormDirect.jsx';
 import FormExtended from './components/FormExtended.jsx';
+import Nested from './components/Nested.jsx';
 
 import '@curiouser/react-forms/dist/index.css'
 
@@ -56,6 +57,8 @@ class App extends React.Component {
         <FormCollectionDirect {...collectionProps} />
         <h2>Complex Form with nested collection</h2>
         <FormComplex collectionProps={collectionProps} />
+        <h2>Nested form with nested collection</h2>
+        <Nested />
       </div>
     );
   }

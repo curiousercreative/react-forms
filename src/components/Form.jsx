@@ -25,13 +25,17 @@ const defaultStore = localStateStore;
 /**
  * @class Form
  * @property {string} [className = '']
- * @property {string} [formName = '']
+ * @property {string} [formName = 'form'] recommended, used for field className
+ * generation for form specific style selectors
+ * @property {number} [index] when used as a nested "field" in a FormCollection
  * @property {object} [initialValues]
- * @property {object} [model]
- * @property {object} [pubsub]
- * @property {object} [store]
+ * @property {FormModel} [model] supply any number of model overrides
+ * @property {string} [name] when used as a nested "field"
+ * @property {Pubsub} [pubsub] an existing Pubsub instance, perhaps you want to
+ * observe several forms at once?
+ * @property {FormStore} [store] supply any number of store overrides
  * @property {boolean} [validateAsYouGo = true]
- * @property {collection} [validations = []] - very specific data structure expected by
+ * @property {collection} [validations] - very specific data structure expected by
  * the validate function. The below example is for a form with two fields that are both required.
  * It should look like this:
  * import { messages, tests } from 'lib/validator';
@@ -40,8 +44,7 @@ const defaultStore = localStateStore;
  *   names: ['username', 'password'],
  *   tests: [[ tests.required, messages.required ]]
  * }]
- * @return {jsx} .form, though this class is frequently extended rather than
- * used directly and the render method is overriden
+ * @return {jsx} .form
  */
 export default class Form extends React.Component {
   static contextType = FormContext;
@@ -52,7 +55,6 @@ export default class Form extends React.Component {
     model: {},
     store: {},
     validateAsYouGo: true,
-    validations: [],
   };
 
   /** @property {object} emptyValues */
@@ -72,7 +74,6 @@ export default class Form extends React.Component {
   constructor (...args) {
     super(...args);
     bindMethods(this);
-    this.pubsub = this.props.pubsub || new Pubsub();
 
     this._setModel = memoize(this._setModel);
     this._setStore = memoize(this._setStore);
@@ -80,6 +81,13 @@ export default class Form extends React.Component {
     this.formatData = memoize(this.formatData);
     this.getContextValue = memoize(this.getContextValue);
 
+    // if we didn't receive a pubsub instance, create a new one specific to this Form.
+    this.pubsub = this.props.pubsub || new Pubsub();
+
+    // accept validations as component prop and override model.validations (not encouraged anyhow)
+    this.props.model.validations = this.props.validations || this.props.model.validations || [];
+
+    // init
     this._setModel(this.props.model);
     this._setStore(this.props.store);
     this.store.initErrors([]);
@@ -96,7 +104,8 @@ export default class Form extends React.Component {
     // TODO: how to best support changing model and store props?
     // this._setModel(this.props.model);
     // this._setStore(this.props.store);
-    // if (this.pubsub) this.pubsub = this.pubsub;
+
+    this.pubsub = this.props.pubsub || this.pubsub;
   }
 
   componentWillUnmount () {
@@ -384,10 +393,9 @@ export default class Form extends React.Component {
   }
 
   /**
-   * this render method is most often overridden by the subclass
-   * @param {jsx} [jsx] jsx to be supplied by subclass, optional since we can
-   * theoretically render a Form without subclassing
-   * @return {jsx} form or anything really
+   * @param {jsx} [jsx] for subclassed Form, a render method's returned jsx will
+   * be wrapped in `super.render()` to provide FormContext
+   * @return {jsx} .form or subclassed render method's jsx
    */
   render (jsx) {
     let classes = this.props.className.split(' ').concat('form');

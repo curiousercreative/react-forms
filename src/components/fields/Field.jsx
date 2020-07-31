@@ -1,6 +1,7 @@
 import React from 'react';
 import memo from 'memoize-one';
 
+import FormCollection from '../FormCollection.jsx';
 import FormContext from '../config/FormContext';
 
 import { getFieldTopic, getValue, isChecked, setValue, toggleValue } from './util';
@@ -183,6 +184,11 @@ export default class Field extends React.Component {
   }
 
   render () {
+    // fail early for FormCollection fields without an index prop
+    if (this.context.form instanceof FormCollection && typeof this.props.index !== 'number') {
+      throw new Error("You've rendered a field component without an index prop as a child of a FormCollection. Please relay the index prop to each field rendered.");
+    }
+
     const Input = this.props.component;
     const { type } = this.props;
     let classes = this.props.className.split(' ')
@@ -197,14 +203,14 @@ export default class Field extends React.Component {
     // add focus class
     if (this.state.hasFocus) classes.push(this.formatClassName('has', 'focus'));
 
+    // has or no value class
     if (this.hasValue()) classes.push(this.formatClassName('has', 'value'));
     else classes.push(this.formatClassName('no', 'value'));
 
-    // add errors class
+    // has or no errors class
     if (this.getErrors().length) classes.push(this.formatClassName('has', 'errors'));
     else classes.push(this.formatClassName('no', 'errors'));
 
-    // TODO: add modifiers for things like has_value, etc
     return (
       <div className={classes.join(' ')} onBlur={this.handleBlur} onFocus={this.handleFocus}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}

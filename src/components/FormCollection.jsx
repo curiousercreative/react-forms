@@ -261,6 +261,7 @@ export default class FormCollection extends Form {
     return (
       <FormContext.Provider value={this.getContextValue(formCollectionData, this.getErrors())}>
         {formCollectionData.map(itemRenderer)}
+        {this.props.children}
       </FormContext.Provider>
     );
   }
