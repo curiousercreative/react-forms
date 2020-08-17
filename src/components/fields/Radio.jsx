@@ -7,17 +7,19 @@ import callMe from '../../util/callMe.js';
  * when clicked, will set a value on form, like a radio button
  * @class Radio
  * @property {string} [className]
- * @property {string} id
+ * @property {object} forwardedRef
+ * @property {string} [id]
+ * @property {boolean} isChecked
  * @property {string} name
  * @property {function} [onClick]
- * @property {string} [type=radio] - what type of input to emulate (toggle vs set)
+ * @property {function} setValue
+ * @property {function} toggleValue
  * @property {string} value
  * @return {jsx} input.form__input
  */
 export default class Radio extends React.Component {
   static defaultProps = {
     className: '',
-    type: 'radio',
   };
 
   constructor (...args) {
@@ -33,7 +35,7 @@ export default class Radio extends React.Component {
 
   render () {
     let classes = this.props.className.split(' ').concat('form__radio');
-    const checked = this.props.isChecked();
+    const checked = this.props.isChecked;
 
     if (checked) classes.push('form__radio--is_active');
 

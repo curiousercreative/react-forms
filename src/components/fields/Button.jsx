@@ -8,9 +8,13 @@ import renderIf from '../../util/renderIf.js';
  * when clicked, will set a value on form, like a radio button
  * @class Button
  * @property {string} [className]
+ * @property {object} forwardedRef
  * @property {string} [id]
+ * @property {boolean} isChecked
  * @property {string} name
  * @property {function} [onClick]
+ * @property {function} setValue
+ * @property {function} toggleValue
  * @property {string} [type=radio] - what type of input to emulate (toggle vs set)
  * @property {string} value
  * @return {jsx} button.form__input
@@ -42,7 +46,7 @@ export default class Button extends React.Component {
   }
 
   render () {
-    const isSelected = this.props.isChecked();
+    const isSelected = this.props.isChecked;
     let classes = this.props.className.split(' ').concat([
       'form__button',
       `form__button--type_${this.props.type}`,

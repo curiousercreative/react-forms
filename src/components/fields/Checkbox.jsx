@@ -7,9 +7,12 @@ import callMe from '../../util/callMe.js';
  * when clicked, will set a value on form, like a radio button
  * @class Checkbox
  * @property {string} [className]
+ * @property {object} forwardedRef
  * @property {string} id
+ * @property {boolean} isChecked
  * @property {string} name
  * @property {function} [onClick]
+ * @property {function} toggleValue
  * @property {any} [value = true]
  * @return {jsx} input.form__input
  */
@@ -33,7 +36,7 @@ export default class Checkbox extends React.Component {
 
   render () {
     let classes = this.props.className.split(' ').concat('form__checkbox');
-    const checked = this.props.isChecked();
+    const checked = this.props.isChecked;
 
     if (checked) classes.push('form__checkbox--is_active');
 

@@ -106,7 +106,7 @@ export default class Field extends React.Component {
       getValue: () => getValue(this),
       hasFocus: this.state.hasFocus,
       id: this.id,
-      isChecked: () => isChecked(this),
+      isChecked: isChecked(this),
       setValue: value => setValue(this, value),
       toggleValue: value => toggleValue(this, value),
     };
