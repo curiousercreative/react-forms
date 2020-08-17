@@ -10,13 +10,14 @@ import callMe from '../../util/callMe.js';
  * @property {string} id
  * @property {string} name
  * @property {function} [onClick]
- * @property {string} value
+ * @property {any} [value = true]
  * @return {jsx} input.form__input
  */
 export default class Checkbox extends React.Component {
   static defaultProps = {
     className: '',
     type: 'checkbox',
+    value: true,
   };
 
   constructor (...args) {
