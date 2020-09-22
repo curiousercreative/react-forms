@@ -81,7 +81,7 @@ export default class FormComplex extends Form {
 
         <FormCollectionExtended name="cast" />
 
-        <Fields.Fields>
+        <Fields.Fields gapless>
           <Fields.EmailField label="email" name="email" />
           <Fields.TextField label="extra text" name="extra_text" />
           <Fields.SelectField label="extra select" name="extra_select" options={OPTIONS} />

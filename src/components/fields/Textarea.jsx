@@ -1,32 +1,25 @@
 import React from 'react';
 
-import bindMethods from '../../util/bindMethods.js';
-
 /**
  * Multiline text input
- * @class Textarea
- * @property {boolean} hasFocus
- * @property {string} id
- * @property {string} name
- * @return {jsx} textarea.form__input
+ * @function Textarea
+ * @param     {object} forwardedRef
+ * @param     {function} getValue
+ * @param     {string} id
+ * @param     {string} name
+ * @param     {number/string} [rows = 1]
+ * @param     {function} setValue
+ * @return    {jsx} textarea.form__input.form__input--type_textarea
  */
-export default class Textarea extends React.Component {
-  constructor (...args) {
-    super(...args);
-    bindMethods(this);
-  }
+export default function Textarea ({ forwardedRef, getValue, id, name, rows = 1, setValue }) {
+  const handleChange = React.useCallback(e => setValue(e.target.value), [ setValue ]);
 
-  handleChange (e) {
-    this.props.setValue(e.target.value);
-  }
-
-  render () {
-    return <textarea
-      id={this.props.id}
-      className="form__input form__input--type_textarea"
-      onChange={this.handleChange}
-      name={this.props.name}
-      ref={this.props.forwardedRef}
-      value={this.props.getValue() || ''} />;
-  }
+  return <textarea
+    id={id}
+    className="form__input form__input--type_textarea"
+    onChange={handleChange}
+    name={name}
+    ref={forwardedRef}
+    rows={rows}
+    value={getValue() || ''} />;
 }
