@@ -70,6 +70,8 @@ export default class Form extends React.Component {
   state = {};
   /** @property {object} store - set of functions that are generally specific to a data store (redux, another component's state, etc) */
   store = {};
+  /** @property {boolean} wasValidated - flag for entire form being validated with errors displayed  */
+  wasValidated = false;
 
   constructor (...args) {
     super(...args);
@@ -84,14 +86,14 @@ export default class Form extends React.Component {
     // if we didn't receive a pubsub instance, create a new one specific to this Form.
     this.pubsub = this.props.pubsub || new Pubsub();
 
-    // accept validations as component prop and override model.validations (not encouraged anyhow)
-    this.props.model.validations = this.props.validations || this.props.model.validations || [];
-
     // init
     this._setModel(this.props.model);
     this._setStore(this.props.store);
     this.store.initErrors([]);
     this.store.initData(this.props.initialValues || this.state.values);
+
+    // accept validations as component prop and override model.validations (not encouraged anyhow)
+    this.model.validations = this.props.validations || this.props.model.validations || [];
   }
 
   componentDidMount () {
@@ -214,8 +216,9 @@ export default class Form extends React.Component {
   _validateOnChange (name, index) {
     if (!this.props.validateAsYouGo) return;
 
-    // we want to render an error if this field has already been blurred
-    const showError = this._hasFieldBlurred(name, index);
+    // we want to render an error if this field has already been blurred or we've
+    // previously and visibly validated the entire form
+    const showError = this.wasValidated || this._hasFieldBlurred(name, index);
     // validate just the field that was changed (but returns all form errors)
     const isValid = this.validateField(name, index, showError);
 
@@ -349,7 +352,10 @@ export default class Form extends React.Component {
       this.setState({ isValid });
 
       // store errors for rendering
-      if (displayErrors) this.setErrors(errors);
+      if (displayErrors) {
+        this.setErrors(errors);
+        this.wasValidated = true;
+      }
     });
 
     // if there are no errors, form is valid

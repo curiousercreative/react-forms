@@ -16,6 +16,14 @@ const OPTIONS = [
 ];
 
 export default class FormComplex extends Form {
+  static defaultProps = {
+    ...Form.defaultProps,
+    validations: [{
+      names: [ 'email', 'extra_text' ],
+      tests: [[ validator.tests.required, validator.messages.required ]],
+    }],
+  };
+
   constructor (...args) {
     super(...args);
     util.bindMethods(this);
