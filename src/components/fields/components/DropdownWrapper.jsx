@@ -4,7 +4,6 @@ import memo from 'memoize-one';
 import bindMethods from '../../../util/bindMethods.js';
 import exists from '../../../util/exists.js';
 import renderIf from '../../../util/renderIf.js';
-import timeoutPromise from '../../../util/timeoutPromise.js';
 import { addEventListener, removeEventListener } from '../../../lib/domEvents.js';
 
 const QUERY_KEY_REGEX = /[a-z0-9]/;

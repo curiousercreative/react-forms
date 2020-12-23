@@ -102,6 +102,7 @@
 }
 
 .form__input,
+.form-select--native,
 .form-select__value,
 .form-tag-selector__value,
 .form-tag-selector__input-wrapper {
@@ -109,7 +110,8 @@
   height: 100%;
 }
 .form__input,
-.form__dropdown-wrapper {
+.form__dropdown-wrapper,
+.form-select--native {
   border: solid 1px #dedede;
   border-color: var(--form-color-gray, #dedede);
   margin-top: auto; /* vertical alignment within row of form__fields */
@@ -121,7 +123,8 @@
 .form__input--type_search,
 .form__input--type_text,
 .form__input--type_url,
-.form__dropdown-wrapper {
+.form__dropdown-wrapper,
+.form-select--native {
   font-size: 16px;
   line-height: 1.5em;
   height: 46px;
