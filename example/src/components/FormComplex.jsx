@@ -1,10 +1,13 @@
 import React from 'react';
 import { Fields, Form, SubmitButton, util, validator } from '@curiouser/react-forms';
-import NativeSelectField from './NativeSelectField.jsx';
 
 import FormCollectionExtended from './FormCollectionExtended.jsx';
 import FormExtended from './FormExtended.jsx';
 
+const NATIVE_OPTIONS = [
+  { label: 'Something something', value: 'yes' },
+  { label: 'and another', value: { nested: 'no' },
+}];
 const OPTIONS = [
   { label: 'apple', value: 'japple' },
   { label: 'banana', value: 'zbanana' },
@@ -89,7 +92,7 @@ export default class FormComplex extends Form {
           <Fields.CheckboxField label="extra checkbox" name="extra_checkbox" />
         </Fields.Fields>
         <Fields.TextareaField label="extra textarea" name="extra_textarea" />
-        <Fields.NativeSelectField label="native select" name="native_select" options={[{ label: 'Something something', value: 'yes' }, { label: 'and another', value: 'no' }]} placeholder="select one..." />
+        <Fields.NativeSelectField label="native select" name="native_select" options={NATIVE_OPTIONS} placeholder="select one..." />
         <Fields.NativeDateField label="native date" name="native_date" placeholder="YYYY-MM-DD" />
         <Fields.TagSelectorField
           label="tag selector"

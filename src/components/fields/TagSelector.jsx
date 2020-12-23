@@ -11,12 +11,12 @@ import DropdownWrapper from './components/DropdownWrapper.jsx';
 import bindMethods from '../../util/bindMethods.js';
 import { addEventListener, removeEventListener } from '../../lib/domEvents.js';
 
-let id = 0;
 /**
  * a custom dropdown + text input for filtering dropdown options
  * @class TagSelector
  * @property {boolean} [disabled]
  * @property {boolean} [hasFocus]
+ * @property {string} id
  * @property {string} name
  * @property {object[]} options
  * @property {string} options[].label
@@ -41,7 +41,6 @@ export default class TagSelector extends React.Component {
     resetOnSelect: false,
   };
 
-  id = `tag-selector${id++}`;
   inputRef = React.createRef();
   state = {
     isOpen: false,
@@ -218,6 +217,7 @@ export default class TagSelector extends React.Component {
             {renderIf(this.props.getValue().length, this.renderTags)}
             <AutosizeInput
               className="form__input-reset form-tag-selector__input"
+              id={this.props.id}
               onChange={this.handleChange}
               onKeyDown={this.handleQueryKeys}
               placeholder="Type to filter..."
@@ -229,6 +229,7 @@ export default class TagSelector extends React.Component {
         <button
           className="form__btn-reset form-tag-selector__value"
           disabled={this.props.disabled}
+          id={this.props.id}
           onClick={this.handleClick}
           ref={this.props.forwardedRef}
           tabIndex={this.state.isOpen ? '-1' : 0}

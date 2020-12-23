@@ -1,6 +1,8 @@
 import React from 'react';
 import memo from 'memoize-one';
 
+import Option from '../model/Option.js';
+
 import bindMethods from '../../../util/bindMethods.js';
 import exists from '../../../util/exists.js';
 import renderIf from '../../../util/renderIf.js';
@@ -81,9 +83,9 @@ export default class DropdownWrapper extends React.Component {
   }
 
   handleClickItem (e) {
-    const opt = this.props.options[Number(e.target.value)];
+    const value = Option.getValueFromNativeEvent(this.props.options, e);
 
-    this.props.onSelect(opt.value);
+    this.props.onSelect(value);
   }
 
   handleFocus () {
@@ -143,7 +145,7 @@ export default class DropdownWrapper extends React.Component {
 
   onOpen () {
     if (this.props.focusOnOpen) {
-      const selectedIndexes = this.getSelectedIndexes(this.props.value);
+      const selectedIndexes = Option.getSelectedIndexes(this.props.options, this.props.value);
       const highlightIndex = selectedIndexes.length === 1
         ? selectedIndexes[0]
         : 0;
@@ -184,19 +186,7 @@ export default class DropdownWrapper extends React.Component {
   }
 
   getOptions (options, prepare) {
-    return prepare(this.getOptionsWithIndexes(options));
-  }
-
-  getOptionsWithIndexes (options) {
-    return options.map((opt, i) => ({ ...opt, i }));
-  }
-
-  getSelectedIndexes (values) {
-    values = Array.isArray(values) ? values : [ values ];
-
-    return values
-      .map(v => this.props.options.findIndex(o => o.value === v))
-      .filter(i => i > -1);
+    return prepare(Option.getOptionsWithIndexes(options));
   }
 
   open () {
@@ -222,7 +212,7 @@ export default class DropdownWrapper extends React.Component {
 
     this.list = [];
     const options = this.getOptions(this.props.options, this.props.prepareOptions);
-    const selectedIndexes = this.getSelectedIndexes(this.props.value);
+    const selectedIndexes = Option.getSelectedIndexes(this.props.options, this.props.value);
 
     return options.length ? (
       <ul className="form__ul-reset form__dropdown">

@@ -5,18 +5,20 @@ import DropdownWrapper from './components/DropdownWrapper.jsx';
 import bindMethods from '../../util/bindMethods.js';
 import exists from '../../util/exists.js';
 
-let id = 0;
 /**
  * a custom dropdown/select input
  * @class Select
  * @property {boolean} [disabled]
  * @property {boolean} [closeOnSelect = true]
+ * @property {string} id
  * @property {string} name
+ * @property {boolean} [native = false]
  * @property {object[]} options
  * @property {string} options[].label
  * @property {string} options[].value
  * @property {function} [optionKeySelector]
  * @property {string} [placeholder]
+ * @property {boolean} [required=true]
  *
  * TEST CASES:
  * Given the dropdown is hidden, dropdown should display when "value" is clicked
@@ -32,9 +34,10 @@ let id = 0;
 export default class Select extends React.Component {
   static defaultProps = {
     closeOnSelect: true,
+    native: false,
+    optionKeySelector: opt => opt.value,
+    required: true,
   };
-
-  id = `select${id++}`;
 
   state = {
     isOpen: false,
@@ -91,11 +94,14 @@ export default class Select extends React.Component {
         hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
         onSelect={this.select}
+        optionKeySelector={this.props.optionKeySelector}
         options={this.props.options}
         setIsOpen={this.setIsOpen}
         value={this.props.getValue()}>
         <button
           className="form__btn-reset form-select__value"
+          disabled={this.props.disabled}
+          id={this.props.id}
           onClick={this.handleClick}
           ref={this.props.forwardedRef}
           type="button">
