@@ -1,5 +1,6 @@
 import React from 'react';
-import { Fields, Form, FormCollection, SubmitButton, util, validator } from '@curiouser/react-forms';
+import { Form, SubmitButton } from '@curiouser/react-forms';
+import { TextField } from '@curiouser/react-forms';
 
 export default class FormDirect extends React.Component {
   handleSubmit () {
@@ -10,7 +11,7 @@ export default class FormDirect extends React.Component {
     return (
       <div className="form-direct">
         <Form ref="form">
-          <Fields.TextField label="username" name="username" />
+          <TextField label="username" name="username" />
           <SubmitButton onClick={this.handleSubmit.bind(this)}>Check form state</SubmitButton>
         </Form>
       </div>

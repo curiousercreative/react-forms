@@ -1,7 +1,6 @@
 import React from 'react';
 import memo from 'memoize-one';
 
-import FormCollection from '../FormCollection.jsx';
 import FormContext from '../config/FormContext';
 
 import { getFieldTopic, getValue, isChecked, setValue, toggleValue } from './util';
@@ -185,7 +184,7 @@ export default class Field extends React.Component {
 
   render () {
     // fail early for FormCollection fields without an index prop
-    if (this.context.form instanceof FormCollection && typeof this.props.index !== 'number') {
+    if ('collection' in this.context.form && typeof this.props.index !== 'number') {
       throw new Error("You've rendered a field component without an index prop as a child of a FormCollection. Please relay the index prop to each field rendered.");
     }
 

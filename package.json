@@ -6,7 +6,6 @@
   "license": "MIT",
   "repository": "github:curiousercreative/react-forms",
   "main": "dist/index.js",
-  "module": "dist/index.js",
   "sideEffects": false,
   "source": "src/index.js",
   "scripts": {

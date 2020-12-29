@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Fields, Form, FormCollection, validator } from '@curiouser/react-forms';
-import '@curiouser/react-forms/dist/index.css';
+import { Form, FormCollection, validator } from '@curiouser/react-forms';
+import { PasswordField, TextField } from '@curiouser/react-forms';
 
 const formProps = {
   formName: 'my-form',
@@ -53,14 +53,14 @@ export default function MyForm () {
     <Form ref={form} {...formProps}>
       <form onSubmit={handleSubmit}>
         <div className="form__fields">
-          <Fields.TextField label="Name" name="username" />
-          <Fields.PasswordField label="Password" name="password" />
+          <TextField label="Name" name="username" />
+          <PasswordField label="Password" name="password" />
         </div>
         <h4>User Details</h4>
         <Form formName="user-details" name="details">
           <div className="form__fields">
-            <Fields.TextField label="Age" name="age" />
-            <Fields.TextField label="Favorite Color" name="favorite_color" />
+            <TextField label="Age" name="age" />
+            <TextField label="Favorite Color" name="favorite_color" />
           </div>
 
           <h5>Favorite dinner combos</h5>
@@ -88,11 +88,11 @@ function DinnerCombo ({ handleClickRemove, index }) {
   return (
     <div>
       <div className="form__fields">
-        <Fields.TextField index={index} label="Beverage" name="beverage" />
-        <Fields.TextField index={index} label="Entrée" name="entree" />
+        <TextField index={index} label="Beverage" name="beverage" />
+        <TextField index={index} label="Entrée" name="entree" />
       </div>
       <Form formName="meta" index={index} name="meta">
-        <Fields.TextField label="Meta - date added" name="date_added" />
+        <TextField label="Meta - date added" name="date_added" />
       </Form>
       <button onClick={handleClickRemove} type="button">remove</button>
     </div>

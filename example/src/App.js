@@ -7,7 +7,7 @@ import FormDirect from './components/FormDirect.jsx';
 import FormExtended from './components/FormExtended.jsx';
 import Nested from './components/Nested.jsx';
 
-import '@curiouser/react-forms/dist/index.css'
+import '@curiouser/react-forms/dist/index.css';
 
 let collectionValues = [{
   username: 'chuck',

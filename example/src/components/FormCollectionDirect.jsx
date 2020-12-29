@@ -1,5 +1,12 @@
 import React from 'react';
-import { Fields, Form, FormCollection, SubmitButton, util, validator } from '@curiouser/react-forms';
+import { FormCollection, util } from '@curiouser/react-forms';
+import { Fields, PasswordField, TextField } from '@curiouser/react-forms';
+import NativeSelectField from './NativeSelectField.jsx';
+
+const OPTIONS = [
+  { label: 'yes', value: '1' },
+  { label: 'no', value: '0' },
+];
 
 export default class FormCollectionDirect extends React.Component {
   constructor (...args) {
@@ -29,10 +36,11 @@ export default class FormCollectionDirect extends React.Component {
 function User ({ index, username, password }) {
   return (
     <div className="form-collection-extended__item" key={index}>
-      <Fields.Fields>
-        <Fields.TextField index={index} label="username" name="username" />
-        <Fields.PasswordField index={index} label="password" name="password" />
-      </Fields.Fields>
+      <Fields>
+        <TextField index={index} label="username" name="username" />
+        <PasswordField index={index} label="password" name="password" />
+        <NativeSelectField index={index} label="opt-in?" name="optin" options={OPTIONS} />
+      </Fields>
     </div>
   );
 }

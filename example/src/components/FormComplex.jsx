@@ -1,5 +1,17 @@
 import React from 'react';
-import { Fields, Form, SubmitButton, util, validator } from '@curiouser/react-forms';
+import { Form, SubmitButton, util, validator } from '@curiouser/react-forms';
+import {
+  CheckboxField,
+  EmailField,
+  Fields,
+  NativeDateField,
+  NativeSelectField,
+  RadioField,
+  SelectField,
+  TagSelectorField,
+  TextareaField,
+  TextField,
+} from '@curiouser/react-forms';
 
 import FormCollectionExtended from './FormCollectionExtended.jsx';
 import FormExtended from './FormExtended.jsx';
@@ -67,13 +79,13 @@ export default class FormComplex extends Form {
       <div className="form form-complex">
         <Form ref="movie">
           <div className="form__fields">
-            <Fields.TextField label="Title" name="title" />
-            <Fields.TextField label="Year" name="year" />
+            <TextField label="Title" name="title" />
+            <TextField label="Year" name="year" />
           </div>
           <Form name="director">
             <div className="form__fields">
-              <Fields.TextField label="Name" name="name" />
-              <Fields.TextField label="Age" name="age" />
+              <TextField label="Name" name="name" />
+              <TextField label="Age" name="age" />
             </div>
           </Form>
         </Form>
@@ -84,23 +96,23 @@ export default class FormComplex extends Form {
 
         <FormCollectionExtended name="cast" />
 
-        <Fields.Fields gapless>
-          <Fields.EmailField label="email" name="email" />
-          <Fields.TextField label="extra text" name="extra_text" />
-          <Fields.SelectField label="extra select" name="extra_select" options={OPTIONS} />
-          <Fields.RadioField label="extra radio" name="extra_radio" value="radio on" />
-          <Fields.CheckboxField label="extra checkbox" name="extra_checkbox" />
-        </Fields.Fields>
-        <Fields.TextareaField label="extra textarea" name="extra_textarea" />
-        <Fields.NativeSelectField label="native select" name="native_select" options={NATIVE_OPTIONS} placeholder="select one..." />
-        <Fields.NativeDateField label="native date" name="native_date" placeholder="YYYY-MM-DD" />
-        <Fields.TagSelectorField
+        <Fields gapless>
+          <EmailField label="email" name="email" />
+          <TextField label="extra text" name="extra_text" />
+          <SelectField label="extra select" name="extra_select" options={OPTIONS} />
+          <RadioField label="extra radio" name="extra_radio" value="radio on" />
+          <CheckboxField label="extra checkbox" name="extra_checkbox" />
+        </Fields>
+        <TextareaField label="extra textarea" name="extra_textarea" />
+        <NativeSelectField label="native select" name="native_select" options={NATIVE_OPTIONS} placeholder="select one..." />
+        <NativeDateField label="native date" name="native_date" placeholder="YYYY-MM-DD" />
+        <TagSelectorField
           label="tag selector"
           name="tag_selector"
           options={OPTIONS}
           placeholder="Select your favorite fruits!"
           resetOnSelect />
-        <Fields.TagSelectorField
+        <TagSelectorField
             disabled
             label="tag selector"
             name="tag_selector"
