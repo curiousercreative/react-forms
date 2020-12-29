@@ -4,6 +4,7 @@ import FormCollectionDirect from './components/FormCollectionDirect.jsx';
 import FormCollectionExtended from './components/FormCollectionExtended.jsx';
 import FormComplex from './components/FormComplex.jsx';
 import FormDirect from './components/FormDirect.jsx';
+import FormDirectRenderProp from './components/FormDirectRenderProp.jsx';
 import FormExtended from './components/FormExtended.jsx';
 import Nested from './components/Nested.jsx';
 
@@ -51,6 +52,8 @@ class App extends React.Component {
         <FormExtended />
         <h2>Simple Form direct render</h2>
         <FormDirect />
+        <h2>Simple Form direct render using render prop</h2>
+        <FormDirectRenderProp />
         <h2>Simple Form collection extended</h2>
         <FormCollectionExtended {...collectionProps} />
         <h2>Simple Form collection direct</h2>

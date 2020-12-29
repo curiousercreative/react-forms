@@ -15,6 +15,7 @@ import fromEntries from '../util/fromEntries.js';
 import renderIf from '../util/renderIf.js';
 import uniq from '../util/uniq.js';
 
+import { functionify } from '../lib/transformers';
 import { Pubsub } from '../lib/pubsub';
 import { validate } from '../lib/validator';
 
@@ -405,13 +406,22 @@ export default class Form extends React.Component {
    */
   render (jsx) {
     let classes = this.props.className.split(' ').concat('form');
+    const children = functionify(this.props.children);
+    const context = this.getContextValue(this.formatData(this.store.values()), this.getErrors());
+    const renderProps = {
+      errors: context.state.errors,
+      form: context.form,
+      pubsub: context.pubsub,
+      renderErrors: this.renderErrors,
+      values: context.state.values,
+    };
 
     return (
-      <FormContext.Provider value={this.getContextValue(this.formatData(this.store.values()), this.getErrors())}>
+      <FormContext.Provider value={context}>
         {renderIf(jsx, () => jsx, () => (
           <div className={classes.join(' ')}>
             {this.renderErrors()}
-            {this.props.children}
+            {children(renderProps)}
           </div>
         ))}
       </FormContext.Provider>
