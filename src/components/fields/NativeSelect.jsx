@@ -49,7 +49,7 @@ export default function NativeSelect ({
       onChange={handleChange}
       ref={forwardedRef}
       value={selectedIndexes.length ? selectedIndexes[0] : ''}>
-      {renderIf(placeholder, () => (
+      {renderIf(placeholder != null, () => (
         <option disabled={required} value="">{placeholder}</option>
       ))}
       {Option.getOptionsWithIndexes(options).map(o => (
