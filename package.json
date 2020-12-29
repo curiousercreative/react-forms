@@ -6,6 +6,8 @@
   "license": "MIT",
   "repository": "github:curiousercreative/react-forms",
   "main": "dist/index.js",
+  "module": "dist/index.js",
+  "sideEffects": false,
   "source": "src/index.js",
   "scripts": {
     "build": "rm -rf ./dist/* && babel ./src --out-dir ./dist --ignore './src/**/*.test.js' --ignore './src/**/*.test.jsx' --ignore './src/**/__tests__/' --ignore './src/**/__mocks__/' --source-maps inline --keep-file-extension --copy-files",

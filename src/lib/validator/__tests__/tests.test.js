@@ -1,5 +1,5 @@
 import { tests } from '../';
-const { email, integer, maxLength, minLength, numeric, passIfEmpty, phone, required } = tests;
+const { email, integer, length, maxLength, minLength, numeric, passIfEmpty, phone, required } = tests;
 const x = {};
 
 describe('validator.tests passIfEmpty', () => {
@@ -50,6 +50,16 @@ describe('validator.tests', () => {
     expect(integer(x.a)).toBe(true);
     expect(integer('2a')).toBe(false);
     expect(integer('asdf')).toBe(false);
+  });
+  test('length', () => {
+    const len = 5;
+
+    expect(length(len)('hello')).toBe(true);
+    expect(length(len, 'hello')).toBe(true);
+    expect(length(len, 'hey')).toBe(false);
+    expect(length(len, ['a', 'b', 'c'])).toBe(false);
+    expect(length(len, ['a', 'b', 'c', 'd', 'e'])).toBe(true);
+    expect(length(len, 'hello! my darling')).toBe(false);
   });
   test('maxLength', () => {
     const length = 5;

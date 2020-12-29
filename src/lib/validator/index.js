@@ -1,5 +1,5 @@
 /** @module lib/validator */
-import { arrayify } from '../transformers';
+import { arrayify, functionify } from '../transformers';
 import uniq from '../../util/uniq.js';
 import curryModule from '../../util/curryModule.js';
 
@@ -49,36 +49,39 @@ export function validate (data, validations, validateMissingFields = true) {
   }
 
   // run all validations and aggregate the errors
-  const ERRORS = validations.reduce((errorCollection, { names, tests }) => {
-    // arrayify if a string was provided and then ensure our array contains no dupes
-    names = uniq(arrayify(names));
+  const errors = validations
+    .reduce((errorCollection, { names, tests }) => {
+      // arrayify if a string was provided and then ensure our array contains no dupes
+      names = uniq(arrayify(names));
 
-    return names
-      // // don't validate fields that already have an error
-      // .filter(name => !errorCollection.find(e => e.name === name))
-      // map to error collections
-      .map(name => {
-        // exit early if this field wasn't provided and flag is set
-        if (!validateMissingFields && !data.hasOwnProperty(name)) return [];
+      return names
+        // // don't validate fields that already have an error
+        // .filter(name => !errorCollection.find(e => e.name === name))
+        // map to error collections
+        .map(name => {
+          // exit early if this field wasn't provided and flag is set
+          if (!validateMissingFields && !data.hasOwnProperty(name)) return [];
 
-        const value = data[name];
+          const value = data[name];
 
-        return tests
-          // run all the tests for this field
-          .map(([ test, error ]) => !test(value) && error(name))
-          // filter out empty items (passed tests)
-          .filter(v => !!v && String(v).length > 0)
-          // format as an error object
-          .map(error => ({ name, error }));
-      })
-      // flatten error collections
-      .reduce((errorAgg, errors) => errorAgg.concat(errors), [])
-      // merge with the running error collection for all validations
-      .concat(errorCollection);
-  }, []);
+          return tests
+            // functionify each validation test and message generator in case fully applied
+            .map(arr => arr.map(functionify))
+            // run all the tests for this field
+            .map(([ test, error ]) => !test(value) && error(name))
+            // filter out empty items (passed tests)
+            .filter(v => !!v && String(v).length > 0)
+            // format as an error object
+            .map(error => ({ name, error }));
+        })
+        // flatten error collections
+        .reduce((errorAgg, errors) => errorAgg.concat(errors), [])
+        // merge with the running error collection for all validations
+        .concat(errorCollection);
+    }, []);
 
   // ensure no field has more than one error
-  return uniq(ERRORS, a => a.name)
+  return uniq(errors, a => a.name)
     // sort for predictable ordering of field errors
     .sort((a, b) => a.name > b.name ? 1 : -1);
 }

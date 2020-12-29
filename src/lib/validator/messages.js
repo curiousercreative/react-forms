@@ -33,6 +33,16 @@ export function integer (name) {
  * @param  {string} name
  * @return {boolean}
  */
+export function length (length, name) {
+  return `${humanize(name)} must be ${length} characters`;
+}
+
+/**
+ * @function
+ * @param  {string|number} length
+ * @param  {string} name
+ * @return {boolean}
+ */
 export function maxLength (length, name) {
   return `${humanize(name)} must not be more than ${length} characters`;
 }

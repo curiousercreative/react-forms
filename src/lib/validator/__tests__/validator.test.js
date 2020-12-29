@@ -56,6 +56,19 @@ describe('simple "required" test', () => {
 
     Simple.expectErrors(errors);
   });
+
+  test('validation ', () => {
+    function _validate () {
+      return validate({ a: '' }, [{
+        names: [ 'a' ],
+        tests: [[ tests.required, messages.required('Custom field name') ]],
+      }]);
+    }
+
+    expect(_validate).not.toThrow();
+    const errors = _validate();
+    expect(errors.length).toBe(1);
+  });
 });
 
 describe('complex tests', () => {

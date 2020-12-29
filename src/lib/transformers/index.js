@@ -6,7 +6,8 @@
  * @module lib/transformers
  */
 
-export { default as arrayify } from './arrayify';
-export { default as capitalize } from './capitalize';
-export { default as humanize } from './humanize';
-export { default as pascalize } from './pascalize';
+export { default as arrayify } from './arrayify.js';
+export { default as capitalize } from './capitalize.js';
+export { default as functionify } from './functionify.js';
+export { default as humanize } from './humanize.js';
+export { default as pascalize } from './pascalize.js';
