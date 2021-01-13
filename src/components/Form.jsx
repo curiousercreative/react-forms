@@ -26,6 +26,8 @@ const defaultStore = localStateStore;
 /**
  * @class Form
  * @property {string} [className = '']
+ * @property {object[]|string[]|array[]} errors - supports errors as list of strings,
+ * internal errors collection { name, error } or entries [ name, error ]
  * @property {string} [formName = 'form'] recommended, used for field className
  * generation for form specific style selectors
  * @property {number} [index] when used as a nested "field" in a FormCollection
@@ -51,6 +53,7 @@ export default class Form extends React.Component {
   static contextType = FormContext;
   static defaultProps = {
     className: '',
+    errors: [],
     formName: 'form',
     initialValues: {},
     model: {},
@@ -170,6 +173,19 @@ export default class Form extends React.Component {
     return this.getErrors(index).filter(e => e.name === name);
   }
 
+  _normalizeError (error) {
+    switch (typeof error) {
+      case 'string':
+        return { error };
+      case 'object':
+        return Array.isArray(error)
+          ? { name: error[0], error: error[1] }
+          : error;
+      default:
+        return error;
+    }
+  }
+
   _setModel (model) {
     this.model = mergeObjects(this, defaultModel, model);
   }
@@ -275,7 +291,9 @@ export default class Form extends React.Component {
    * @return {Error[]} collection of errors (name, error)
    */
   getErrors () {
-    return this.store.getErrors();
+    return this.store.getErrors()
+      .concat(this.props.errors)
+      .map(this._normalizeError);
   }
 
   /**
@@ -382,13 +400,13 @@ export default class Form extends React.Component {
   renderErrors (includeFieldErrors = false) {
     // always include critical (non-field) errors
     let errors = this.getErrors()
-      .filter(e => typeof e === 'string')
-      .map(e => <li className="form__error" key={e}>{e}</li>);
+      .filter(({ name }) => !name)
+      .map(({ error }) => <li className="form__error" key={error}>{error}</li>);
 
     if (includeFieldErrors) {
       errors = errors.concat(this.getErrors()
         .filter(e => e.name && e.error)
-        .map(e => <li className="form__error" key={e.error}>{e.error}</li>)
+        .map(({ error }) => <li className="form__error" key={error}>{error}</li>)
       );
     }
 
@@ -402,11 +420,16 @@ export default class Form extends React.Component {
   /**
    * @param {jsx} [jsx] for subclassed Form, a render method's returned jsx will
    * be wrapped in `super.render()` to provide FormContext
+   * NOTE: we have three different render scenarios:
+   * 1. Subclassed where form content is passed to render method: super.render(<SomeComponentTree />)
+   * 2. Render "prop" (component passed as child): <Form>{SomeComponent}</Form>
+   * 3. Simple children: <Form><SomeComponentTree /></Form>
+   * scenario 3 is the simplest and most intuitive, however it lacks the ability
+   * to read form values for conditional rendering.
    * @return {jsx} .form or subclassed render method's jsx
    */
   render (jsx) {
     let classes = this.props.className.split(' ').concat('form');
-    const children = functionify(this.props.children);
     const context = this.getContextValue(this.formatData(this.store.values()), this.getErrors());
     const renderProps = {
       errors: context.state.errors,
@@ -415,15 +438,15 @@ export default class Form extends React.Component {
       renderErrors: this.renderErrors,
       values: context.state.values,
     };
+    const Child = typeof this.props.children === 'function' && this.props.children;
 
     return (
       <FormContext.Provider value={context}>
-        {renderIf(jsx, () => jsx, () => (
-          <div className={classes.join(' ')}>
-            {this.renderErrors()}
-            {children(renderProps)}
-          </div>
-        ))}
+        <div className={classes.join(' ')}>
+          {renderIf(jsx, () => jsx)}
+          {renderIf(Child, () => <Child {...renderProps} />)}
+          {renderIf(typeof this.props.children !== 'function', () => this.props.children)}
+        </div>
       </FormContext.Provider>
     );
   }

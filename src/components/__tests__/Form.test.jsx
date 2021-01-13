@@ -39,6 +39,18 @@ test('Form._hasParentForm should return true for nested form', () => {
   expect(child._hasParentForm()).toBe(true);
 });
 
+test('Form._hasParentForm should return true for nested form using renderProp', () => {
+  const testRenderer = renderer.create(
+    <Form>
+      {() => <Form name="child" />}
+    </Form>
+  );
+
+  const child = testRenderer.root.findByProps({ name: 'child' }).instance;
+
+  expect(child._hasParentForm()).toBe(true);
+});
+
 test('Nested form should use parent form as store', () => {
   const testRenderer = renderer.create(
     <Form initialValues={{ child_field: 'b' }}>
