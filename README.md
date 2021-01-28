@@ -4,7 +4,7 @@
 - boilerplate-free field label and error rendering
 - validation tests and error messages as data and functions with support for validations conditioned upon form data
 - library of common form fields with support for supplying your own field components
-- use default store (component state) or supply your own functions describing how to read and write field values
+- use default store (component state) or supply your own functions describing how to write field values (you're responsible for supplying a `values` prop)
 - model first architecture-ready; bundle validations and data transformations into a single prop
 - observable
 - toggle `validateAsYouGo`
@@ -32,7 +32,8 @@ A simple login form with validation that requires both fields to be filled in an
 ```javascript
 import React from 'react';
 
-import { Fields, Form, validator } from '@curiouser/react-forms';
+import { Form, validator } from '@curiouser/react-forms';
+import { PasswordField, TextField } from '@curiouser/react-forms';
 import '@curiouser/react-forms/dist/index.css';
 
 const formProps = {
@@ -65,8 +66,8 @@ export default function MyForm () {
     <Form ref={form} {...formProps}>
       <form onSubmit={handleSubmit}>
         <div className="form__fields">
-          <Fields.TextField label="Name" name="username" />
-          <Fields.PasswordField label="Password" name="password" />
+          <TextField label="Name" name="username" />
+          <PasswordField label="Password" name="password" />
         </div>
         <button type="submit">Sign in</button>
       </form>
@@ -79,7 +80,8 @@ export default function MyForm () {
 ```javascript
 import React from 'react';
 
-import { Fields, Form, util, validator } from '@curiouser/react-forms';
+import { Form, util, validator } from '@curiouser/react-forms';
+import { PasswordField, TextField } from '@curiouser/react-forms';
 import '@curiouser/react-forms/dist/index.css';
 
 class MyForm extends Form {
@@ -116,8 +118,8 @@ class MyForm extends Form {
     return super.render(
       <form className="form" onSubmit={this.handleSubmit}>
         <div className="form__fields">
-          <Fields.TextField label="Name" name="username" />
-          <Fields.PasswordField label="Password" name="password" />
+          <TextField label="Name" name="username" />
+          <PasswordField label="Password" name="password" />
         </div>
         <button type="submit">Sign in</button>
       </form>
@@ -126,103 +128,10 @@ class MyForm extends Form {
 }
 ```
 
-### Render a more complex form with a nested data structure
-
-```javascript
-import React from 'react';
-
-import { Fields, Form, FormCollection, validator } from '@curiouser/react-forms';
-import '@curiouser/react-forms/dist/index.css';
-
-const formProps = {
-  formName: 'my-form',
-  initialValues: {
-    details: {
-      age: 8,
-      favorite_color: 'blue',
-      favorite_dinner_combos: [],
-    },
-    password: 'xxxxxx',
-    username: 'coolguy95',
-  },
-  validations: [{
-    names: [ 'username', 'password' ],
-    tests: [[ validator.tests.required, validator.messages.required ]],
-  }, {
-    names: [ 'password' ],
-    tests: [[ validator.tests.minLength(6), validator.messages.minLength(6) ]],
-  }],
-}
-
-const dinnerComboDefaults = {
-  beverage: '',
-  entree: '',
-  meta: {},
-};
-
-export default function MyForm () {
-  const collection = React.useRef();
-  const form = React.useRef();
-
-  const handleClickAdd = React.useCallback(() => {
-    collection.current.handleClickAdd();
-  }, []);
-
-  const handleSubmit = React.useCallback(() => {
-    if (!form.current.validate() || form.current.state.isLoading) return;
-
-    const formData = form.current.getData();
-
-    // do something with formData...
-  }, []);
-
-  return (
-    <Form ref={form} {...formProps}>
-      <form onSubmit={handleSubmit}>
-        <div className="form__fields">
-          <Fields.TextField label="Name" name="username" />
-          <Fields.PasswordField label="Password" name="password" />
-        </div>
-        <h4>User Details</h4>
-        <Form formName="user-details" name="details">
-          <div className="form__fields">
-            <Fields.TextField label="Age" name="age" />
-            <Fields.TextField label="Favorite Color" name="favorite_color" />
-          </div>
-
-          <h5>Favorite dinner combos</h5>
-          <FormCollection
-            component={DinnerCombo}
-            defaultValues={dinnerComboDefaults}
-            formName="user-combos"
-            name="favorite_dinner_combos"
-            ref={collection}>
-            <button onClick={handleClickAdd} type="button">Add dinner combo</button>
-          </FormCollection>
-        </Form>
-        <button type="submit">Sign in</button>
-      </form>
-    </Form>
-  );
-}
-
-function DinnerCombo ({ handleClickRemove, index }) {
-  return (
-    <div>
-      <div className="form__fields">
-        <Fields.TextField index={index} label="Beverage" name="beverage" />
-        <Fields.TextField index={index} label="Entrée" name="entree" />
-      </div>
-
-      <Form formName="meta" index={index} name="meta">
-        <Fields.TextField label="Meta - date added" name="date_added" />
-      </Form>
-
-      <button onClick={handleClickRemove} type="button">remove</button>
-    </div>
-  );
-}
-```
+### More examples in the repo
+Run all of the form examples in your browser with `yarn start`. Here are some common examples:
+- [Store form data elsewhere (redux perhaps)](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/FormDirect.jsx)
+- [Render a more complex form with a nested data structure](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/Nested.jsx)
 
 ### Extending with your own form field components
 Form fields are broken into two, one representing the field (with label, error messaging and className generation) and the actual input/control component.

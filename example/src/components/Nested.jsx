@@ -33,6 +33,27 @@ const dinnerComboDefaults = {
   meta: {},
 };
 
+
+/**
+ * @param       {function} handleClickRemove
+ * @param       {number} index
+ * @return      {jsx}
+ */
+const DinnerCombo = React.forwardRef(function ({ handleClickRemove, index }, forwardedRef) {
+  return (
+    <div>
+      <div className="form__fields">
+        <TextField index={index} label="Beverage" name="beverage" forwardedRef={forwardedRef} />
+        <TextField index={index} label="Entrée" name="entree" />
+      </div>
+      <Form formName="meta" index={index} name="meta">
+        <TextField label="Meta - date added" name="date_added" />
+      </Form>
+      <button onClick={handleClickRemove} type="button">remove</button>
+    </div>
+  );
+});
+
 export default function MyForm () {
   const collection = React.useRef();
   const form = React.useRef();
@@ -47,6 +68,7 @@ export default function MyForm () {
     const formData = form.current.getData();
 
     // do something with formData...
+    alert(JSON.stringify(formData));
   }, []);
 
   return (
@@ -76,25 +98,5 @@ export default function MyForm () {
         <button type="submit">Sign in</button>
       </form>
     </Form>
-  );
-}
-
-/**
- * @param       {function} handleClickRemove
- * @param       {number} index
- * @return      {jsx}
- */
-function DinnerCombo ({ handleClickRemove, index }) {
-  return (
-    <div>
-      <div className="form__fields">
-        <TextField index={index} label="Beverage" name="beverage" />
-        <TextField index={index} label="Entrée" name="entree" />
-      </div>
-      <Form formName="meta" index={index} name="meta">
-        <TextField label="Meta - date added" name="date_added" />
-      </Form>
-      <button onClick={handleClickRemove} type="button">remove</button>
-    </div>
   );
 }

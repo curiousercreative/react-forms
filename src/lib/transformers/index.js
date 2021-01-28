@@ -11,3 +11,4 @@ export { default as capitalize } from './capitalize.js';
 export { default as functionify } from './functionify.js';
 export { default as humanize } from './humanize.js';
 export { default as pascalize } from './pascalize.js';
+export { default as promisify } from './promisify.js';

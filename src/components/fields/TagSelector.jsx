@@ -53,6 +53,10 @@ export default class TagSelector extends React.Component {
 
     this.prepareOptions = memo(curry(this.prepareOptions));
     this.updateHasFocus = memo(this.updateHasFocus);
+
+    if (!Array.isArray(this.props.getValue())) {
+      console.error(`TagSelector field "${this.props.name}" data must be of type array but found: ${this.props.getValue()}`);
+    }
   }
 
   componentDidMount () {

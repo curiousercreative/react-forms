@@ -15,7 +15,7 @@ import fromEntries from '../util/fromEntries.js';
 import renderIf from '../util/renderIf.js';
 import uniq from '../util/uniq.js';
 
-import { functionify } from '../lib/transformers';
+import { promisify } from '../lib/transformers';
 import { Pubsub } from '../lib/pubsub';
 import { validate } from '../lib/validator';
 
@@ -31,14 +31,14 @@ const defaultStore = localStateStore;
  * @property {string} [formName = 'form'] recommended, used for field className
  * generation for form specific style selectors
  * @property {number} [index] when used as a nested "field" in a FormCollection
- * @property {object} [initialValues]
- * @property {FormModel} [model] supply any number of model overrides
+ * @property {object} [initialValues = {}]
+ * @property {FormModel|function} [model] supply any number of model overrides
  * @property {string} [name] when used as a nested "field"
  * @property {Pubsub} [pubsub] an existing Pubsub instance, perhaps you want to
  * observe several forms at once?
- * @property {FormStore} [store] supply any number of store overrides
+ * @property {FormStore|function} [store] supply any number of store overrides
  * @property {boolean} [validateAsYouGo = true]
- * @property {collection} [validations] - very specific data structure expected by
+ * @property {object[]} [validations] - very specific data structure expected by
  * the validate function. The below example is for a form with two fields that are both required.
  * It should look like this:
  * import { messages, tests } from 'lib/validator';
@@ -47,6 +47,8 @@ const defaultStore = localStateStore;
  *   names: ['username', 'password'],
  *   tests: [[ tests.required, messages.required ]]
  * }]
+ * @property {object} [values] if you plan to manage storing form values, pass them in here.
+ * Be sure you are passing in a store prop with setValue methods
  * @return {jsx} .form
  */
 export default class Form extends React.Component {
@@ -61,8 +63,6 @@ export default class Form extends React.Component {
     validateAsYouGo: true,
   };
 
-  /** @property {object} emptyValues */
-  emptyValues = {};
   /** @property {array} fieldsBlurred - list of field names that have been blurred used for validating as you go */
   fieldsBlurred = [];
   /** @property {object} model - set of functions that are generally specific to a data model */
@@ -83,7 +83,7 @@ export default class Form extends React.Component {
 
     this._setModel = memoize(this._setModel);
     this._setStore = memoize(this._setStore);
-    this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, false);
+    this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, true);
     this.formatData = memoize(this.formatData);
     this.getContextValue = memoize(this.getContextValue);
 
@@ -94,7 +94,7 @@ export default class Form extends React.Component {
     this._setModel(this.props.model);
     this._setStore(this.props.store);
     this.store.initErrors([]);
-    this.store.initData(this.props.initialValues || this.state.values);
+    this.store.initData(this.props.initialValues);
 
     // accept validations as component prop and override model.validations (not encouraged anyhow)
     this.model.validations = this.props.validations || this.props.model.validations || [];
@@ -108,8 +108,8 @@ export default class Form extends React.Component {
 
   componentDidUpdate () {
     // TODO: how to best support changing model and store props?
-    // this._setModel(this.props.model);
-    // this._setStore(this.props.store);
+    this._setModel(this.props.model);
+    this._setStore(this.props.store);
 
     this.pubsub = this.props.pubsub || this.pubsub;
   }
@@ -164,7 +164,7 @@ export default class Form extends React.Component {
   }
 
   /**
-   * _getErrors - Field.jsx should call this during render
+   * _getFieldErrors - Field.jsx should call this during render
    * @param  {string} name
    * @param  {number} [index]
    * @return {Error[]} collection of error objects (name, error)
@@ -178,7 +178,7 @@ export default class Form extends React.Component {
       case 'string':
         return { error };
       case 'object':
-        return Array.isArray(error)
+        return Array.isArray(error) && error.length
           ? { name: error[0], error: error[1] }
           : error;
       default:
@@ -199,7 +199,7 @@ export default class Form extends React.Component {
    * @return {array} [ boolean, object[] ]
    */
   _validate () {
-    const errors = validate(this.store.values(), this.getValidations());
+    const errors = validate(this.getData(), this.getValidations());
     const isValid = errors.length === 0;
 
     return [ isValid, errors ];
@@ -309,11 +309,10 @@ export default class Form extends React.Component {
    * especially if you want to read/write form state elsewhere. You can also
    * override me for side effects and still call me using super.getValue
    * @param  {string} name
-   * @param  {number} [index]
    * @return {string|any}
    */
-  getValue (name, index) {
-    return this.store.getValue(name, index);
+  getValue (name) {
+    return this.getData()[name];
   }
 
   /**
@@ -347,7 +346,7 @@ export default class Form extends React.Component {
    * @returns {Promise}
    */
   setValue (name, value, context, index) {
-    return this.store.setValue(name, value, index)
+    return promisify(this.store.setValue(name, value, index))
       // NOTE: overriding this method will require reimplementing this
       // publish a message to let field respond to external update
       .then(() => this.pubsub.trigger(getFieldTopic(name, 'updated'), { index, name, value, context }));
@@ -430,7 +429,7 @@ export default class Form extends React.Component {
    */
   render (jsx) {
     let classes = this.props.className.split(' ').concat('form');
-    const context = this.getContextValue(this.formatData(this.store.values()), this.getErrors());
+    const context = this.getContextValue(this.formatData(this.getData()), this.getErrors());
     const renderProps = {
       errors: context.state.errors,
       form: context.form,

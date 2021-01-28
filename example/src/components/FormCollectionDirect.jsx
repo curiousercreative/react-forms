@@ -8,6 +8,18 @@ const OPTIONS = [
   { label: 'no', value: '0' },
 ];
 
+const User = React.forwardRef(function User ({ index, username, password }, ref) {
+  return (
+    <div className="form-collection-extended__item" key={index}>
+      <Fields>
+        <TextField forwardedRef={ref} index={index} label="username" name="username" />
+        <PasswordField index={index} label="password" name="password" />
+        <NativeSelectField index={index} label="opt-in?" name="optin" options={OPTIONS} />
+      </Fields>
+    </div>
+  );
+});
+
 export default class FormCollectionDirect extends React.Component {
   constructor (...args) {
     super(...args);
@@ -31,16 +43,4 @@ export default class FormCollectionDirect extends React.Component {
       </div>
     );
   }
-}
-
-function User ({ index, username, password }) {
-  return (
-    <div className="form-collection-extended__item" key={index}>
-      <Fields>
-        <TextField index={index} label="username" name="username" />
-        <PasswordField index={index} label="password" name="password" />
-        <NativeSelectField index={index} label="opt-in?" name="optin" options={OPTIONS} />
-      </Fields>
-    </div>
-  );
 }

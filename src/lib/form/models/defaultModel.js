@@ -1,6 +1,8 @@
 /** @module lib/form/models/defaultModel */
 import { pascalize } from '../../transformers';
 
+const primaryKey = 'id';
+
 /**
  * @function defaultModel
  * @param  {object} instance - Form component instance
@@ -107,17 +109,6 @@ export default function defaultModel (instance) {
     return this[methodName](value);
   }
 
-  /**
-   * selectPrimaryKey
-   * @description selector function for identifying data, helpful for merging
-   * temporary and persistent data
-   * @param  {object} modelInstance
-   * @return {string|number|any} primary key
-   */
-  function selectPrimaryKey (modelInstance) {
-    return modelInstance.id;
-  }
-
   return {
     _cleanValue,
     _formatValue,
@@ -128,7 +119,7 @@ export default function defaultModel (instance) {
     formatModel,
     formatValue,
     getValidations,
-    selectPrimaryKey,
+    primaryKey,
     validations: [],
   };
 }

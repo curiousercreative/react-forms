@@ -8,21 +8,32 @@ import localStateStoreCollection from '../lib/form/stores/localStateStoreCollect
 import bindMethods from '../util/bindMethods.js';
 import callMe from '../util/callMe.js';
 import curry from '../util/curry.js';
-import fromEntries from '../util/fromEntries.js';
 import omit from '../util/omit.js';
 import { validate } from '../lib/validator';
 
 const defaultIsNew = data => !('id' in data);
+const emptyValues = [];
 
 /**
  * @class FormCollection
  * @extends Form
  * @property {string} [className = '']
  * @property {React.Component} [component]
+ * @property {object} [defaultValues] - default values of collection item when created
  * @property {function} [delete] Object => Promise
- * @property {string} [formName = '']
+ * @property {object[]|string[]|array[]} errors - supports errors as list of strings,
+ * internal errors collection { name, error } or entries [ name, error ]
+ * @property {string} [formName = 'form'] recommended, used for field className
+ * generation for form specific style selectors
+ * @property {number} [index] when used as a nested "field" in a FormCollection
+ * @property {object} [initialValues = []] initial collection data to import
+ * @property {FormModel|function} [model] supply any number of model overrides
+ * @property {string} [name] when used as a nested "field"
+ * @property {Pubsub} [pubsub] an existing Pubsub instance, perhaps you want to
+ * observe several forms at once?
+ * @property {FormStore|function} [store] supply any number of store overrides
  * @property {boolean} [validateAsYouGo = true]
- * @property {collection} [validations = []] - very specific data structure expected by
+ * @property {object[]} [validations] - very specific data structure expected by
  * the validate function. The below example is for a form with two fields that are both required.
  * It should look like this:
  * import { messages, tests } from 'lib/validator';
@@ -31,36 +42,36 @@ const defaultIsNew = data => !('id' in data);
  *   names: ['username', 'password'],
  *   tests: [[ tests.required, messages.required ]]
  * }]
- * @property {object[]} [values = []] set initial values NOTE: if you're passing values in,
- * consider overwriting setValue and getValue in your instance so field values are
- * always passed down
- * @return {jsx} form.form, though this class is frequently extended rather than
+ * @property {object[]} [values] if you plan to manage storing form values, pass them in here.
+ * Be sure you are passing in a store prop with setValue methods
+ * @return {jsx} .form, though this class is frequently extended rather than
  * used directly and the render method is overriden
  */
 export default class FormCollection extends Form {
   static defaultProps = {
     ...Form.defaultProps,
     defaultValues: {},
-    values: [],
+    initialValues: [],
+    store: localStateStoreCollection,
   };
 
   /** @property {number} cid - client id, FormCollection managed index */
   cid = 0;
   collection = []; // used for refs
-  emptyValues = [];
 
   constructor (...args) {
     super(...args);
     bindMethods(this);
 
-    this._setStore(localStateStoreCollection, this.props.store);
-
     const errors = [];
     const values = this.store.getPersistentData()
+      // unlikely, but prefilled collection data that is not yet persistent
+      .concat(this.props.initialValues)
       .map(this.create);
 
     // init any lists per collection item
     values.forEach(() => {
+      errors.push([]);
       this.fieldsBlurred.push([]);
     });
 
@@ -75,8 +86,8 @@ export default class FormCollection extends Form {
    * @return {array} [ boolean, object[] ]
    */
   _validate () {
-    // arrayify to  FormCollection
-    const errors = this.store.values().map(data => validate(data, this.getValidations()));
+    // 2d array of errors
+    const errors = this.getData(true).map(data => validate(data, this.getValidations()));
     // if there are any, form is invalid
     const isValid = !errors.some(eArr => eArr.length > 0);
 
@@ -115,8 +126,14 @@ export default class FormCollection extends Form {
 
   handleClickRemove (e) {
     const index = Number(e.target.value);
+    const pred = (_, i) => i !== index;
 
-    this.remove(index);
+    this.remove(index)
+      // cleanup
+      .then(() => {
+        this.fieldsBlurred.filter(pred);
+        this.store.setErrors(this.store.getErrors().filter(pred));
+      });
   }
 
   /**
@@ -132,7 +149,7 @@ export default class FormCollection extends Form {
     return Promise
       .all([
         this.store.setErrors([ ...this.getErrors(), [] ]),
-        this.store.setData(this.store.values().concat(object)),
+        this.store.setData(this.store.getData().concat(object)),
       ])
       .then(() => {
         // init lists for this new item
@@ -154,10 +171,10 @@ export default class FormCollection extends Form {
 
   formatData (data) {
     return this.model.formatCollection(data
+      // be sure all items have default values
+      .map(item => ({ ...this.props.defaultValues, ...item }))
       // run field level hooks
-      .map(obj => fromEntries(Object.entries(obj)
-        .map(([ name, val ]) => [ name, this.model.formatValue(name, val) ]))
-      )
+      .map(item => super.formatData(item))
       // run model level hooks
       .map(this.model.formatModel)
     );
@@ -169,19 +186,21 @@ export default class FormCollection extends Form {
 
   /**
    * getData - get data for external consumption, merges temporary data atop permanent data
+   * @param {boolean} [withCid = false] omit cid attr by default, included when rendering internally
    * @return {object[]}
    */
-  getData () {
+  getData (withCid = false) {
     const list = [];
     const set = new Set();
-    const { selectPrimaryKey } = this.model;
+    const { primaryKey } = this.model;
 
-    this.store.getPersistentData().concat(this.store.values()).forEach(a => {
-      const key = selectPrimaryKey(a);
+    // merge our edited data over the persistent data
+    [ ...this.store.getPersistentData(), ...this.store.getData() ].forEach(a => {
+      const key = a[primaryKey];
 
       // we already added a persistent item
       if (key && set.has(key)) {
-        const i = list.findIndex(b => key === selectPrimaryKey(b));
+        const i = list.findIndex(b => key === b[primaryKey]);
         list[i] = { ...list[i], ...a };
       }
       else {
@@ -190,16 +209,18 @@ export default class FormCollection extends Form {
       }
     });
 
-    return this.parse(list);
+    if (!list.length) return emptyValues;
+
+    // by default, omit the cid for external consumers
+    return withCid ? list : list.map(omit('cid'));
   }
 
   getItemProps (data) {
     return { data };
   }
 
-  parse (collection) {
-    // by default, omit the cid for external consumers
-    return collection.map(omit('cid'));
+  getValue (name, index) {
+    return this.getData()[index][name];
   }
 
   /**
@@ -210,13 +231,13 @@ export default class FormCollection extends Form {
    */
   remove (dataOrIndex, isNew = defaultIsNew) {
     const data = typeof dataOrIndex === 'number'
-      ? this.store.values()[dataOrIndex]
+      ? this.getData(true)[dataOrIndex]
       : dataOrIndex;
 
     // if object is new, just handle in state
     if (isNew(data)) {
       this.removeTemporaryItem(data);
-      return Promise.resolve().then(this.onRemove);
+      return Promise.resolve();
     }
 
     // object isn't new, pass it to the prop function
@@ -240,7 +261,7 @@ export default class FormCollection extends Form {
       ? dataOrCid
       : dataOrCid.cid;
 
-    this.setData(this.store.values().filter(obj => obj.cid !== cid));
+    this.setData(this.store.getData(true).filter(obj => obj.cid !== cid));
   }
 
   renderItem (Component, item, index) {
@@ -253,7 +274,7 @@ export default class FormCollection extends Form {
   }
 
   render (Component) {
-    const formCollectionData = this.formatData(this.store.values());
+    const formCollectionData = this.formatData(this.getData(true));
     Component = Component || this.props.component;
     const itemRenderer = this.renderItem(Component);
     this.collection = [];

@@ -2,6 +2,8 @@
 import exists from '../../../util/exists.js';
 
 const emptyErrors = [];
+const emptyValues = [];
+
 /**
  * @function localStateStoreCollection
  * @param  {object} instance - Form component instance
@@ -10,26 +12,15 @@ const emptyErrors = [];
 export default function localStateStoreCollection (instance) {
   return {
     /**
-     * @function _getValue
-     * @description generic value getter describing how any value should be retrieved
-     * @param  {string} name
-     * @param  {number} index
-     * @return {any}
-     */
-    _getValue (name, index) {
-      return this.values()[index][name];
-    },
-
-    /**
      * @function _setData
      * @description wrapper for providing the store with complete data. this method
      * currently assumes data is user entered
-     * @param       {object} _values - raw values that may be cleaned by model before
+     * @param       {object} data - raw values that may be cleaned by model before
      * being transformed for store
      * @return {Promise}
      */
-    _setData (_values) {
-      return this.setData(this.toStore(instance.model.cleanCollection(_values)));
+    _setData (data) {
+      return this.setData(instance.model.cleanCollection(data));
     },
 
     /**
@@ -42,11 +33,25 @@ export default function localStateStoreCollection (instance) {
      */
     _setValue (name, value, index) {
       // don't touch any values except for index requested
-      return this._setData(this.values().map((v, i) => (
+      return this._setData(this.getData().map((v, i) => (
         i === index
           ? { ...v, [name]: value }
           : v
       )));
+    },
+
+    /**
+     * getData
+     * @description retrieves edited form data
+     * @return      {object[]}
+     */
+    getData () {
+      // get our collection data that we control
+      const values = instance._hasParentForm()
+        ? instance.context.form.getValue(instance.props.name, instance.props.index)
+        : instance.state.values;
+
+      return values.length ? values : emptyValues;
     },
 
     /**
@@ -69,8 +74,7 @@ export default function localStateStoreCollection (instance) {
      * @return {object[]}
      */
     getPersistentData () {
-      // TODO: how to manage incoming updates to persistent data?
-      return instance.props.values;
+      return instance.props.values || emptyValues;
     },
   };
 }
