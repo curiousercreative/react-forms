@@ -37,7 +37,8 @@
     "jsdoc-memberof-namespace": "^2.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-test-renderer": "^16.13.1"
+    "react-test-renderer": "^16.13.1",
+    "yarn": "^1.22.10"
   },
   "files": [
     "dist"
