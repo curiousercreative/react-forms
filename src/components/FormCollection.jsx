@@ -136,6 +136,13 @@ export default class FormCollection extends Form {
       });
   }
 
+  onItemRemove () {
+    this.pubsub.trigger('item.removed');
+
+    // publish a message for the entire form
+    this._publishOnChange(this.formatData(this.getData()));
+  }
+
   /**
    * add - create a new default object and add to collection
    * @param {object} [attr] - model attributes to merge in while adding
@@ -243,7 +250,7 @@ export default class FormCollection extends Form {
     // object isn't new, pass it to the prop function
     return this.props.delete(data)
       .then(() => this.removeTemporaryItem(data))
-      .then(() => this.pubsub.trigger('item.removed'))
+      .then(this.onItemRemove)
       .catch(errors => {
         this.handleErrors(data, errors);
         // bubble up the rejection
