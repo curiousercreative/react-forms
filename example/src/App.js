@@ -7,6 +7,7 @@ import FormDirect from './components/FormDirect.jsx';
 import FormDirectRenderProp from './components/FormDirectRenderProp.jsx';
 import FormExtended from './components/FormExtended.jsx';
 import Nested from './components/Nested.jsx';
+import Observable from './components/Observable.jsx';
 
 import '@curiouser/react-forms/dist/index.css';
 
@@ -62,6 +63,8 @@ class App extends React.Component {
         <FormComplex collectionProps={collectionProps} />
         <h2>Nested form with nested collection</h2>
         <Nested />
+        <h2>Observe a form</h2>
+        <Observable />
       </div>
     );
   }

@@ -20,6 +20,7 @@ import { Pubsub } from '../lib/pubsub';
 import { validate } from '../lib/validator';
 
 const CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD = 60;
+const FORM_UPDATE_PUBLISH_DEBOUNCE_PERIOD = 60;
 
 const defaultStore = localStateStore;
 
@@ -81,6 +82,7 @@ export default class Form extends React.Component {
     super(...args);
     bindMethods(this);
 
+    this._publishOnChange = memoize(debounce(this._publishOnChange, FORM_UPDATE_PUBLISH_DEBOUNCE_PERIOD, true));
     this._setModel = memoize(this._setModel);
     this._setStore = memoize(this._setStore);
     this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, true);
@@ -186,6 +188,10 @@ export default class Form extends React.Component {
     }
   }
 
+  _publishOnChange (formData) {
+    this.pubsub.trigger('form.updated', formData);
+  }
+
   _setModel (model) {
     this.model = mergeObjects(this, defaultModel, model);
   }
@@ -254,6 +260,10 @@ export default class Form extends React.Component {
   }
 
   onFieldUpdate ({ name, value, context, index }) {
+    // publish a message for the entire form
+    this._publishOnChange(this.formatData(this.getData()));
+
+    // perform validations as necessary
     this._validateOnChange(name, index);
   }
 

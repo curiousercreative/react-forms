@@ -1,15 +1,17 @@
 // import './index.css';
 
+// Form level components
 export { default as Editable } from './components/Editable.jsx';
 export { default as Form } from './components/Form.jsx';
 export { default as FormCollection } from './components/FormCollection.jsx';
 export { default as SubmitButton } from './components/SubmitButton.jsx';
 
+// Form "SDK"
+export { default as FormContext } from './components/config/FormContext.js';
+
+// Form Field "SDK"
 export * as fieldUtil from './components/fields/util';
 export * as util from './util';
-export { default as validator } from './lib/validator';
-
-export { default as FormContext } from './components/config/FormContext.js';
 
 // Form Fields
 export { default as Button } from './components/fields/Button.jsx';
@@ -25,3 +27,7 @@ export { default as SelectField } from './components/fields/SelectField.jsx';
 export { default as TagSelectorField } from './components/fields/TagSelectorField.jsx';
 export { default as TextField } from './components/fields/TextField.jsx';
 export { default as TextareaField } from './components/fields/TextareaField.jsx';
+
+// lib exports
+export * as pubsub from './lib/pubsub';
+export { default as validator } from './lib/validator';

@@ -110,4 +110,5 @@ export class Pubsub {
   }
 }
 
-export default new Pubsub();
+export const pubsub = new Pubsub();
+export default pubsub;
