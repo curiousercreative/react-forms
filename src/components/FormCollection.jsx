@@ -115,6 +115,7 @@ export default class FormCollection extends Form {
 
   handleClickAdd () {
     this.add()
+      .then(this.onItemAdd)
       .then(() => {
         // attempt to focus on newly added item
         setTimeout(() => {
@@ -129,11 +130,19 @@ export default class FormCollection extends Form {
     const pred = (_, i) => i !== index;
 
     this.remove(index)
+      .then(this.onItemRemove)
       // cleanup
       .then(() => {
         this.fieldsBlurred.filter(pred);
         this.store.setErrors(this.store.getErrors().filter(pred));
       });
+  }
+
+  onItemAdd () {
+    this.pubsub.trigger('item.added');
+
+    // publish a message for the entire form
+    this._publishOnChange(this.formatData(this.getData()));
   }
 
   onItemRemove () {
@@ -250,7 +259,6 @@ export default class FormCollection extends Form {
     // object isn't new, pass it to the prop function
     return this.props.delete(data)
       .then(() => this.removeTemporaryItem(data))
-      .then(this.onItemRemove)
       .catch(errors => {
         this.handleErrors(data, errors);
         // bubble up the rejection
