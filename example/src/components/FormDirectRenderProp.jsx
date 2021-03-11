@@ -11,8 +11,9 @@ export default class FormDirect extends React.Component {
     return (
       <div className="form-direct">
         <Form ref="form">
-          {() => (
+          {({ values }) => (
             <>
+              {values.username ? `you entered username ${values.username}` : 'no username entered' }
               <TextField label="username" name="username" />
               <SubmitButton onClick={this.handleSubmit.bind(this)}>Check form state</SubmitButton>
             </>

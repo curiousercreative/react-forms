@@ -130,6 +130,7 @@ class MyForm extends Form {
 
 ### More examples in the repo
 Run all of the form examples in your browser with `yarn start`. Here are some common examples:
+- [Render form with renderProp and read form values for dynamic rendering](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/FormDirectRenderProp.jsx)
 - [Store form data elsewhere (redux perhaps)](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/FormDirect.jsx)
 - [Render a more complex form with a nested data structure](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/Nested.jsx)
 - [Observe your form (share the state)](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/Observable.jsx)
