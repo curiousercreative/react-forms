@@ -35,6 +35,7 @@ const defaultStore = localStateStore;
  * @property {object} [initialValues = {}]
  * @property {FormModel|function} [model] supply any number of model overrides
  * @property {string} [name] when used as a nested "field"
+ * @property {function} [onChange] will receive form values as only arg
  * @property {Pubsub} [pubsub] an existing Pubsub instance, perhaps you want to
  * observe several forms at once?
  * @property {FormStore|function} [store] supply any number of store overrides
@@ -190,6 +191,9 @@ export default class Form extends React.Component {
 
   _publishOnChange (formData) {
     this.pubsub.trigger('form.updated', formData);
+
+    // support for onChange prop
+    if (typeof this.props.onChange === 'function') this.props.onChange(formData);
   }
 
   _setModel (model) {

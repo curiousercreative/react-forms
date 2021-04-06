@@ -28,6 +28,7 @@ const FIELD_TYPES_LABEL_AFTER_INPUT = [
  * @property {number} [index] - when used within FormCollection
  * @property {string} [label] - label text for this field
  * @property {string} name - form field name, will be key in form data
+ * @property {function} [onChange] - receives field value and { index, name, value, context }
  * @property {collection} [options] - for selectField or anything else that accepts
  * a predefined list of options to select from
  * @property {boolean} [retainsFocus = false] whether to consider this field to still
@@ -58,6 +59,12 @@ export default class Field extends React.Component {
     bindMethods(this);
 
     this.updateHasFocus = memo(this.updateHasFocus);
+  }
+
+  componentDidMount () {
+    this.context.pubsub.on(getFieldTopic(this.props.name, 'updated'), ({ index, name, value, context }) => {
+      if (typeof this.props.onChange === 'function') this.props.onChange(value, { index, name, value, context });
+    });
   }
 
   componentWillUnmount () {

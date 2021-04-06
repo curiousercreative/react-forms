@@ -8,6 +8,7 @@ import FormDirectRenderProp from './components/FormDirectRenderProp.jsx';
 import FormExtended from './components/FormExtended.jsx';
 import Nested from './components/Nested.jsx';
 import Observable from './components/Observable.jsx';
+import OnChange from './components/OnChange.jsx';
 
 import '@curiouser/react-forms/dist/index.css';
 
@@ -65,6 +66,8 @@ class App extends React.Component {
         <Nested />
         <h2>Observe a form</h2>
         <Observable />
+        <h2>React via onChange handler props to form and fields (console.logged)</h2>
+        <OnChange />
       </div>
     );
   }

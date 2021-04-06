@@ -14,13 +14,12 @@
 ## Install
 ### NPM
 ```bash
-npm add @curiouser/react-forms@curiousercreative/react-forms
+npm install @curiouser/react-forms
 ```
 
 ### Yarn
-Be sure to use this full GitHub URL while this [yarn bug](https://github.com/yarnpkg/yarn/issues/8238) exists.
 ```bash
-yarn add @curiouser/react-forms@https://github.com/curiousercreative/react-forms
+yarn add @curiouser/react-forms
 ```
 
 ## Usage
@@ -134,6 +133,7 @@ Run all of the form examples in your browser with `yarn start`. Here are some co
 - [Store form data elsewhere (redux perhaps)](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/FormDirect.jsx)
 - [Render a more complex form with a nested data structure](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/Nested.jsx)
 - [Observe your form (share the state)](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/Observable.jsx)
+- [React to form and field updates with onChange prop](https://github.com/curiousercreative/react-forms/blob/master/example/src/components/OnChange.jsx)
 
 ### Extending with your own form field components
 Form fields are broken into two, one representing the field (with label, error messaging and className generation) and the actual input/control component.

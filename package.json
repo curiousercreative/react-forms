@@ -1,10 +1,13 @@
 {
   "name": "@curiouser/react-forms",
-  "version": "0.1.0",
+  "version": "0.14.0",
   "description": "A simple library for rendering React forms and form fields along with managing form state and validation",
   "author": "curiousercreative",
   "license": "MIT",
-  "repository": "github:curiousercreative/react-forms",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/curiousercreative/react-forms.git"
+  },
   "main": "dist/index.js",
   "sideEffects": false,
   "source": "src/index.js",
@@ -28,6 +31,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.10.1",
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.10.1",
+    "@testing-library/react": "^11.2.6",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.6.0",
     "eslint-plugin-jest": "^23.13.2",
@@ -48,7 +52,15 @@
     "pubsub-js": "^1.8.0"
   },
   "directories": {
-    "example": "example",
-    "lib": "src/components"
-  }
+    "example": "example"
+  },
+  "bugs": {
+    "url": "https://github.com/curiousercreative/react-forms/issues"
+  },
+  "homepage": "https://github.com/curiousercreative/react-forms#readme",
+  "keywords": [
+    "react",
+    "forms",
+    "component"
+  ]
 }
