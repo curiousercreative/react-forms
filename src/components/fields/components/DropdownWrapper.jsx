@@ -79,7 +79,7 @@ export default class DropdownWrapper extends React.Component {
     this.timeout = setTimeout(() => {
       this.close();
       this.updateHasFocus(document.activeElement === document.body);
-    }, 0);
+    }, 100);
   }
 
   handleClickItem (e) {
