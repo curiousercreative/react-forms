@@ -7,7 +7,7 @@ import FormContext from './config/FormContext';
 import defaultModel from '../lib/form/models/defaultModel.js';
 import getFieldTopic from './fields/util/getFieldTopic.js';
 import localStateStore from '../lib/form/stores/localStateStore.js';
-import { mergeObjects } from '../lib/form';
+import { injectInstance, mergeObjects } from '../lib/form';
 
 import bindMethods from '../util/bindMethods.js';
 import debounce from '../util/debounce.js';
@@ -100,7 +100,7 @@ export default class Form extends React.Component {
     this.store.initData(this.props.initialValues);
 
     // accept validations as component prop and override model.validations (not encouraged anyhow)
-    this.model.validations = this.props.validations || this.props.model.validations || [];
+    this.model.validations = this.props.validations || injectInstance(this.props.model).validations || [];
   }
 
   componentDidMount () {

@@ -19,6 +19,16 @@ function bindMethods (source) {
 }
 
 /**
+ * @function injectInstance
+ * @param  {object} [obj={}] models, stores, etc for injecting a Form instance into
+ * @param  {Form} instance Form instance
+ * @return {object}
+ */
+export function injectInstance (obj = {}, instance) {
+  return typeof obj === 'function' ? obj(instance) : obj;
+}
+
+/**
  * @function mergeObjects
  * @param  {Form} instance
  * @param  {object[]} objects - for merging
@@ -26,14 +36,4 @@ function bindMethods (source) {
  */
 export function mergeObjects (instance, ...objects) {
   return bindMethods(objects.reduce((merged, obj) => Object.assign(merged, injectInstance(obj, instance)), {}));
-}
-
-/**
- * @function injectInstance
- * @param  {object} [obj={}] models, stores, etc for injecting a Form instance into
- * @param  {Form} instance Form instance
- * @return {object}
- */
-function injectInstance (obj = {}, instance) {
-  return typeof obj === 'function' ? obj(instance) : obj;
 }

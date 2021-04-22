@@ -15,15 +15,15 @@ const formProps = {
     username: 'coolguy95',
   },
   model: instance => ({
-    getValidations () {
-      return [{
+    validations: [
+      {
         names: [ 'username', 'password' ],
         tests: [[ validator.tests.required, validator.messages.required ]],
       }, {
         names: [ 'password' ],
         tests: [[ validator.tests.minLength(6), validator.messages.minLength(6) ]],
-      }];
-    },
+      },
+    ],
   }),
 }
 
