@@ -19,7 +19,6 @@ import callMe from '../../util/callMe.js';
 export default class Checkbox extends React.Component {
   static defaultProps = {
     className: '',
-    type: 'checkbox',
     value: true,
   };
 
