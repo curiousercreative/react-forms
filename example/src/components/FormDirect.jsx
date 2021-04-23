@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, SubmitButton } from '@curiouser/react-forms';
+import { Form, SubmitButton, validator } from '@curiouser/react-forms';
 import { SelectField, TextField } from '@curiouser/react-forms';
 
 const keySelector = opt => opt.label;
@@ -13,6 +13,12 @@ export default function FormDirect (props) {
   const [ values, setValues ] = React.useState({
     is_subscribed: false,
   });
+  const model = React.useMemo(() => ({
+    validations: [{
+      names: [ 'phone', 'username' ],
+      tests: [[ validator.tests.required, validator.messages.required ]],
+    }],
+  }), []);
   const store = React.useMemo(() => ({
     setValue: (key, value) => setValues({ ...values, [key]: value }),
   }), [ values ]);
@@ -23,7 +29,7 @@ export default function FormDirect (props) {
 
   return (
     <div className="form-direct">
-      <Form ref={form} store={store} values={values}>
+      <Form model={model} ref={form} store={store} values={values}>
         <TextField label="username" name="username" />
         <TextField label="phone" name="phone" />
         <SelectField name="is_subscribed" options={options} optionKeySelector={keySelector} />

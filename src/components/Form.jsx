@@ -259,8 +259,8 @@ export default class Form extends React.Component {
    * @param  {number} [index]
    */
   onFieldBlur ({ name, index }) {
-    this._validateOnChange(name, index);
     this._addFieldBlurred(name, index);
+    this._validateOnChange(name, index);
   }
 
   onFieldUpdate ({ name, value, context, index }) {

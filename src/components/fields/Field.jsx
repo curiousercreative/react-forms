@@ -24,6 +24,7 @@ const FIELD_TYPES_LABEL_AFTER_INPUT = [
  * Form field that adds nice form consistency and focus managementused to wrap around a form input
  * @class Field
  * @property {string} [className]
+ * @property {React.Component} component
  * @property {object} [forwardedRef]
  * @property {number} [index] - when used within FormCollection
  * @property {string} [label] - label text for this field
