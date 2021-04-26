@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, SubmitButton, util, validator } from '@curiouser/react-forms';
+import { Errors, Form, SubmitButton, util, validator } from '@curiouser/react-forms';
 import {
   CheckboxField,
   EmailField,
@@ -77,6 +77,7 @@ export default class FormComplex extends Form {
   render () {
     return super.render(
       <div className="form form-complex">
+        <Errors includeFieldErrors />
         <Form ref="movie">
           <div className="form__fields">
             <TextField label="Title" name="title" />

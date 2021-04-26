@@ -9,6 +9,8 @@ import getFieldTopic from './fields/util/getFieldTopic.js';
 import localStateStore from '../lib/form/stores/localStateStore.js';
 import { injectInstance, mergeObjects } from '../lib/form';
 
+import Errors from './Errors.jsx';
+
 import bindMethods from '../util/bindMethods.js';
 import debounce from '../util/debounce.js';
 import fromEntries from '../util/fromEntries.js';
@@ -411,23 +413,7 @@ export default class Form extends React.Component {
   }
 
   renderErrors (includeFieldErrors = false) {
-    // always include critical (non-field) errors
-    let errors = this.getErrors()
-      .filter(({ name }) => !name)
-      .map(({ error }) => <li className="form__error" key={error}>{error}</li>);
-
-    if (includeFieldErrors) {
-      errors = errors.concat(this.getErrors()
-        .filter(e => e.name && e.error)
-        .map(({ error }) => <li className="form__error" key={error}>{error}</li>)
-      );
-    }
-
-    return (
-      <ul className="form__errors">
-        {errors}
-      </ul>
-    );
+    return <Errors includeFieldErrors={includeFieldErrors} />;
   }
 
   /**

@@ -2,6 +2,7 @@
 
 // Form level components
 export { default as Editable } from './components/Editable.jsx';
+export { default as Errors } from './components/Errors.jsx';
 export { default as Form } from './components/Form.jsx';
 export { default as FormCollection } from './components/FormCollection.jsx';
 export { default as SubmitButton } from './components/SubmitButton.jsx';
