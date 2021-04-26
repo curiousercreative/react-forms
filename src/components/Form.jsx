@@ -279,15 +279,12 @@ export default class Form extends React.Component {
   }
 
   /**
-   * @param   {boolean} [storeOnly = false]
+   * @param   {object[]} storeErrors
+   * @param   {object[]} propErrors
    * @return  {Error[]} collection of errors (name, error)
    */
-  formatErrors (storeOnly = false) {
-    const errors = this.getErrors();
-
-    // allow for getting only store (local) errors
-    return (storeOnly ? errors : errors.concat(this.props.errors))
-      .map(this._normalizeError);
+  formatErrors (storeErrors, propErrors) {
+    return storeErrors.concat(propErrors).map(this._normalizeError);
   }
 
   getContextValue (values, errors) {
@@ -438,7 +435,10 @@ export default class Form extends React.Component {
    */
   render (jsx) {
     let classes = this.props.className.split(' ').concat('form');
-    const context = this.getContextValue(this.formatData(this.getData()), this.formatErrors(this.getErrors()));
+    const context = this.getContextValue(
+      this.formatData(this.getData()),
+      this.formatErrors(this.getErrors(), this.props.errors)
+    );
     const renderProps = {
       errors: context.state.errors,
       form: context.form,
