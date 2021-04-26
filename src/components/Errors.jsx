@@ -15,7 +15,7 @@ export default function Errors ({ errors, includeFieldErrors = false }) {
   // use props.errors or grab from context
   errors = errors || ctx.state.errors;
   // optionally including field errors
-  errors = includeFieldErrors ? errors : ctx.filter(({ name }) => !name);
+  errors = includeFieldErrors ? errors : errors.filter(({ name }) => !name);
 
   return (
     <ul className="form__errors">
