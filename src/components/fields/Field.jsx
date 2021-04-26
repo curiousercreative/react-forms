@@ -49,7 +49,6 @@ export default class Field extends React.Component {
   };
 
   id = `field${id++}`;
-  inputRef = React.createRef();
   state = {
     hasFocus: false,
   };
@@ -59,6 +58,7 @@ export default class Field extends React.Component {
     super(...args);
     bindMethods(this);
 
+    this.inputRef = this.props.forwardedRef || React.createRef();
     this.updateHasFocus = memo(this.updateHasFocus);
   }
 
