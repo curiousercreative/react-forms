@@ -90,6 +90,7 @@ export default class Form extends React.Component {
     this._setStore = memoize(this._setStore);
     this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, true);
     this.formatData = memoize(this.formatData);
+    this.formatErrors = memoize(this.formatErrors);
     this.getContextValue = memoize(this.getContextValue);
 
     // if we didn't receive a pubsub instance, create a new one specific to this Form.
@@ -160,7 +161,7 @@ export default class Form extends React.Component {
       if (this.context.form instanceof Form) return true;
 
       if (!this.parentFormWarned) {
-        console.warn('form was given a "name" prop but could not find parent form');
+        console.warn(new Error('form was given a "name" prop but could not find parent form'));
         this.parentFormWarned = true;
       }
     }
@@ -168,26 +169,21 @@ export default class Form extends React.Component {
     return false;
   }
 
-  /**
-   * _getFieldErrors - Field.jsx should call this during render
-   * @param  {string} name
-   * @param  {number} [index]
-   * @return {Error[]} collection of error objects (name, error)
-   */
-  _getFieldErrors (name, index) {
-    return this.getErrors(index).filter(e => e.name === name);
-  }
-
   _normalizeError (error) {
     switch (typeof error) {
-      case 'string':
-        return { error };
       case 'object':
-        return Array.isArray(error) && error.length
-          ? { name: error[0], error: error[1] }
-          : error;
-      default:
-        return error;
+        // convert entries to objects
+        if (Array.isArray(error) && error.length) {
+          return { name: error[0], error: error[1] };
+        }
+        // convert Errors to strings
+        if ('message' in error) {
+          return { error: error.message };
+        }
+        // properly formatted as is
+        if ('error' in error) return error;
+      default: // eslint-disable-line no-fallthrough
+        return { error: error.toString() };
     }
   }
 
@@ -282,6 +278,18 @@ export default class Form extends React.Component {
     return this.model.formatModel(formattedValues);
   }
 
+  /**
+   * @param   {boolean} [storeOnly = false]
+   * @return  {Error[]} collection of errors (name, error)
+   */
+  formatErrors (storeOnly = false) {
+    const errors = this.getErrors();
+
+    // allow for getting only store (local) errors
+    return (storeOnly ? errors : errors.concat(this.props.errors))
+      .map(this._normalizeError);
+  }
+
   getContextValue (values, errors) {
     return {
       actions: {
@@ -304,12 +312,13 @@ export default class Form extends React.Component {
   }
 
   /**
-   * @return {Error[]} collection of errors (name, error)
+   * @param   {number} [index]
+   * @return  {Error[]} collection of errors (name, error)
    */
-  getErrors () {
-    return this.store.getErrors()
-      .concat(this.props.errors)
-      .map(this._normalizeError);
+  getErrors (index) {
+    const errors = this.store.getErrors();
+
+    return typeof index === 'number' ? errors[index] : errors;
   }
 
   /**
@@ -429,7 +438,7 @@ export default class Form extends React.Component {
    */
   render (jsx) {
     let classes = this.props.className.split(' ').concat('form');
-    const context = this.getContextValue(this.formatData(this.getData()), this.getErrors());
+    const context = this.getContextValue(this.formatData(this.getData()), this.formatErrors(this.getErrors()));
     const renderProps = {
       errors: context.state.errors,
       form: context.form,

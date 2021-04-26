@@ -77,7 +77,7 @@ export default class FormComplex extends Form {
   render () {
     return super.render(
       <div className="form form-complex">
-        <Errors includeFieldErrors />
+        <Errors />
         <Form ref="movie">
           <div className="form__fields">
             <TextField label="Title" name="title" />

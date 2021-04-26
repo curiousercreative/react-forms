@@ -94,7 +94,7 @@ export default class Field extends React.Component {
     try {
       this.inputRef.current.focus();
     } catch (e) {
-      console.warn(`Unable to focus form field ${this.props.name}${this.props.index}`);
+      console.warn(new Error(`Unable to focus form field ${this.props.name}${this.props.index}`));
     }
   }
 
@@ -102,8 +102,16 @@ export default class Field extends React.Component {
     return `form__field--${modifierKey}_${modifierVal}`;
   }
 
+  /**
+   * @return {string[]}
+   */
   getErrors () {
-    return this.context.form._getFieldErrors(this.props.name, this.props.index);
+    const { index, name } = this.props;
+    const errors = this.context.state.errors;
+
+    return (typeof index === 'number' ? errors[index] : errors)
+      .filter(e => e.name === name)
+      .map(({ error }) => error);
   }
 
   getProps () {
@@ -174,12 +182,12 @@ export default class Field extends React.Component {
   }
 
   renderErrors () {
-    const errors = this.getErrors(this.props.index);
+    const errors = this.getErrors();
     if (!errors.length) return;
 
     return (<div className="form__field-errors">
-      {errors.map(({ error }, i) => (
-        <div className="form__field-error" key={i}>{error}</div>
+      {errors.map(e => (
+        <div className="form__field-error" key={e}>{e}</div>
       ))}
     </div>);
   }
