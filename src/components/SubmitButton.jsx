@@ -11,18 +11,20 @@ import exists from '../util/exists.js';
  * @param {string} [className = '']
  * @param {jsx} children
  * @param {boolean} [isLoading] will derive from parent form state if not provided
+ * @param {boolean} [isValid] will derive from parent form state if not provided
  * @param {function} [onClick] if not supplied, button will be type="submit"
  * @return {jsx} button[type=submit|button]
  */
-export default function SubmitButton ({ children, className = '', isLoading, onClick }) {
+export default function SubmitButton ({ children, className = '', isLoading, isValid, onClick }) {
   const { form } = useContext(FormContext);
   isLoading = exists(isLoading) ? isLoading : form.state.isLoading;
+  isValid = exists(isValid) ? isValid : form.state.isValid;
   let classes = className.split(' ').concat('form__submit');
   if (isLoading) classes.push('form__submit--is_loading');
 
   let props = {
     className: classes.join(' '),
-    disabled: isLoading || !form.state.isValid,
+    disabled: isLoading || !isValid,
     type: onClick ? 'button' : 'submit',
   };
 
