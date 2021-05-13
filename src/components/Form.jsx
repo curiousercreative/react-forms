@@ -195,7 +195,6 @@ export default class Form extends React.Component {
   }
 
   _setModel (model) {
-    console.log('setting model', this.props.formName, model);
     this.model = mergeObjects(this, defaultModel, model);
   }
 
