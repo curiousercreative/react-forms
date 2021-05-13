@@ -103,7 +103,7 @@ export default class Form extends React.Component {
     this.store.initData(this.props.initialValues);
 
     // accept validations as component prop and override model.validations (not encouraged anyhow)
-    this.model.validations = this.props.validations || injectInstance(this.props.model).validations || [];
+    this.model.validations = this.props.validations || injectInstance(this.props.model, this).validations || [];
   }
 
   componentDidMount () {
@@ -195,6 +195,7 @@ export default class Form extends React.Component {
   }
 
   _setModel (model) {
+    console.log('setting model', this.props.formName, model);
     this.model = mergeObjects(this, defaultModel, model);
   }
 
