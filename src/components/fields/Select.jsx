@@ -72,7 +72,9 @@ export default class Select extends React.Component {
     this.props.toggleValue(value);
     if (this.props.closeOnSelect) {
       // restore focus before closing dropdown
-      this.props.forwardedRef.current.focus();
+      if (this.props.forwardedRef.current) {
+        this.props.forwardedRef.current.focus();
+      }
       this.setIsOpen(false);
     }
   }

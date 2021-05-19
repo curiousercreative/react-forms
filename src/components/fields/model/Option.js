@@ -12,6 +12,6 @@ export default class Option {
   }
 
   static getValueFromNativeEvent (options, e) {
-    return options[Number(e.target.value)].value;
+    return options[Number(e.currentTarget.value)].value;
   }
 }
