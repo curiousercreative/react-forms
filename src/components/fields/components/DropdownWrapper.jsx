@@ -24,6 +24,7 @@ const QUERY_KEY_WINDOW = 1000;
  * @property {string} options[].value
  * @property {function} [optionKeySelector]
  * @property {function} [prepareOptions] - given options collection, returned collection is rendered
+ * @property {function} [querySelectorThunk] - (a function returning) a function for matching a query to option
  * @property {function} setIsOpen
  * @property {array|any} value
  */
@@ -34,6 +35,18 @@ export default class DropdownWrapper extends React.Component {
     noOptions: () => 'No options were found',
     optionKeySelector: opt => opt.value,
     prepareOptions: opts => opts,
+    querySelectorThunk (query) {
+      return ({ label }) => {
+        try {
+          return label.toLowerCase().startsWith(query);
+        }
+        catch (e) {
+          console.warn('Try passing a querySelector prop to your DropdownWrapper or supply option labels with a toLowerCase method', e);
+        }
+
+        return false;
+      };
+    },
   };
 
   hasFocus = false;
@@ -166,7 +179,7 @@ export default class DropdownWrapper extends React.Component {
     this.queryLastUpdated = now;
 
     // focus on a result if possible
-    const index = this.props.options.findIndex(({ label }) => label.toLowerCase().startsWith(this.query));
+    const index = this.props.options.findIndex(this.props.querySelectorThunk(this.query));
     if (index > -1) this.focusResult(index);
   }
 
