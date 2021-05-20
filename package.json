@@ -1,6 +1,6 @@
 {
   "name": "@curiouser/react-forms",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "description": "A simple library for rendering React forms and form fields along with managing form state and validation",
   "author": "curiousercreative",
   "license": "MIT",
