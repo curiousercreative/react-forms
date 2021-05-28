@@ -18,7 +18,7 @@ import exists from '../util/exists.js';
 export default function SubmitButton ({ children, className = '', isLoading, isValid, onClick }) {
   const { form } = useContext(FormContext);
   isLoading = exists(isLoading) ? isLoading : form.state.isLoading;
-  isValid = exists(isValid) ? isValid : form.state.isValid;
+  isValid = exists(isValid) ? isValid : !form.props.validateAsYouGo || form.state.isValid;
   let classes = className.split(' ').concat('form__submit');
   if (isLoading) classes.push('form__submit--is_loading');
 
