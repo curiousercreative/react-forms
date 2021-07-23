@@ -7,6 +7,7 @@ import bindMethods from '../../util/bindMethods.js';
  * @class Password
  * @property {string} id
  * @property {string} name
+ * @property {string} [placeholder]
  * @return {jsx} div.form-password
  */
 export default class Password extends React.Component {
@@ -34,6 +35,7 @@ export default class Password extends React.Component {
         className="form__input form__input--type_password"
         name={this.props.name}
         onChange={this.handleChange}
+        placeholder={this.props.placeholder}
         ref={this.props.forwardedRef}
         type={type}
         value={this.props.getValue() || ''} />
