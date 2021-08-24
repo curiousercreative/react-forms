@@ -10,6 +10,7 @@ const TYPE_MODE_MAP = {
 /**
  * As basic as it gets, a text input
  * @class Text
+ * @property {boolean} [disabled = false]
  * @property {React.Ref} [forwardedRef]
  * @property {boolean} [hasFocus]
  * @property {string} id
@@ -19,6 +20,7 @@ const TYPE_MODE_MAP = {
  */
 export default class Text extends React.Component {
   static defaultProps = {
+    disabled: false,
     type: 'text',
   };
 

@@ -7,6 +7,7 @@ import callMe from '../../util/callMe.js';
  * when clicked, will set a value on form, like a radio button
  * @class Radio
  * @property {string} [className]
+ * @property {boolean} [disabled = false]
  * @property {object} forwardedRef
  * @property {string} [id]
  * @property {boolean} isChecked
@@ -20,6 +21,7 @@ import callMe from '../../util/callMe.js';
 export default class Radio extends React.Component {
   static defaultProps = {
     className: '',
+    disabled: false,
   };
 
   constructor (...args) {
@@ -42,6 +44,7 @@ export default class Radio extends React.Component {
     return <input
       defaultChecked={checked}
       className={classes.join(' ')}
+      disabled={this.props.disabled}
       id={this.props.id}
       name={this.props.name}
       onClick={this.handleClick}

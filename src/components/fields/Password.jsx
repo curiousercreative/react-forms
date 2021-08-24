@@ -5,12 +5,16 @@ import bindMethods from '../../util/bindMethods.js';
 /**
  * password input that allows for toggling visibility
  * @class Password
+ * @property {boolean} [disabled = false]
  * @property {string} id
  * @property {string} name
  * @property {string} [placeholder]
  * @return {jsx} div.form-password
  */
 export default class Password extends React.Component {
+  static defaultProps = {
+    disabled: false,
+  };
   state = { showPassword: false };
 
   constructor (...args) {
@@ -33,6 +37,7 @@ export default class Password extends React.Component {
       <input
         id={this.props.id}
         className="form__input form__input--type_password"
+        disabled={this.props.disabled}
         name={this.props.name}
         onChange={this.handleChange}
         placeholder={this.props.placeholder}

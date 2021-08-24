@@ -8,7 +8,7 @@ import renderIf from '../../util/renderIf.js';
 
 /**
  * @class NativeSelect
- * @param       {boolean}   [disabled]
+ * @param       {boolean}   [disabled = false]
  * @param       {React.ref} forwardedRef
  * @param       {function}  getValue
  * @param       {string}    id
@@ -20,7 +20,7 @@ import renderIf from '../../util/renderIf.js';
  * @returns     {jsx}       select
  */
 export default function NativeSelect ({
-  disabled,
+  disabled = false,
   forwardedRef,
   getValue,
   id,
@@ -45,6 +45,7 @@ export default function NativeSelect ({
   return (
     <select
       className={classes.join(' ')}
+      disabled={disabled}
       id={id}
       onChange={handleChange}
       ref={forwardedRef}

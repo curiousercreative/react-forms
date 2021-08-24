@@ -8,6 +8,7 @@ import renderIf from '../../util/renderIf.js';
  * when clicked, will set a value on form, like a radio button
  * @class Button
  * @property {string} [className]
+ * @property {boolean} [disabled = false]
  * @property {object} forwardedRef
  * @property {string} [id]
  * @property {boolean} isChecked
@@ -22,6 +23,7 @@ import renderIf from '../../util/renderIf.js';
 export default class Button extends React.Component {
   static defaultProps = {
     className: '',
+    disabled: false,
     type: 'radio',
   };
 
@@ -57,6 +59,7 @@ export default class Button extends React.Component {
     return (<button
       id={this.props.id}
       className={classes.join(' ')}
+      disabled={this.props.disabled}
       name={this.props.name}
       onClick={this.handleClick}
       ref={this.props.forwardedRef}

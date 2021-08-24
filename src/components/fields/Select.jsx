@@ -8,7 +8,7 @@ import exists from '../../util/exists.js';
 /**
  * a custom dropdown/select input
  * @class Select
- * @property {boolean} [disabled]
+ * @property {boolean} [disabled = false]
  * @property {boolean} [closeOnSelect = true]
  * @property {string} id
  * @property {string} name
@@ -34,6 +34,7 @@ import exists from '../../util/exists.js';
 export default class Select extends React.Component {
   static defaultProps = {
     closeOnSelect: true,
+    disabled: false,
     native: false,
     optionKeySelector: opt => opt.value,
     required: true,
