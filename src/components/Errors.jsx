@@ -1,6 +1,11 @@
 import React from 'react';
 import FormContext from './config/FormContext.js';
 
+import Error from '../model/Error.js';
+
+import arrayify from '../lib/transformers/arrayify.js';
+import exists from '../util/exists.js';
+
 /**
  * @param       {object[]} [errors] - { name, error }
  * @param       {boolean} [includeFieldErrors=false] by default, we're filtering out field errors
@@ -9,13 +14,17 @@ import FormContext from './config/FormContext.js';
 export default function Errors ({ errors, includeFieldErrors = false }) {
   const ctx = React.useContext(FormContext);
 
-  // TODO: test this warning
-  if (!errors && !ctx.form.getErrors) console.error(new Error('You are attempting to render errors with an uptree Form and without errors supplied. Please supply an errors prop or render as a descendant of a Form'));
-
   // use props.errors or grab from context
-  errors = errors || ctx.state.errors;
+  // errors in context are already normalized, but props.errors require normalizing
+  errors = exists(errors) ? arrayify(errors).map(Error.normalize) : ctx.state.errors;
+
+  if (!errors) console.error(new Error('You are attempting to render errors without an uptree Form and without errors supplied. Please supply an errors prop or render as a descendant of a Form'));
+
   // optionally including field errors
-  errors = includeFieldErrors ? errors : errors.filter(({ name }) => !name);
+  try {
+    if (includeFieldErrors) errors = errors.filter(({ name }) => !name);
+  }
+  catch (e) { console.error(e); }
 
   return (
     <ul className="form__errors">

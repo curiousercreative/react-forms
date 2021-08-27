@@ -3,6 +3,8 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { unstable_batchedUpdates } from 'react-dom';
 
+import Error from '../model/Error.js';
+
 import FormContext from './config/FormContext';
 import defaultModel from '../lib/form/models/defaultModel.js';
 import getFieldTopic from './fields/util/getFieldTopic.js';
@@ -71,6 +73,7 @@ export default class Form extends React.Component {
   fieldsBlurred = [];
   /** @property {object} model - set of functions that are generally specific to a data model */
   model = {};
+  _normalizeError = Error.normalize;
   /** @property {boolean} parentFormWarned - a flag to prevent repeating warning message */
   parentFormWarned = false;
   /** @property {object} pubsub - a Pubsub instance for messaging. Defaults to a 1:1 relationship with Form instance, but can be a shared Pubsub instance provided via props */
@@ -168,24 +171,6 @@ export default class Form extends React.Component {
     }
 
     return false;
-  }
-
-  _normalizeError (error) {
-    switch (typeof error) {
-      case 'object':
-        // convert entries to objects
-        if (Array.isArray(error) && error.length) {
-          return { name: error[0], error: error[1] };
-        }
-        // convert Errors to strings
-        if ('message' in error) {
-          return { error: error.message };
-        }
-        // properly formatted as is
-        if ('error' in error) return error;
-      default: // eslint-disable-line no-fallthrough
-        return { error: error.toString() };
-    }
   }
 
   _publishOnChange (formData) {
