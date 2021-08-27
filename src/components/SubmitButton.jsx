@@ -19,10 +19,11 @@ import exists from '../util/exists.js';
  * @return {jsx} button[type=submit|button]
  */
 export default function SubmitButton ({ children, className = '', disabled, isLoading, isValid, onClick, type, value }) {
-  const { form } = useContext(FormContext);
+  const ctx = useContext(FormContext);
+  if (!exists(isLoading)) isLoading = ctx.state.isLoading;
+  if (!exists(isValid)) isValid = !ctx.state.validateAsYouGo || ctx.state.isValid;
+  // NOTE: this must be ordered after isLoading and isValid values are normalized above
   if (!exists(disabled)) disabled = isLoading || !isValid;
-  if (!exists(isLoading)) isLoading = form.state.isLoading;
-  if (!exists(isValid)) isValid = !form.props.validateAsYouGo || form.state.isValid;
   let classes = className.split(' ').concat('form__submit');
   if (isLoading) classes.push('form__submit--is_loading');
   if (!type) type = onClick ? 'button' : 'submit';

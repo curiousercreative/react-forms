@@ -24,16 +24,20 @@ describe('validateField method', () => {
     };
 
     const form = F.render(<Form initialValues={{ a: '', b: '' }} model={model} />);
+    // mock a field blur
+    form.fieldsBlurred = [ 'a' ];
     form.validateField('a');
-    const errors = form.formatErrors(form.getErrors(), form.props.errors);
+    const errors = form.formatErrors(form.getErrors(), form.props.errors, form.fieldsBlurred, form.props.validateAsYouGo);
 
     expect(errors.filter(({ name }) => name === 'b')).toHaveLength(0);
   });
 
   test('validateField method should store errors for display by default', () => {
     const form = F.render(<Form initialValues={{ a: '' }} model={model} />);
+    // mock a field blur
+    form.fieldsBlurred = [ 'a' ];
     form.validateField('a');
-    const errors = form.formatErrors(form.getErrors(), form.props.errors);
+    const errors = form.formatErrors(form.getErrors(), form.props.errors, form.fieldsBlurred, form.props.validateAsYouGo);
 
     expect(errors.filter(({ name }) => name === 'a')).toEqual(expect.arrayContaining(
       [ expect.objectContaining({ name: 'a' }) ]
@@ -43,7 +47,7 @@ describe('validateField method', () => {
   test('validateField method should not store errors for display if flag set', () => {
     const form = F.render(<Form initialValues={{ a: '' }} model={model} />);
     form.validateField('a', null, false);
-    const errors = form.formatErrors(form.getErrors(), form.props.errors);
+    const errors = form.formatErrors(form.getErrors(), form.props.errors, form.fieldsBlurred, form.props.validateAsYouGo);
 
     expect(errors.filter(({ name }) => name === 'a')).toEqual(expect.not.arrayContaining(
       [ expect.objectContaining({ name: 'a' }) ]

@@ -107,16 +107,17 @@ export default class Form extends React.Component {
   }
 
   componentDidMount () {
-    setTimeout(() => this.validate(false), 15);
+    setTimeout(() => this.validate(this.props.validateAsYouGo), 15);
     this.pubsub.on(getFieldTopic(null, 'updated'), this.onFieldUpdate);
     this.pubsub.on(getFieldTopic(null, 'blurred'), this.onFieldBlur);
   }
 
   componentDidUpdate () {
     // TODO: how to best support changing model and store props?
+    // prop updates
     this._setModel(this.props.model);
     this._setStore(this.props.store);
-
+    if (this.props.validations) this.model.validations = this.props.validations;
     this.pubsub = this.props.pubsub || this.pubsub;
   }
 
@@ -241,11 +242,8 @@ export default class Form extends React.Component {
   _validateOnChange (name, index) {
     if (!this.props.validateAsYouGo) return;
 
-    // we want to render an error if this field has already been blurred or we've
-    // previously and visibly validated the entire form
-    const showError = this.wasValidated || this._hasFieldBlurred(name, index);
     // validate just the field that was changed (but returns all form errors)
-    const isValid = this.validateField(name, index, showError);
+    const isValid = this.validateField(name, index);
 
     // update form valid flag
     this.setState({ isValid });
@@ -284,18 +282,36 @@ export default class Form extends React.Component {
    * @return  {Error[]} collection of errors (name, error)
    */
   formatErrors (storeErrors, propErrors) {
-    return storeErrors.concat(propErrors).map(this._normalizeError);
+    return storeErrors
+      .concat(propErrors)
+      .map(this._normalizeError)
+      // filter out errors for fields that haven't been blurred yet
+      .filter(e => this.shouldErrorDisplay(e));
   }
 
-  getContextValue (values, errors) {
+  /**
+   * @param  {object}  values
+   * @param  {object[]}  errors
+   * @param  {boolean} isValid
+   * @param  {boolean} validateAsYouGo
+   * @param  {string} formName
+   * @param  {object} pubsub
+   * @param  {boolean} isLoading
+   * @return {object}
+   */
+  getContextValue (values, errors, isValid, validateAsYouGo, formName, pubsub, isLoading) {
     return {
       actions: {
         setValue: this.setValueFromField,
       },
-      form: this,
-      pubsub: this.pubsub,
+      form: this, // don't use please, doesn't bust memoization
+      pubsub,
       state: {
+        formName,
         errors,
+        isLoading,
+        isValid,
+        validateAsYouGo,
         values,
       },
     };
@@ -380,11 +396,20 @@ export default class Form extends React.Component {
   }
 
   /**
+   * @param  {string} name - name of field error relates to
+   * @param  {number} [index]
+   * @return {boolean}
+   */
+  shouldErrorDisplay ({ name }, index) {
+    return !name || !this.props.validateAsYouGo || this._hasFieldBlurred(name, index);
+  }
+
+  /**
    * validate - validate the entire form and render errors (unless disabled)
-   * @param  {Boolean} [displayErrors=true] flag to disable error rendering
+   * @param  {Boolean} [storeErrors=true] flag to disable error storage (and rendering)
    * @return {boolean} true = valid
    */
-  validate (displayErrors = true) {
+  validate (storeErrors = true) {
     const [ isValid, errors ] = this._validate();
 
     // NOTE: might need to unwrap this for React v17
@@ -392,7 +417,7 @@ export default class Form extends React.Component {
       this.setState({ isValid });
 
       // store errors for rendering
-      if (displayErrors) {
+      if (storeErrors) {
         this.setErrors(errors);
         this.wasValidated = true;
       }
@@ -437,7 +462,12 @@ export default class Form extends React.Component {
     let classes = this.props.className.split(' ').concat('form');
     const context = this.getContextValue(
       this.formatData(this.getData()),
-      this.formatErrors(this.getErrors(), this.props.errors)
+      this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
+      this.state.isValid,
+      this.props.validateAsYouGo,
+      this.props.formName,
+      this.pubsub,
+      this.state.isLoading,
     );
     const renderProps = {
       errors: context.state.errors,

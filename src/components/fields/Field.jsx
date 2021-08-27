@@ -211,7 +211,7 @@ export default class Field extends React.Component {
         'form__field',
         this.formatClassName('type', this.props.type),
         this.formatClassName('theme', this.props.theme),
-        `${this.context.form.props.formName}__${this.props.name}`,
+        `${this.context.state.formName}__${this.props.name}`,
       ])
       .concat(this.getWidthClassNames());
 

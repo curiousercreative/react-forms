@@ -33,6 +33,7 @@ const OPTIONS = [
 export default class FormComplex extends Form {
   static defaultProps = {
     ...Form.defaultProps,
+    formName: 'complex-form',
     validations: [{
       names: [ 'email', 'extra_text' ],
       tests: [[ validator.tests.required, validator.messages.required ]],
@@ -90,8 +91,6 @@ export default class FormComplex extends Form {
             </div>
           </Form>
         </Form>
-
-
 
         <FormExtended ref="user" />
 

@@ -196,6 +196,20 @@ export default class FormCollection extends Form {
     );
   }
 
+  /**
+   * @param   {object[]} storeErrors
+   * @param   {object[]} propErrors
+   * @return  {Error[]} collection of errors (name, error)
+   */
+  formatErrors (storeErrors, propErrors) {
+    return storeErrors.map((errors, i) => errors
+      .concat(propErrors[i] || [])
+      .map(this._normalizeError)
+      // filter out errors for fields that haven't been blurred yet
+      .filter(e => this.shouldErrorDisplay(e, i))
+    );
+  }
+
   getCid () {
     return `c${this.cid++}`;
   }
@@ -291,11 +305,20 @@ export default class FormCollection extends Form {
   render (Component) {
     const formCollectionData = this.formatData(this.getData(true));
     Component = Component || this.props.component;
+    const context = this.getContextValue(
+      this.formatData(this.getData()),
+      this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
+      this.state.isValid,
+      this.props.validateAsYouGo,
+      this.props.formName,
+      this.pubsub,
+      this.state.isLoading,
+    );
     const itemRenderer = this.renderItem(Component);
     this.collection = [];
 
     return (
-      <FormContext.Provider value={this.getContextValue(formCollectionData, this.getErrors())}>
+      <FormContext.Provider value={context}>
         {formCollectionData.map(itemRenderer)}
         {this.props.children}
       </FormContext.Provider>

@@ -6,6 +6,10 @@ const FormContext = React.createContext({
   pubsub: {},
   state: {
     errors: [],
+    formName: '',
+    isLoading: true,
+    isValid: true,
+    validateAsYouGo: true,
     values: {},
   },
 });
