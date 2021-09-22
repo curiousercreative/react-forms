@@ -426,7 +426,9 @@ export default class Form extends React.Component {
     // store errors for rendering
     if (displayErrors) this.setErrors(errors);
 
-    return errors.length === 0;
+    return typeof index === 'number'
+      ? errors[index].filter(e => e.name === name).length === 0
+      : errors.filter(e => e.name === name).length === 0;
   }
 
   renderErrors (includeFieldErrors = false) {
