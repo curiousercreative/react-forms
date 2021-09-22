@@ -16,6 +16,7 @@ import Errors from './Errors.jsx';
 import bindMethods from '../util/bindMethods.js';
 import debounce from '../util/debounce.js';
 import fromEntries from '../util/fromEntries.js';
+import isComponent from '../util/isComponent.js';
 import renderIf from '../util/renderIf.js';
 import uniq from '../util/uniq.js';
 
@@ -461,14 +462,14 @@ export default class Form extends React.Component {
       renderErrors: this.renderErrors,
       values: context.state.values,
     };
-    const Child = typeof this.props.children === 'function' && this.props.children;
+    const Children = this.props.children;
 
     return (
       <FormContext.Provider value={context}>
         <div className={classes.join(' ')}>
           {renderIf(jsx, () => jsx)}
-          {renderIf(Child, () => <Child {...renderProps} />)}
-          {renderIf(typeof this.props.children !== 'function', () => this.props.children)}
+          {renderIf(Children && isComponent(Children), () => <Children {...renderProps} />)}
+          {renderIf(Children && !isComponent(Children), () => Children)}
         </div>
       </FormContext.Provider>
     );

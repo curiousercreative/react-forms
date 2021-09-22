@@ -8,6 +8,7 @@ import localStateStoreCollection from '../lib/form/stores/localStateStoreCollect
 import bindMethods from '../util/bindMethods.js';
 import callMe from '../util/callMe.js';
 import curry from '../util/curry.js';
+import isComponent from '../util/isComponent.js';
 import omit from '../util/omit.js';
 import { validate } from '../lib/validator';
 
@@ -304,7 +305,7 @@ export default class FormCollection extends Form {
 
   render (Component) {
     const formCollectionData = this.formatData(this.getData(true));
-    Component = Component || this.props.component;
+    Component = isComponent(Component) ? Component : this.props.component;
     const context = this.getContextValue(
       this.formatData(this.getData()),
       this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
