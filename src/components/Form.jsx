@@ -467,7 +467,7 @@ export default class Form extends React.Component {
     return (
       <FormContext.Provider value={context}>
         <div className={classes.join(' ')}>
-          {renderIf(jsx, () => jsx)}
+          {renderIf(jsx && '$$typeof' in jsx, () => jsx)}
           {renderIf(Children && isComponent(Children), () => <Children {...renderProps} />)}
           {renderIf(Children && !isComponent(Children), () => Children)}
         </div>
