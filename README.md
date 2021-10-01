@@ -173,6 +173,16 @@ export default function NativeSelect ({ forwardedRef, getValue, id, options, pla
 ### Styles
 You're responsible for importing or linking the stylesheet with `import '@curiouser/react-forms/dist/index.css';` or any other way you like, it's just a css file. The package styles don't try to do anything pretty for you, just provide functional styles. Class names try to follow the [BEM naming convention](http://getbem.com/naming/).
 
+#### CSS variables
+The exported stylesheet predefines these CSS variables that you're encouraged to override.
+```css
+.form {
+  --form-color-error: red;
+  --form-color-gray: #dedede;
+  --form-field-height: 46px;
+}
+```
+
 ## License
 
 MIT © [curiousercreative](https://github.com/curiousercreative)
