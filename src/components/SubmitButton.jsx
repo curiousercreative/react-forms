@@ -24,7 +24,7 @@ export default function SubmitButton ({ children, className = '', disabled, isLo
   if (!exists(isValid)) isValid = !ctx.state.validateAsYouGo || ctx.state.isValid;
   // NOTE: this must be ordered after isLoading and isValid values are normalized above
   if (!exists(disabled)) disabled = isLoading || !isValid;
-  let classes = className.split(' ').concat('form__submit');
+  let classes = className.split(' ').concat([ 'form__submit', `${ctx.state.formName}__submit` ]);
   if (isLoading) classes.push('form__submit--is_loading');
   if (!type) type = onClick ? 'button' : 'submit';
 

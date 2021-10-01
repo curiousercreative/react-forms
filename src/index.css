@@ -71,11 +71,15 @@
   justify-content: center;
 }
 
+.form__field,
+.form__fields > .form__submit {
+  margin-bottom: 1rem;
+}
 .form__field {
   flex-basis: 100%;
-  margin-bottom: 1em;
 }
-.form__fields--with_gaps .form__field + .form__field {
+.form__fields--with_gaps .form__field + .form__field,
+.form__fields--with_gaps .form__field + .form__submit {
   margin-left: 1rem;
 }
 /* border-collapsing of adjacent fields */
