@@ -20,6 +20,10 @@ const FIELD_TYPES_LABEL_AFTER_INPUT = [
   'radio',
 ];
 
+const IS_PREACT = React.Component.length === 2;
+const focusInKey = IS_PREACT ? 'onfocusin' : 'onFocus';
+const focusOutKey = IS_PREACT ? 'onfocusout' : 'onBlur';
+
 /**
  * Form field that adds nice form consistency and focus managementused to wrap around a form input
  * @class Field
@@ -227,7 +231,11 @@ export default class Field extends React.Component {
     else classes.push(this.formatClassName('no', 'errors'));
 
     return (
-      <div className={classes.join(' ')} onBlur={this.handleBlur} onFocus={this.handleFocus}>
+      <div {...{
+        className: classes.join(' '),
+        [focusOutKey]: this.handleBlur,
+        [focusInKey]: this.handleFocus,
+      }}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.renderErrors()}
         <Input {...this.getProps()} forwardedRef={this.inputRef} />
