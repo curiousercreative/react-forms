@@ -13,6 +13,7 @@ import exists from '../../util/exists.js';
  * @property {string} id
  * @property {string} name
  * @property {boolean} [native = false]
+ * @property {function} [noOptions]
  * @property {object[]} options
  * @property {string} options[].label
  * @property {string} options[].value
@@ -96,6 +97,7 @@ export default class Select extends React.Component {
         className={classes.join(' ')}
         hasFocus={this.props.hasFocus}
         isOpen={this.state.isOpen}
+        noOptions={this.props.noOptions}
         onSelect={this.select}
         optionKeySelector={this.props.optionKeySelector}
         options={this.props.options}
