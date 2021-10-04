@@ -189,7 +189,12 @@ export default class DropdownWrapper extends React.Component {
 
   focusResult (highlightIndex) {
     this.highlightIndex = highlightIndex;
-    this.list[highlightIndex].focus();
+    try {
+      this.list[highlightIndex].focus();
+    }
+    catch (e) {
+      console.error(new Error('Unable to focus dropdown item'), e);
+    }
   }
 
   getHandlers () {
