@@ -1,3 +1,5 @@
+import isJsx from '../util/isJsx.js';
+
 export default class Error {
   static normalize (error) {
     switch (typeof error) {
@@ -13,7 +15,7 @@ export default class Error {
         // properly formatted as is
         if ('error' in error) return error;
       default: // eslint-disable-line no-fallthrough
-        return { error: error.toString() };
+        return { error: isJsx(error) ? error : error.toString() };
     }
   }
 }

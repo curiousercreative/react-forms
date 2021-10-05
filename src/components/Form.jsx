@@ -17,6 +17,7 @@ import bindMethods from '../util/bindMethods.js';
 import debounce from '../util/debounce.js';
 import fromEntries from '../util/fromEntries.js';
 import isComponent from '../util/isComponent.js';
+import isJsx from '../util/isJsx.js';
 import renderIf from '../util/renderIf.js';
 import uniq from '../util/uniq.js';
 
@@ -473,7 +474,7 @@ export default class Form extends React.Component {
     return (
       <FormContext.Provider value={context}>
         <div className={classes.join(' ')}>
-          {renderIf(jsx && '$$typeof' in jsx, () => jsx)}
+          {renderIf(isJsx(jsx), () => jsx)}
           {renderIf(Children && isComponent(Children), () => <Children {...renderProps} />)}
           {renderIf(Children && !isComponent(Children), () => Children)}
         </div>
