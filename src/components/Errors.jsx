@@ -20,9 +20,9 @@ export default function Errors ({ errors, includeFieldErrors = false }) {
 
   if (!errors) console.error(new Error('You are attempting to render errors without an uptree Form and without errors supplied. Please supply an errors prop or render as a descendant of a Form'));
 
-  // optionally including field errors
+  // optionally including field errors (yes, there's a lot of confusing negative logic here)
   try {
-    if (includeFieldErrors) errors = errors.filter(({ name }) => !name);
+    if (!includeFieldErrors) errors = errors.filter(({ name }) => !name);
   }
   catch (e) { console.error(e); }
 

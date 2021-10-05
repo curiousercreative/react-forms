@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fields, Form, SubmitButton, validator } from '@curiouser/react-forms';
+import { Errors, Fields, Form, SubmitButton, validator } from '@curiouser/react-forms';
 import { SelectField, TextField } from '@curiouser/react-forms';
 
 const keySelector = opt => opt.label;
@@ -28,6 +28,7 @@ export default function FormDirect (props) {
   return (
     <div className="form-direct">
       <Form model={model} ref={form} store={store} values={values}>
+        <Errors />
         <Fields>
           <TextField label="username" name="username" />
           <TextField label="phone" name="phone" />
