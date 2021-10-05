@@ -10,12 +10,10 @@ const options = [
 
 export default function FormDirect (props) {
   const form = React.useRef();
-  const [ values, setValues ] = React.useState({
-    is_subscribed: false,
-  });
+  const [ values, setValues ] = React.useState({});
   const model = React.useMemo(() => ({
     validations: [{
-      names: [ 'phone', 'username' ],
+      names: [ 'phone', 'username', 'is_subscribed' ],
       tests: [[ validator.tests.required, validator.messages.required ]],
     }],
   }), []);
@@ -33,7 +31,7 @@ export default function FormDirect (props) {
         <Fields>
           <TextField label="username" name="username" />
           <TextField label="phone" name="phone" />
-          <SelectField name="is_subscribed" options={options} optionKeySelector={keySelector} />
+          <SelectField name="is_subscribed" options={options} optionKeySelector={keySelector} placeholder="Select me" />
           <SubmitButton onClick={handleSubmit}>Check form state</SubmitButton>
         </Fields>
       </Form>

@@ -144,7 +144,8 @@
 /* .form__field--has_focus .form__input {
   border-color: #17419b;
 } */
-.form__field--has_errors .form__input {
+.form__field--has_errors .form__input,
+.form__field--has_errors .form__dropdown-wrapper {
   border-color: red;
   border-color: var(--form-color-error, red);
 }
