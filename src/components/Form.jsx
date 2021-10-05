@@ -95,7 +95,7 @@ export default class Form extends React.Component {
     this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, true);
     this.formatData = memoize(this.formatData);
     this.formatErrors = memoize(this.formatErrors);
-    this.getContextValue = memoize(this.getContextValue);
+    this._getContextValue = memoize(this._getContextValue);
 
     // if we didn't receive a pubsub instance, create a new one specific to this Form.
     this.pubsub = this.props.pubsub || new Pubsub();
@@ -145,6 +145,34 @@ export default class Form extends React.Component {
       : this.fieldsBlurred;
 
     this.fieldsBlurred = uniq(fieldsBlurred.concat(name));
+  }
+
+  /**
+   * @param  {object}  values
+   * @param  {object[]}  errors
+   * @param  {boolean} isValid
+   * @param  {boolean} validateAsYouGo
+   * @param  {string} formName
+   * @param  {object} pubsub
+   * @param  {boolean} isLoading
+   * @return {object}
+   */
+  _getContextValue (values, errors, isValid, validateAsYouGo, formName, pubsub, isLoading) {
+    return {
+      actions: {
+        setValue: this.setValueFromField,
+      },
+      form: this, // don't use please, doesn't bust memoization
+      pubsub,
+      state: {
+        formName,
+        errors,
+        isLoading,
+        isValid,
+        validateAsYouGo,
+        values,
+      },
+    };
   }
 
   /**
@@ -275,32 +303,16 @@ export default class Form extends React.Component {
       .filter(e => this.shouldErrorDisplay(e));
   }
 
-  /**
-   * @param  {object}  values
-   * @param  {object[]}  errors
-   * @param  {boolean} isValid
-   * @param  {boolean} validateAsYouGo
-   * @param  {string} formName
-   * @param  {object} pubsub
-   * @param  {boolean} isLoading
-   * @return {object}
-   */
-  getContextValue (values, errors, isValid, validateAsYouGo, formName, pubsub, isLoading) {
-    return {
-      actions: {
-        setValue: this.setValueFromField,
-      },
-      form: this, // don't use please, doesn't bust memoization
-      pubsub,
-      state: {
-        formName,
-        errors,
-        isLoading,
-        isValid,
-        validateAsYouGo,
-        values,
-      },
-    };
+  getContextValue () {
+    return this._getContextValue(
+      this.formatData(this.getData()),
+      this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
+      this.getErrors().length === 0,
+      this.props.validateAsYouGo,
+      this.props.formName,
+      this.pubsub,
+      this.state.isLoading,
+    );
   }
 
   /**
@@ -448,15 +460,7 @@ export default class Form extends React.Component {
    */
   render (jsx) {
     let classes = this.props.className.split(' ').concat('form');
-    const context = this.getContextValue(
-      this.formatData(this.getData()),
-      this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
-      this.state.isValid,
-      this.props.validateAsYouGo,
-      this.props.formName,
-      this.pubsub,
-      this.state.isLoading,
-    );
+    const context = this.getContextValue();
     const renderProps = {
       errors: context.state.errors,
       form: context.form,

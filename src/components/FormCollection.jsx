@@ -215,6 +215,18 @@ export default class FormCollection extends Form {
     return `c${this.cid++}`;
   }
 
+  getContextValue () {
+    return this._getContextValue(
+      this.formatData(this.getData()),
+      this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
+      this.getErrors().every(_errors => _errors.length === 0),
+      this.props.validateAsYouGo,
+      this.props.formName,
+      this.pubsub,
+      this.state.isLoading,
+    );
+  }
+
   /**
    * getData - get data for external consumption, merges temporary data atop permanent data
    * @param {boolean} [withCid = false] omit cid attr by default, included when rendering internally
@@ -306,15 +318,7 @@ export default class FormCollection extends Form {
   render (Component) {
     const formCollectionData = this.formatData(this.getData(true));
     Component = isComponent(Component) ? Component : this.props.component;
-    const context = this.getContextValue(
-      this.formatData(this.getData()),
-      this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
-      this.state.isValid,
-      this.props.validateAsYouGo,
-      this.props.formName,
-      this.pubsub,
-      this.state.isLoading,
-    );
+    const context = this.getContextValue();
     const itemRenderer = this.renderItem(Component);
     this.collection = [];
 
