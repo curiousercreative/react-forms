@@ -21,10 +21,7 @@ export default function humanize (str, casing = 'sentence') {
 
   str = str
     // converts all cap casing toLowerCase with a preceding space
-    .replace(/[^A-Z]([A-Z])/g, str => {
-      console.log(str);
-      return `${str[0]} ${str[1].toLowerCase()}`;
-    })
+    .replace(/[^A-Z]([A-Z])/g, str => `${str[0]} ${str[1].toLowerCase()}`)
     // split it up
     .split(/[-_\s]+/)
     // glue it back
