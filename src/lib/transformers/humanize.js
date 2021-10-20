@@ -1,4 +1,5 @@
 import capitalize from './capitalize';
+import titlize from './titlize';
 
 /**
  * convert a machine readable string to a human readable string
@@ -6,7 +7,7 @@ import capitalize from './capitalize';
  * @function humanize
  * @memberof module:lib/transformers
  * @param  {string} str
- * @param {boolean} [sentenceCase] - if true, capitalizes first character
+ * @param {string} [casing = 'sentence'] - sentence | title
  * @return {string}
  * @example
  * humanize('some_snake_case') => 'Some snake case'
@@ -15,18 +16,32 @@ import capitalize from './capitalize';
  * humanize('someCamelCase') => 'Some camel case'
  * humanize('SomePascalCase') => 'Some pascal case'
  */
-export default function humanize (str, sentenceCase = true) {
+export default function humanize (str, casing = 'sentence') {
   if (!str) return str;
 
-  // Set the first character casing
-  str = sentenceCase ? capitalize(str) : `${str[0].toLowerCase()}${str.slice(1)}`;
-
-  return str
-    // skips the first character, then converts all subsequent cap casing toLowerCase
-    // with a preceding space
-    .replace(/.+([A-Z])/g, match => ` ${match.toLowerCase()}`)
+  str = str
+    // converts all cap casing toLowerCase with a preceding space
+    .replace(/[^A-Z]([A-Z])/g, str => {
+      console.log(str);
+      return `${str[0]} ${str[1].toLowerCase()}`;
+    })
     // split it up
     .split(/[-_\s]+/)
     // glue it back
-    .join(' ');
+    .join(' ')
+    // trim whitespace
+    .trim();
+
+  switch (casing) {
+    case 'lower':
+      return str.toLowerCase();
+    case 'sentence':
+      return capitalize(str);
+    case 'title':
+      return titlize(str);
+    case 'upper':
+      return str.toUpperCase();
+    default:
+      return str;
+  }
 }
