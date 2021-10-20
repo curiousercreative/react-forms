@@ -77,7 +77,8 @@ export default class Select extends React.Component {
       if (this.props.forwardedRef.current) {
         this.props.forwardedRef.current.focus();
       }
-      this.setIsOpen(false);
+
+      setTimeout(() => this.setIsOpen(false), 0);
     }
   }
 

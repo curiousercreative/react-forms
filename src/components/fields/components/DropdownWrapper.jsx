@@ -140,6 +140,7 @@ export default class DropdownWrapper extends React.Component {
       switch (e.which) {
         case 13: // enter
         case 32: // space
+          if (document.activeElement.tagName === 'INPUT') break;
         case 38: // up
         case 40: // down
           e.preventDefault();
