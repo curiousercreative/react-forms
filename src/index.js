@@ -15,6 +15,7 @@ export * as fieldUtil from './components/fields/util';
 export * as util from './util';
 
 // Form Fields
+export { default as AutoSuggestField } from './components/fields/AutoSuggestField.jsx';
 export { default as Button } from './components/fields/Button.jsx';
 export { default as CheckboxField } from './components/fields/CheckboxField.jsx';
 export { default as EmailField } from './components/fields/EmailField.jsx';
