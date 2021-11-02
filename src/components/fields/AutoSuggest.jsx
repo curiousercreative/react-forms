@@ -1,5 +1,6 @@
 import React from 'react';
 import DropdownWrapper from './components/DropdownWrapper';
+import exists from '../../util/exists.js';
 
 /**
  * @param       {React.Ref}  forwardedRef - comes from Field
@@ -27,10 +28,31 @@ export default function AutoSuggest ({
   const [ isOpen, setIsOpen ] = React.useState(false);
   const [ query, setQuery ] = React.useState(getValue() || '');
 
+  const _setValue = React.useCallback(val => {
+    // allow transformed value to
+    switch (typeof val) {
+      case 'string':
+        setQuery(val);
+        setValue(val);
+        break;
+      case 'object':
+        setQuery(val.label);
+        setValue(val.value);
+        break;
+    }
+  }, [ setValue ]);
+
   /** @param {Event} e */
   const handleChange = React.useCallback(e => {
-    setQuery(e.target.value);
-    onQuery(e.target.value);
+    const { value } = e.target;
+
+    // allow optional onQuery to transform val
+    const promiseFn = typeof onQuery === 'function' ? onQuery : Promise.resolve;
+
+    // allow optional onQuery to execute async or sync
+    Promise.resolve(promiseFn(value))
+      .then(transformedValue => exists(transformedValue) ? transformedValue : value)
+      .then(_setValue);
   }, [ onQuery ]);
 
   /** @param {any} val */
@@ -39,20 +61,10 @@ export default function AutoSuggest ({
     const promiseFn = typeof onSelect === 'function' ? onSelect : Promise.resolve;
 
     // allow optional onSelect to execute async or sync
-    Promise.resolve(promiseFn(val)).then(val => {
-      // allow transformed value to
-      switch (typeof val) {
-        case 'string':
-          setQuery(val);
-          setValue(val);
-          break;
-        case 'object':
-          setQuery(val.label);
-          setValue(val.value);
-          break;
-      }
-      setIsOpen(false);
-    });
+    Promise.resolve(promiseFn(val))
+      .then(transformedValue => exists(transformedValue) ? transformedValue : val)
+      .then(_setValue)
+      .then(() => setIsOpen(false));
   }, [ onSelect, setValue ]);
 
   React.useEffect(() => {
