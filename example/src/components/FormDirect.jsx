@@ -10,6 +10,7 @@ const options = [
 
 export default function FormDirect (props) {
   const form = React.useRef();
+  const inputRef = React.useRef();
   const [ values, setValues ] = React.useState({});
   const model = React.useMemo(() => ({
     validations: [{
@@ -25,12 +26,16 @@ export default function FormDirect (props) {
     alert(`form state: ${JSON.stringify(form.current.getData())}`);
   }, []);
 
+  React.useEffect(() => {
+    inputRef.current.focus();
+  }, []);
+
   return (
     <div className="form-direct">
       <Form model={model} ref={form} store={store} values={values}>
         <Errors />
         <Fields>
-          <TextField label="username" name="username" />
+          <TextField forwardedRef={inputRef} label="username" name="username" />
           <TextField label="phone" name="phone" />
           <SelectField name="is_subscribed" options={options} optionKeySelector={keySelector} placeholder="Select me" />
           <SubmitButton onClick={handleSubmit}>Check form state</SubmitButton>

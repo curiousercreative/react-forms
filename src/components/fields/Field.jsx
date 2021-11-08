@@ -53,6 +53,7 @@ export default class Field extends React.Component {
   };
 
   id = `field${id++}`;
+  inputRef = React.createRef();
   state = {
     hasFocus: false,
   };
@@ -62,7 +63,6 @@ export default class Field extends React.Component {
     super(...args);
     bindMethods(this);
 
-    this.inputRef = this.props.forwardedRef || React.createRef();
     this.updateHasFocus = memo(this.updateHasFocus);
   }
 
@@ -122,6 +122,7 @@ export default class Field extends React.Component {
     // TODO: look into render optimization (memoization or otherwise)
     return {
       ...omit('className', this.props),
+      forwardedRef: this.inputRef,
       getValue: () => getValue(this),
       hasFocus: this.state.hasFocus,
       id: this.id,
@@ -238,7 +239,7 @@ export default class Field extends React.Component {
       }}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.renderErrors()}
-        <Input {...this.getProps()} forwardedRef={this.inputRef} />
+        <Input {...this.getProps()} />
         {renderIf(FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.props.children}
       </div>
