@@ -91,10 +91,10 @@ export default class Form extends React.Component {
     super(...args);
     bindMethods(this);
 
-    this._publishOnChange = memoize(debounce(this._publishOnChange, FORM_UPDATE_PUBLISH_DEBOUNCE_PERIOD, true));
+    this._publishOnChange = memoize(debounce(this._publishOnChange, FORM_UPDATE_PUBLISH_DEBOUNCE_PERIOD));
     this._setModel = memoize(this._setModel);
     this._setStore = memoize(this._setStore);
-    this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD, true);
+    this._validateOnChange = debounce(this._validateOnChange, CHANGE_FIELD_VALIDATION_DEBOUNCE_PERIOD);
     this.formatData = memoize(this.formatData);
     this.formatErrors = memoize(this.formatErrors);
     this._getContextValue = memoize(this._getContextValue);
