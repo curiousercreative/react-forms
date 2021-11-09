@@ -45,7 +45,8 @@ const defaultStore = localStateStore;
  * @property {Pubsub} [pubsub] an existing Pubsub instance, perhaps you want to
  * observe several forms at once?
  * @property {FormStore|function} [store] supply any number of store overrides
- * @property {boolean} [validateAsYouGo = true]
+ * @property {string|boolean} [validateAsYouGo = 'form'] set to 'field' as performance
+ * optimization to only validate the field that has changed rather than entire form
  * @property {object[]} [validations] - very specific data structure expected by
  * the validate function. The below example is for a form with two fields that are both required.
  * It should look like this:
@@ -68,7 +69,7 @@ export default class Form extends React.Component {
     initialValues: {},
     model: {},
     store: {},
-    validateAsYouGo: true,
+    validateAsYouGo: 'form', // 'field', true, false
   };
 
   /** @property {array} fieldsBlurred - list of field names that have been blurred used for validating as you go */
@@ -255,13 +256,25 @@ export default class Form extends React.Component {
    * @param {number} [index]
    */
   _validateOnChange (name, index) {
-    if (!this.props.validateAsYouGo) return;
+    switch (this.props.validateAsYouGo) {
+      case true:
+      case 'form':
+        this.validate();
+        break;
 
-    // validate just the field that was changed (but returns all form errors)
-    const isValid = this.validateField(name, index);
+      case 'field':
+        // validate just the field that was changed
+        const isValid = this.validateField(name, index);
 
-    // update form valid flag
-    this.setState({ isValid });
+        // update form valid flag
+        this.setState({ isValid });
+        break;
+      case false:
+        break;
+
+      default:
+        console.warn(new Error(`Expected value of "form", "field", true, or false for prop "validateAsYouGo" but found "${this.props.validateAsYouGo}".`));
+    }
   }
 
   /**
