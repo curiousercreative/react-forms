@@ -10,11 +10,13 @@ const TYPE_MODE_MAP = {
 /**
  * As basic as it gets, a text input
  * @class Text
+ * @property {string} [autoComplete]
  * @property {boolean} [disabled = false]
  * @property {React.Ref} [forwardedRef]
  * @property {boolean} [hasFocus]
  * @property {string} id
  * @property {string} name
+ * @property {any} [readOnly]
  * @property {string} type - supply a type to hint device's virtual keyboard
  * @return {jsx} input.form__input
  */
@@ -60,11 +62,13 @@ export default class Text extends React.Component {
   render () {
     return <input
       id={this.props.id}
+      autoComplete={this.props.autoComplete}
       className="form__input form__input--type_text"
       disabled={this.props.disabled}
       inputMode={this.getInputMode()}
       name={this.props.name}
       onChange={this.handleChange}
+      readOnly={this.props.readOnly}
       ref={this.props.forwardedRef}
       placeholder={this.props.placeholder}
       type={this.getType()}

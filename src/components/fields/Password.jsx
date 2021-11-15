@@ -5,10 +5,12 @@ import bindMethods from '../../util/bindMethods.js';
 /**
  * password input that allows for toggling visibility
  * @class Password
+ * @property {string} [autoComplete]
  * @property {boolean} [disabled = false]
  * @property {string} id
  * @property {string} name
  * @property {string} [placeholder]
+ * @property {any} [readOnly]
  * @return {jsx} div.form-password
  */
 export default class Password extends React.Component {
@@ -36,11 +38,13 @@ export default class Password extends React.Component {
     return (<div className="form-password">
       <input
         id={this.props.id}
+        autoComplete={this.props.autoComplete}
         className="form__input form__input--type_password"
         disabled={this.props.disabled}
         name={this.props.name}
         onChange={this.handleChange}
         placeholder={this.props.placeholder}
+        readOnly={this.props.readOnly}
         ref={this.props.forwardedRef}
         type={type}
         value={this.props.getValue() || ''} />
