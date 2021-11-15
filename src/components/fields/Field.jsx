@@ -106,16 +106,27 @@ export default class Field extends React.Component {
     return `form__field--${modifierKey}_${modifierVal}`;
   }
 
-  /**
-   * @return {string[]}
-   */
-  getErrors () {
+  /** @return {object[]} */
+  _getErrors () {
     const { index, name } = this.props;
     const errors = this.context.state.errors;
 
     return (typeof index === 'number' ? errors[index] : errors)
-      .filter(e => e.name === name)
-      .map(({ error }) => error);
+      .filter(e => e.name === name);
+  }
+
+  /** @return {string[]} */
+  getErrors () {
+    return this._getErrors()
+      .filter(e => !e.meta || !e.meta.warning)
+      .map(e => e.error);
+  }
+
+  /** @return {string[]} */
+  getWarnings () {
+    return this._getErrors()
+      .filter(e => e.meta && e.meta.warning)
+      .map(e => e.error);
   }
 
   getProps () {
@@ -203,12 +214,25 @@ export default class Field extends React.Component {
     }
   }
 
+  renderWarnings () {
+    const warnings = this.getWarnings();
+    if (!warnings.length) return;
+
+    return (<div className="form__field-warnings">
+      {warnings.map(e => (
+        <div className="form__field-warning" key={e}>{e}</div>
+      ))}
+    </div>);
+  }
+
   render () {
     // fail early for FormCollection fields without an index prop
     if ('collection' in this.context.form && typeof this.props.index !== 'number') {
       throw new Error("You've rendered a field component without an index prop as a child of a FormCollection. Please relay the index prop to each field rendered.");
     }
 
+    const errors = this.renderErrors();
+    const warnings = this.renderWarnings();
     const Input = this.props.component;
     const { type } = this.props;
     let classes = this.props.className.split(' ')
@@ -228,7 +252,8 @@ export default class Field extends React.Component {
     else classes.push(this.formatClassName('no', 'value'));
 
     // has or no errors class
-    if (this.getErrors().length) classes.push(this.formatClassName('has', 'errors'));
+    if (errors) classes.push(this.formatClassName('has', 'errors'));
+    else if (warnings) classes.push(this.formatClassName('has', 'warnings'));
     else classes.push(this.formatClassName('no', 'errors'));
 
     return (
@@ -238,7 +263,8 @@ export default class Field extends React.Component {
         [focusInKey]: this.handleFocus,
       }}>
         {renderIf(!FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
-        {this.renderErrors()}
+        {errors}
+        {warnings}
         <Input {...this.getProps()} />
         {renderIf(FIELD_TYPES_LABEL_AFTER_INPUT.includes(type), this.renderLabel)}
         {this.props.children}

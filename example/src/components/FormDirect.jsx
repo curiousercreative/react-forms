@@ -15,7 +15,7 @@ export default function FormDirect (props) {
   const model = React.useMemo(() => ({
     validations: [{
       names: [ 'phone', 'username', 'is_subscribed' ],
-      tests: [[ validator.tests.required, validator.messages.required ]],
+      tests: [[ validator.tests.required, validator.messages.required, { warning: true } ]],
     }],
   }), []);
   const store = React.useMemo(() => ({
@@ -23,7 +23,7 @@ export default function FormDirect (props) {
   }), [ values ]);
 
   const handleSubmit = React.useCallback(() => {
-    alert(`form state: ${JSON.stringify(form.current.getData())}`);
+    if (form.current.validate()) alert(`form state: ${JSON.stringify(form.current.getData())}`);
   }, []);
 
   React.useEffect(() => {

@@ -96,7 +96,10 @@ class MyForm extends Form {
       tests: [[ validator.tests.required, validator.messages.required ]],
     }, {
       names: [ 'password' ],
-      tests: [[ validator.tests.minLength(6), validator.messages.minLength(6) ]],
+      tests: [
+        [ validator.tests.minLength(6), validator.messages.minLength(6) ],
+        [ validator.tests.minLength(8), () => `Password is weak, consider making it 8 characters or more`), { warning: true } ],
+      ],
     }],
   };
 
@@ -179,6 +182,7 @@ The exported stylesheet predefines these CSS variables that you're encouraged to
 .form {
   --form-color-error: red;
   --form-color-gray: #dedede;
+  --form-color-warning: #fc9403;
   --form-field-height: 46px;
 }
 ```

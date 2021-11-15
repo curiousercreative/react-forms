@@ -18,4 +18,8 @@ export default class Error {
         return { error: isJsx(error) ? error : error.toString() };
     }
   }
+
+  static errorsWithoutWarnings (errors) {
+    return errors.filter(e => !e.meta || !e.meta.warning);
+  }
 }

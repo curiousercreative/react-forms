@@ -1,6 +1,8 @@
 /** @module components/FormCollection */
 import React from 'react';
 
+import Error from '../model/Error.js';
+
 import Form from './Form.jsx';
 import FormContext from './config/FormContext';
 import localStateStoreCollection from '../lib/form/stores/localStateStoreCollection.js';
@@ -90,7 +92,7 @@ export default class FormCollection extends Form {
     // 2d array of errors
     const errors = this.getData(true).map(data => validate(data, this.getValidations()));
     // if there are any, form is invalid
-    const isValid = !errors.some(eArr => eArr.length > 0);
+    const isValid = !errors.some(eArr => Error.errorsWithoutWarnings(eArr).length > 0);
 
     return [ isValid, errors ];
   }
@@ -219,7 +221,7 @@ export default class FormCollection extends Form {
     return this._getContextValue(
       this.formatData(this.getData()),
       this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
-      this.getErrors().every(_errors => _errors.length === 0),
+      this.getErrors().every(_errors => Error.errorsWithoutWarnings(_errors).length === 0),
       this.props.validateAsYouGo,
       this.props.formName,
       this.pubsub,
@@ -316,16 +318,21 @@ export default class FormCollection extends Form {
   }
 
   render (Component) {
+    const classes = this.props.className.split(' ').concat([ 'form', 'form-collection' ]);
     const formCollectionData = this.formatData(this.getData(true));
     Component = isComponent(Component) ? Component : this.props.component;
     const context = this.getContextValue();
     const itemRenderer = this.renderItem(Component);
     this.collection = [];
 
+    if (this.props.formName) classes.push(`form--${this.props.formName}`);
+
     return (
       <FormContext.Provider value={context}>
-        {formCollectionData.map(itemRenderer)}
-        {this.props.children}
+        <div className={classes.join(' ')}>
+          {formCollectionData.map(itemRenderer)}
+          {this.props.children}
+        </div>
       </FormContext.Provider>
     );
   }

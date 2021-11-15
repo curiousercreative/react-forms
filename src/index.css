@@ -53,6 +53,7 @@
 .form {
   --form-color-error: red;
   --form-color-gray: #dedede;
+  --form-color-warning: #fc9403;
   --form-field-height: 46px;
 }
 
@@ -89,7 +90,8 @@
 }
 
 .form__label,
-.form__field-error {
+.form__field-error,
+.form__field-warning {
   font-size: 13px;
   line-height: 1.15em;
   margin-bottom: 8px;
@@ -100,6 +102,10 @@
 .form__field-error {
   color: red;
   color: var(--form-color-error, red);
+}
+.form__field-warning {
+  color: #fc9403;
+  color: var(--form-color-warning);
 }
 .form__label + .form__field {
   margin-top: 10px;
@@ -148,6 +154,11 @@
 .form__field--has_errors .form__dropdown-wrapper {
   border-color: red;
   border-color: var(--form-color-error, red);
+}
+.form__field--has_warnings .form__input,
+.form__field--has_warnings .form__dropdown-wrapper {
+  border-color: #fc9403;
+  border-color: var(--form-color-warning);
 }
 .form__errors {
   color: red;

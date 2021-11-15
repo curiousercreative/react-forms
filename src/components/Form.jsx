@@ -225,7 +225,7 @@ export default class Form extends React.Component {
    */
   _validate () {
     const errors = validate(this.getData(), this.getValidations());
-    const isValid = errors.length === 0;
+    const isValid = Error.errorsWithoutWarnings(errors).length === 0;
 
     return [ isValid, errors ];
   }
@@ -321,7 +321,7 @@ export default class Form extends React.Component {
     return this._getContextValue(
       this.formatData(this.getData()),
       this.formatErrors(this.getErrors(), this.props.errors, this.fieldsBlurred, this.props.validateAsYouGo),
-      this.getErrors().length === 0,
+      Error.errorsWithoutWarnings(this.getErrors()).length === 0,
       this.props.validateAsYouGo,
       this.props.formName,
       this.pubsub,
@@ -483,6 +483,8 @@ export default class Form extends React.Component {
       values: context.state.values,
     };
     const Children = this.props.children;
+
+    if (this.props.formName) classes.push(`form--${this.props.formName}`);
 
     return (
       <FormContext.Provider value={context}>
