@@ -119,14 +119,14 @@ export default class Field extends React.Component {
   getErrors () {
     return this._getErrors()
       .filter(e => !e.meta || !e.meta.warning)
-      .map(e => e.error);
+      .map(e => e.message);
   }
 
   /** @return {string[]} */
   getWarnings () {
     return this._getErrors()
       .filter(e => e.meta && e.meta.warning)
-      .map(e => e.error);
+      .map(e => e.message);
   }
 
   getProps () {

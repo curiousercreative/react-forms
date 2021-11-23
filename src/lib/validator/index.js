@@ -66,13 +66,13 @@ export function validate (data, validations, validateMissingFields = true) {
 
           return tests
             // functionify each validation test and message generator in case fully applied
-            .map(([ test, error, meta ]) => [ functionify(test), functionify(error), functionify(meta) ])
-            // run all the tests for this field
-            .map(([ test, error, meta ]) => [ !test(value) && error(name), meta(name, value) ])
+            .map(([ test, message, meta ]) => [ functionify(test), functionify(message), functionify(meta) ])
+            // run all the tests for this field``
+            .map(([ testFn, messageFn, metaFn ]) => [ !testFn(value) && messageFn(name), metaFn(name, value) ])
             // filter out empty items (passed tests)
             .filter(([ v ]) => !!v && String(v).length > 0)
             // format as an error object
-            .map(([ error, meta ]) => ({ meta, name, error }));
+            .map(([ message, meta ]) => ({ meta, name, message }));
         })
         // flatten error collections
         .reduce((errorAgg, errors) => errorAgg.concat(errors), [])

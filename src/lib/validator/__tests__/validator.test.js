@@ -6,7 +6,7 @@ function expectValid (errors) {
 
 class Simple {
   static expectErrors (errors) {
-    expect(errors).toEqual([{ name: 'a', error: 'A is a required field' }]);
+    expect(errors).toEqual([{ name: 'a', message: 'A is a required field' }]);
   }
   static invalidData = { a: '' };
   static validData = { a: 'b' };
@@ -75,8 +75,8 @@ describe('complex tests', () => {
   class Complex {
     static expectErrors (errors) {
       expect(errors).toEqual([
-        { name: 'password', error: 'Password is a required field' },
-        { name: 'username', error: 'Username must be at least 6 characters' },
+        { name: 'password', message: 'Password is a required field' },
+        { name: 'username', message: 'Username must be at least 6 characters' },
       ]);
     }
     static invalidData = { username: 'some', password: '' };
