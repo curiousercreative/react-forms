@@ -29,7 +29,7 @@ export default function Errors ({ errors, includeFieldErrors = false }) {
   return (
     <ul className="form__errors">
       {errors
-        .map(({ error }) => error)
+        .map(({ message }) => message)
         .sort()
         .map(e => (
           <li className="form__error" key={e}>{e}</li>
