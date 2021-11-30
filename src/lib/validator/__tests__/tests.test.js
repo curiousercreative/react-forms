@@ -1,5 +1,5 @@
 import { tests } from '../';
-const { email, integer, length, maxLength, minLength, numeric, passIfEmpty, phone, required } = tests;
+const { email, equals, integer, length, maxLength, minLength, numeric, passIfEmpty, phone, required } = tests;
 const x = {};
 
 describe('validator.tests passIfEmpty', () => {
@@ -40,6 +40,15 @@ describe('validator.tests', () => {
     expect(email('aj@ajm.m')).toBe(false);
     expect(email('user@sub.host.tld')).toBe(true); // multiple domains
     expect(email('user@sub.host.t')).toBe(false); // tld 2+ chars
+  });
+  test('equals', () => {
+    const a = { a: 'b' };
+
+    expect(equals(true, true)).toBe(true);
+    expect(equals(false, true)).toBe(false);
+    expect(equals(undefined, true)).toBe(true); /* eslint-disable-line no-undefined */
+    expect(equals({ a: 'b' }, { a: 'b' })).toBe(false); // unidentical objects
+    expect(equals(a, a)).toBe(true); // identical objects
   });
   test('integer', () => {
     expect(integer('0')).toBe(true);

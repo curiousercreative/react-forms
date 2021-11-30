@@ -28,6 +28,20 @@ export function email (value) {
 /**
  * @function
  * @param  {any} value
+ * @param  {any} expectedValue
+ * @return {boolean}
+ * @example (true, true) => true
+ * @example (false, true) => false
+ * @example (undefined, true) => true
+ * @example ({ a: 'b' }, { a: 'b' }) => false
+ */
+export function equals (value, expectedValue) {
+  return passIfEmpty(value, value => value === expectedValue);
+}
+
+/**
+ * @function
+ * @param  {any} value
  * @return {boolean}
  * @example '0' => true
  * @example 0 => true
