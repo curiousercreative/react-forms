@@ -38,6 +38,8 @@ describe('validator.tests', () => {
     expect(email('2ajs12x@ajm.co')).toBe(true);
     expect(email('aj@ajm')).toBe(false);
     expect(email('aj@ajm.m')).toBe(false);
+    expect(email('user@sub.host.tld')).toBe(true); // multiple domains
+    expect(email('user@sub.host.t')).toBe(false); // tld 2+ chars
   });
   test('integer', () => {
     expect(integer('0')).toBe(true);
