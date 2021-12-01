@@ -29,11 +29,13 @@ describe('validate method', () => {
     expect(form.getErrors()).toHaveLength(1);
   });
 
-  test('validate method should not save errors for display when flag is set', () => {
+  test('validate method should set Form.wasSubmitted when flag is set', () => {
     const form = F.render(<Form initialValues={{ a: '' }} model={model} />);
     form.validate(false);
+    expect(form.wasSubmitted).toBe(false);
 
-    expect(form.getErrors()).toHaveLength(0);
+    form.validate();
+    expect(form.wasSubmitted).toBe(true);
   });
 
   test('validate method should set instance flag for isValid', () => {

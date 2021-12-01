@@ -84,6 +84,8 @@ export default class Form extends React.Component {
   state = {};
   /** @property {object} store - set of functions that are generally specific to a data store (redux, another component's state, etc) */
   store = {};
+  /** @property {boolean} wasSubmitted - flag for entire form submission attempted  */
+  wasSubmitted = false;
   /** @property {boolean} wasValidated - flag for entire form being validated with errors displayed  */
   wasValidated = false;
 
@@ -113,7 +115,7 @@ export default class Form extends React.Component {
   }
 
   componentDidMount () {
-    setTimeout(() => this.validate(this.props.validateAsYouGo), 15);
+    setTimeout(() => this.validate(false), 15);
     this.pubsub.on(getFieldTopic(null, 'updated'), this.onFieldUpdate);
     this.pubsub.on(getFieldTopic(null, 'blurred'), this.onFieldBlur);
   }
@@ -259,7 +261,7 @@ export default class Form extends React.Component {
     switch (this.props.validateAsYouGo) {
       case true:
       case 'form':
-        this.validate();
+        this.validate(false);
         break;
 
       case 'field':
@@ -413,15 +415,20 @@ export default class Form extends React.Component {
    * @return {boolean}
    */
   shouldErrorDisplay ({ name }, index) {
-    return !name || !this.props.validateAsYouGo || this._hasFieldBlurred(name, index);
+    return !name
+      || this.wasSubmitted
+      || !this.props.validateAsYouGo
+      || this._hasFieldBlurred(name, index);
   }
 
   /**
    * validate - validate the entire form and render errors (unless disabled)
-   * @param  {Boolean} [storeErrors=true] flag to disable error storage (and rendering)
+   * @param  {Boolean} [isSubmit=true] flag to indicate validation is for form submission
    * @return {boolean} true = valid
    */
-  validate (storeErrors = true) {
+  validate (isSubmit = true) {
+    if (isSubmit) this.wasSubmitted = true;
+
     const [ isValid, errors ] = this._validate();
 
     // NOTE: might need to unwrap this for React v17
@@ -429,10 +436,8 @@ export default class Form extends React.Component {
       this.setState({ isValid });
 
       // store errors for rendering
-      if (storeErrors) {
-        this.setErrors(errors);
-        this.wasValidated = true;
-      }
+      this.setErrors(errors);
+      this.wasValidated = true;
     });
 
     // if there are no errors, form is valid
