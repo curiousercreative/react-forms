@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Input from './model/Input.js';
 import bindMethods from '../../util/bindMethods.js';
 
 /**
@@ -8,14 +8,17 @@ import bindMethods from '../../util/bindMethods.js';
  * @property {string} [autoComplete]
  * @property {boolean} [disabled = false]
  * @property {string} id
+ * @property {string} [inputMode = text]
  * @property {string} name
  * @property {string} [placeholder]
  * @property {any} [readOnly]
+ * @property {string} [type]
  * @return {jsx} div.form-password
  */
 export default class Password extends React.Component {
   static defaultProps = {
     disabled: false,
+    inputMode: 'text',
   };
   state = { showPassword: false };
 
@@ -41,6 +44,7 @@ export default class Password extends React.Component {
         autoComplete={this.props.autoComplete}
         className="form__input form__input--type_password"
         disabled={this.props.disabled}
+        inputMode={this.props.inputMode}
         name={this.props.name}
         onChange={this.handleChange}
         placeholder={this.props.placeholder}

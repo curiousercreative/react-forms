@@ -12,8 +12,8 @@ const User = React.forwardRef(function User ({ index, username, password }, ref)
   return (
     <div className="form-collection-extended__item" key={index}>
       <Fields>
-        <TextField forwardedRef={ref} index={index} label="username" name="username" />
-        <PasswordField index={index} label="password" name="password" />
+        <TextField forwardedRef={ref} inputMode="numeric" index={index} label="username" name="username" />
+        <PasswordField index={index} inputMode="numeric" label="password" name="password" />
         <NativeSelectField index={index} label="opt-in?" name="optin" options={OPTIONS} />
       </Fields>
     </div>
