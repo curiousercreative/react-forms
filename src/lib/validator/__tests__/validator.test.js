@@ -4,9 +4,14 @@ function expectValid (errors) {
   expect(errors).toEqual([]);
 }
 
+const meta = {
+  formTest: false,
+  warning: false,
+};
+
 class Simple {
   static expectErrors (errors) {
-    expect(errors).toEqual([{ name: 'a', message: 'A is a required field' }]);
+    expect(errors).toEqual([{ name: 'a', message: 'A is a required field', meta }]);
   }
   static invalidData = { a: '' };
   static validData = { a: 'b' };
@@ -75,8 +80,8 @@ describe('complex tests', () => {
   class Complex {
     static expectErrors (errors) {
       expect(errors).toEqual([
-        { name: 'password', message: 'Password is a required field' },
-        { name: 'username', message: 'Username must be at least 6 characters' },
+        { name: 'password', message: 'Password is a required field', meta },
+        { name: 'username', message: 'Username must be at least 6 characters', meta },
       ]);
     }
     static invalidData = { username: 'some', password: '' };
@@ -122,5 +127,51 @@ describe('complex tests', () => {
   test('complex tests fail with identical results given invalid data using either validations data formats', () => {
     expect(validate(Complex.invalidData, Complex.validations))
       .toEqual(validate(Complex.invalidData, Complex.validationsAlt));
+  });
+});
+
+describe('validations with meta', () => {
+  test('warning meta flag should translate', () => {
+    const errors = [{
+      name: 'a',
+      message: 'A is a required field',
+      meta: { ...meta, warning: true, x: 'x' },
+    }];
+    const formData = {};
+    const validations = [{
+      names: [ 'a' ],
+      tests: [[ tests.required, messages.required, { warning: true, x: 'x' } ]],
+    }];
+
+    expect(validate(formData, validations)).toEqual(errors);
+  });
+
+  test('without meta.formValidation flag, validation test should be supplied form field', () => {
+    const formData = { a: 'b' };
+    const testFn = jest.fn();
+    const validations = [{
+      names: [ 'a' ],
+      tests: [[ testFn, messages.required ]],
+    }];
+
+    validate(formData, validations);
+    expect(testFn).toHaveBeenCalledWith(formData.a);
+  });
+
+  test('meta.formValidation flag should supply form data', () => {
+    const errors = [{
+      name: 'a',
+      message: 'A is a required field',
+      meta: { ...meta, formTest: true },
+    }];
+    const formData = { a: 'b' };
+    const testFn = jest.fn();
+    const validations = [{
+      names: [ 'a' ],
+      tests: [[ testFn, messages.required, { formTest: true } ]],
+    }];
+
+    expect(validate(formData, validations)).toEqual(errors);
+    expect(testFn).toHaveBeenCalledWith(formData);
   });
 });

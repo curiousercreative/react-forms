@@ -34,10 +34,19 @@ export default class FormComplex extends Form {
   static defaultProps = {
     ...Form.defaultProps,
     formName: 'complex-form',
-    validations: [{
-      names: [ 'email', 'extra_text' ],
-      tests: [[ validator.tests.required, validator.messages.required ]],
-    }],
+    validations: [
+      {
+        names: [ 'email', 'extra_text' ],
+        tests: [[ validator.tests.required, validator.messages.required ]],
+      }, {
+        names: [ 'extra_text' ],
+        tests: [[
+          ({ email, extra_text }) => email === extra_text,
+          name => `${name} does not match email`,
+          { formTest: true },
+        ]],
+      },
+    ],
   };
 
   constructor (...args) {

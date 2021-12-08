@@ -11,6 +11,11 @@ const messages = curryModule(uncurriedMessages);
 const tests = curryModule(uncurriedTests);
 export { messages, tests };
 
+const DEFAULT_TEST_META = {
+  formTest: false,
+  warning: false,
+};
+
 /**
  * validations definition collection
  * @typedef {object[]} Validations
@@ -62,13 +67,16 @@ export function validate (data, validations, validateMissingFields = true) {
           // exit early if this field wasn't provided and flag is set
           if (!validateMissingFields && !data.hasOwnProperty(name)) return [];
 
-          const value = data[name];
-
           return tests
             // functionify each validation test and message generator in case fully applied
-            .map(([ test, message, meta ]) => [ functionify(test), functionify(message), functionify(meta) ])
-            // run all the tests for this field``
-            .map(([ testFn, messageFn, metaFn ]) => [ !testFn(value) && messageFn(name), metaFn(name, value) ])
+            .map(([ test, message, meta ]) => [ functionify(test), functionify(message), meta ])
+            // run all the tests for this field
+            .map(([ testFn, messageFn, _meta ]) => {
+              const meta = { ...DEFAULT_TEST_META, ..._meta };
+              const isValid = testFn(meta.formTest ? data : data[name]);
+
+              return [ !isValid && messageFn(name), meta ];
+            })
             // filter out empty items (passed tests)
             .filter(([ v ]) => !!v && String(v).length > 0)
             // format as an error object
