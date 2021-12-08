@@ -54,39 +54,38 @@ export function validate (data, validations, validateMissingFields = true) {
   }
 
   // run all validations and aggregate the errors
-  const errors = validations
-    .reduce((errorCollection, { names, tests }) => {
-      // arrayify if a string was provided and then ensure our array contains no dupes
-      names = uniq(arrayify(names));
+  const errors = validations.reduce((_errors, { names, tests }) => {
+    // arrayify if a string was provided and then ensure our array contains no dupes
+    const errors = uniq(arrayify(names))
+      // // don't validate fields that already have an error
+      // .filter(name => !errorCollection.find(e => e.name === name))
+      // map to error collections
+      .map(name => {
+        // exit early if this field wasn't provided and flag is set
+        if (!validateMissingFields && !data.hasOwnProperty(name)) return [];
 
-      return names
-        // // don't validate fields that already have an error
-        // .filter(name => !errorCollection.find(e => e.name === name))
-        // map to error collections
-        .map(name => {
-          // exit early if this field wasn't provided and flag is set
-          if (!validateMissingFields && !data.hasOwnProperty(name)) return [];
+        return tests
+          // functionify each validation test and message generator in case fully applied
+          .map(([ test, message, meta ]) => [ functionify(test), functionify(message), meta ])
+          // run all the tests for this field
+          .map(([ testFn, messageFn, _meta ]) => {
+            const meta = { ...DEFAULT_TEST_META, ..._meta };
+            const isValid = testFn(meta.formTest ? data : data[name]);
 
-          return tests
-            // functionify each validation test and message generator in case fully applied
-            .map(([ test, message, meta ]) => [ functionify(test), functionify(message), meta ])
-            // run all the tests for this field
-            .map(([ testFn, messageFn, _meta ]) => {
-              const meta = { ...DEFAULT_TEST_META, ..._meta };
-              const isValid = testFn(meta.formTest ? data : data[name]);
+            return [ !isValid && messageFn(name), meta ];
+          })
+          // filter out empty items (passed tests)
+          .filter(([ v ]) => !!v && String(v).length > 0)
+          // format as an error object
+          .map(([ message, meta ]) => ({ meta, name, message }));
+      })
+      // flatten error collections
+      .reduce((errorAgg, errors) => errorAgg.concat(errors), []);
 
-              return [ !isValid && messageFn(name), meta ];
-            })
-            // filter out empty items (passed tests)
-            .filter(([ v ]) => !!v && String(v).length > 0)
-            // format as an error object
-            .map(([ message, meta ]) => ({ meta, name, message }));
-        })
-        // flatten error collections
-        .reduce((errorAgg, errors) => errorAgg.concat(errors), [])
-        // merge with the running error collection for all validations
-        .concat(errorCollection);
-    }, []);
+    // merge with the running error collection for all validations
+    _errors.push(...errors);
+    return _errors;
+  }, []);
 
   // ensure no field has more than one error
   return uniq(errors, a => a.name)
