@@ -415,10 +415,13 @@ export default class Form extends React.Component {
    * @return {boolean}
    */
   shouldErrorDisplay ({ name }, index) {
-    return !name
-      || this.wasSubmitted
-      || !this.props.validateAsYouGo
-      || this._hasFieldBlurred(name, index);
+    // all errors are visible after a submission attempt
+    return this.wasSubmitted
+      // with validateAsYouGo=true, even before submit show...
+      || (this.props.validateAsYouGo
+        // critical errors (without name) and blurred field errors should display
+        && (!name || this._hasFieldBlurred(name, index))
+      );
   }
 
   /**
