@@ -110,7 +110,12 @@
 .form__label + .form__field {
   margin-top: 10px;
 }
-
+.form__input,
+.form__dropdown-wrapper,
+.form-select--native,
+.form-password {
+  margin-top: auto; /* vertical alignment within row of form__fields */
+}
 .form__input,
 .form-select--native,
 .form-select__value,
@@ -124,7 +129,6 @@
 .form-select--native {
   border: solid 1px #dedede;
   border-color: var(--form-color-gray, #dedede);
-  margin-top: auto; /* vertical alignment within row of form__fields */
 }
 .form__input--type_date,
 .form__input--type_email,

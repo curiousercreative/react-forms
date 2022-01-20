@@ -1,6 +1,6 @@
 import React from 'react';
 import { Errors, Fields, Form, SubmitButton, validator } from '@curiouser/react-forms';
-import { SelectField, TextField } from '@curiouser/react-forms';
+import { PasswordField, RedactedField, SelectField, TextField } from '@curiouser/react-forms';
 
 const keySelector = opt => opt.label;
 const options = [
@@ -37,6 +37,9 @@ export default function FormDirect (props) {
         <Fields>
           <TextField forwardedRef={inputRef} label="username" name="username" />
           <TextField label="phone" name="phone" />
+          <PasswordField label="password" name="redact" />
+          <RedactedField label="redacted field on focus" name="redact" />
+          <RedactedField asPassword label="redacted field as pass" name="redact" />
           <SelectField name="is_subscribed" options={options} optionKeySelector={keySelector} placeholder="Select me" />
           <SubmitButton onClick={handleSubmit}>Check form state</SubmitButton>
         </Fields>

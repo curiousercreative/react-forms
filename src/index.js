@@ -24,6 +24,7 @@ export { default as Fields } from './components/fields/Fields.jsx';
 export { default as NativeDateField } from './components/fields/NativeDateField.jsx';
 export { default as NativeSelectField } from './components/fields/NativeSelectField.jsx';
 export { default as RadioField } from './components/fields/RadioField.jsx';
+export { default as RedactedField } from './components/fields/RedactedField.jsx';
 export { default as PasswordField } from './components/fields/PasswordField.jsx';
 export { default as SelectField } from './components/fields/SelectField.jsx';
 export { default as TagSelectorField } from './components/fields/TagSelectorField.jsx';
