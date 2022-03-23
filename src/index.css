@@ -56,11 +56,6 @@
   --form-color-warning: #fc9403;
   --form-field-height: 46px;
 }
-
-.form__fields {
-  display: flex;
-  align-items: stretch;
-}
 .form__fields .form__field--type_checkbox,
 .form__fields .form__field--type_radio {
   display: flex;
@@ -78,10 +73,6 @@
 }
 .form__field {
   flex-basis: 100%;
-}
-.form__fields--with_gaps .form__field + .form__field,
-.form__fields--with_gaps .form__field + .form__submit {
-  margin-left: 1rem;
 }
 /* border-collapsing of adjacent fields */
 .form__fields--no_gaps .form__field--no_errors + .form__field--no_errors .form__input,
@@ -177,7 +168,6 @@
 .form__error + .form__error {
   margin-top: 1em;
 }
-
 .form__dropdown-wrapper {
   position: relative;
 }
@@ -336,40 +326,6 @@
 
 }
 
-.form__fields--count_2 .form__field {
-  max-width: calc((100% - 1rem) / 2);
-}
-.form__fields--count_3 .form__field {
-  max-width: calc((100% - 2rem) / 3);
-}
-.form__fields--count_4 .form__field {
-  max-width: calc((100% - 3rem) / 4);
-}
-.form__fields--count_5 .form__field {
-  max-width: calc((100% - 4rem) / 5);
-}
-.form__fields--count_6 .form__field {
-  max-width: calc((100% - 5rem) / 6);
-}
-.form__fields--count_7 .form__field {
-  max-width: calc((100% - 6rem) / 7);
-}
-.form__fields--count_8 .form__field {
-  max-width: calc((100% - 7rem) / 8);
-}
-.form__fields--count_9 .form__field {
-  max-width: calc((100% - 8rem) / 9);
-}
-.form__fields--count_10 .form__field {
-  max-width: calc((100% - 9rem) / 10);
-}
-.form__fields--count_11 .form__field {
-  max-width: calc((100% - 10rem) / 11);
-}
-.form__fields--count_12 .form__field {
-  max-width: calc((100% - 11rem) / 12);
-}
-
 .form__field--all_25 { flex-basis: 25%; }
 .form__field--all_50 { flex-basis: 50%; }
 .form__field--all_75 { flex-basis: 75%; }
@@ -386,6 +342,48 @@
   .form__field--nm_50 { flex-basis: 50%; }
   .form__field--nm_75 { flex-basis: 75%; }
   .form__field--nm_100 { flex-basis: 100%; }
+
+  .form__fields {
+    display: flex;
+    align-items: stretch;
+  }
+  .form__fields--with_gaps .form__field + .form__field,
+  .form__fields--with_gaps .form__field + .form__submit {
+    margin-left: 1rem;
+  }
+  .form__fields--count_2 .form__field {
+    max-width: calc((100% - 1rem) / 2);
+  }
+  .form__fields--count_3 .form__field {
+    max-width: calc((100% - 2rem) / 3);
+  }
+  .form__fields--count_4 .form__field {
+    max-width: calc((100% - 3rem) / 4);
+  }
+  .form__fields--count_5 .form__field {
+    max-width: calc((100% - 4rem) / 5);
+  }
+  .form__fields--count_6 .form__field {
+    max-width: calc((100% - 5rem) / 6);
+  }
+  .form__fields--count_7 .form__field {
+    max-width: calc((100% - 6rem) / 7);
+  }
+  .form__fields--count_8 .form__field {
+    max-width: calc((100% - 7rem) / 8);
+  }
+  .form__fields--count_9 .form__field {
+    max-width: calc((100% - 8rem) / 9);
+  }
+  .form__fields--count_10 .form__field {
+    max-width: calc((100% - 9rem) / 10);
+  }
+  .form__fields--count_11 .form__field {
+    max-width: calc((100% - 10rem) / 11);
+  }
+  .form__fields--count_12 .form__field {
+    max-width: calc((100% - 11rem) / 12);
+  }
 }
 @media (min-width: 768px) and (max-width: 1023px) {
   .form__field--t_25 { flex-basis: 25%; }
