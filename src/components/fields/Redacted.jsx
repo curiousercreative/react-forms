@@ -32,14 +32,34 @@ export default function RedactedInput ({
   type = 'text',
 }) {
   const [ showPassword, setShowPassword ] = React.useState(false);
+  const [ cursor, setCursor ] = React.useState();
   const _showPassword = (asPassword && showPassword) // in password mode, showPassword must be toggled
     || (!asPassword && hasFocus); // otherwise, we must be focused
   const _value = getValue() || '';
   // are we rendering redacted?
   const value = _showPassword ? _value : _value.replace(/./g, '•');
 
-  const handleChange = React.useCallback(e => setValue(e.target.value), [ setValue ]);
   const handleClickToggle = React.useCallback(() => setShowPassword(!showPassword), [ showPassword ]);
+  const handleInput = React.useCallback(e => {
+    const { data, inputType } = e.nativeEvent;
+
+    switch (inputType) {
+      case 'insertText':
+        setValue(_value.slice(0, cursor[0]) + data + _value.slice(cursor[1]));
+        break;
+      case 'deleteContentBackward':
+        setValue(_value.slice(0, cursor[0] === cursor[1] ? cursor[0] - 1 : cursor[0]) + _value.slice(cursor[1]));
+        break;
+      case 'deleteContentForward':
+        setValue(_value.slice(0, cursor[0]) + _value.slice(cursor[0] === cursor[1] ? cursor[1] + 1 : cursor[1]));
+        break;
+    }
+  }, [ _value, cursor ]);
+
+  const handleSelect = React.useCallback(e => {
+    const { selectionDirection, selectionEnd, selectionStart } = e.target;
+    setCursor([ selectionStart, selectionEnd, selectionDirection ]);
+  }, []);
 
   const input = <input
     autoComplete={autoComplete}
@@ -48,7 +68,8 @@ export default function RedactedInput ({
     id={id}
     inputMode={inputMode}
     name={name}
-    onChange={handleChange}
+    onInput={handleInput}
+    onSelect={handleSelect}
     placeholder={placeholder}
     readOnly={readOnly}
     ref={forwardedRef}
