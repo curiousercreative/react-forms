@@ -43,15 +43,18 @@ export default function RedactedInput ({
   const handleInput = React.useCallback(e => {
     const { data, inputType } = e.nativeEvent;
 
+    // TODO: reconsider this component altogether, there are a lot of inputTypes to consider
+    // https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
     switch (inputType) {
-      case 'insertText':
-        setValue(_value.slice(0, cursor[0]) + data + _value.slice(cursor[1]));
-        break;
       case 'deleteContentBackward':
         setValue(_value.slice(0, cursor[0] === cursor[1] ? cursor[0] - 1 : cursor[0]) + _value.slice(cursor[1]));
         break;
       case 'deleteContentForward':
         setValue(_value.slice(0, cursor[0]) + _value.slice(cursor[0] === cursor[1] ? cursor[1] + 1 : cursor[1]));
+        break;
+      case 'insertText':
+      default:
+        setValue(_value.slice(0, cursor[0]) + data + _value.slice(cursor[1]));
         break;
     }
   }, [ _value, cursor ]);
