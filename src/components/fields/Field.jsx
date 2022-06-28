@@ -246,11 +246,11 @@ export default class Field extends React.Component {
 
     // add focus class
     if (this.state.hasFocus) classes.push(this.formatClassName('has', 'focus'));
-
+    // add label class
+    if (this.props.label) classes.push(this.formatClassName('has', 'label'));
     // has or no value class
     if (this.hasValue()) classes.push(this.formatClassName('has', 'value'));
     else classes.push(this.formatClassName('no', 'value'));
-
     // has or no errors class
     if (errors) classes.push(this.formatClassName('has', 'errors'));
     else if (warnings) classes.push(this.formatClassName('has', 'warnings'));
