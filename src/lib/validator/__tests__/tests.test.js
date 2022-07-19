@@ -40,6 +40,7 @@ describe('validator.tests', () => {
     expect(email('aj@ajm.m')).toBe(false);
     expect(email('user@sub.host.tld')).toBe(true); // multiple domains
     expect(email('user@sub.host.t')).toBe(false); // tld 2+ chars
+    expect(email('user@s.u.b.host.tld')).toBe(true); // subdomain of 1 char
   });
   test('equals', () => {
     const a = { a: 'b' };
