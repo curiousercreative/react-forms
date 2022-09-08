@@ -31,6 +31,7 @@ export default function RedactedInput ({
   setValue,
   type = 'text',
 }) {
+  const beforeInputData = React.useRef();
   const [ showPassword, setShowPassword ] = React.useState(false);
   const [ cursor, setCursor ] = React.useState();
   const _showPassword = (asPassword && showPassword) // in password mode, showPassword must be toggled
@@ -39,9 +40,18 @@ export default function RedactedInput ({
   // are we rendering redacted?
   const value = _showPassword ? _value : _value.replace(/./g, '•');
 
+  const handleBeforeInput = React.useCallback(e => {
+    // NOTE: because chromium browsers only send the pasted data in the beforeinput
+    // event rather than in the input event, we have to store this value for use
+    // in the input event handler when data is absent but expected
+    beforeInputData.current = e.data;
+  }, []);
   const handleClickToggle = React.useCallback(() => setShowPassword(!showPassword), [ showPassword ]);
   const handleInput = React.useCallback(e => {
-    const { data, inputType } = e.nativeEvent;
+    let { data, inputType } = e.nativeEvent;
+
+    // NOTE: because Chromium sends pasted data in beforeinput event
+    data = inputType === 'insertFromPaste' && !data ? beforeInputData.current : data;
 
     // TODO: reconsider this component altogether, there are a lot of inputTypes to consider
     // https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
@@ -54,8 +64,7 @@ export default function RedactedInput ({
         break;
       case 'insertText':
       default:
-        setValue(_value.slice(0, cursor[0]) + data + _value.slice(cursor[1]));
-        break;
+        if (data) setValue(_value.slice(0, cursor[0]) + data + _value.slice(cursor[1]));
     }
   }, [ _value, cursor ]);
 
@@ -71,6 +80,7 @@ export default function RedactedInput ({
     id={id}
     inputMode={inputMode}
     name={name}
+    onBeforeInput={handleBeforeInput}
     onInput={handleInput}
     onSelect={handleSelect}
     placeholder={placeholder}
