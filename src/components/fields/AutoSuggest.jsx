@@ -71,6 +71,11 @@ export default function AutoSuggest ({
     if (hasFocus) setIsOpen(!!options.length);
   }, [ hasFocus, options ]);
 
+  // initialize value and query
+  React.useEffect(() => {
+    _setValue(getValue());
+  }, []);
+
   return (
     <DropdownWrapper
       focusOnOpen={false}
