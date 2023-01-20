@@ -49,6 +49,7 @@ export default class Field extends React.Component {
   static contextType = FormContext;
   static defaultProps = {
     className: '',
+    focusOnLabelClick: true,
     retainsFocus: false,
     theme: 'default',
   };
