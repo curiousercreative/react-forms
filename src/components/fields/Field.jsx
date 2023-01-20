@@ -29,6 +29,7 @@ const focusOutKey = IS_PREACT ? 'onfocusout' : 'onBlur';
  * @class Field
  * @property {string} [className]
  * @property {React.Component} component
+ * @property {boolean} [focusOnLabelClick = true ]
  * @property {object} [forwardedRef]
  * @property {number} [index] - when used within FormCollection
  * @property {string} [label] - label text for this field
@@ -85,6 +86,10 @@ export default class Field extends React.Component {
       if (this.props.retainsFocus && document.activeElement === document.body) this.focus();
       else this.updateHasFocus(false);
     }, 0);
+  }
+
+  handleClickLabel () {
+    if (this.props.focusOnLabelClick) this.focus();
   }
 
   handleFocus () {
@@ -210,7 +215,7 @@ export default class Field extends React.Component {
 
   renderLabel () {
     if (this.props.label) {
-      return <label className="form__label" htmlFor={this.id}>{this.props.label}</label>;
+      return <label className="form__label" htmlFor={this.id} onClick={this.handleClickLabel}>{this.props.label}</label>;
     }
   }
 

@@ -29,10 +29,11 @@ export default function AutoSuggestCats ({ label, name, placeholder }) {
   }, []);
 
   return <AutoSuggestField
+    focusOnLabelClick={false}
     label={label}
     name={name}
     onQuery={handleQuery}
     onSelect={handleSelect}
     options={options}
-    placeholder="Type 'cat' to see suggestions" />;
+    placeholder="Type 'cat' to see suggestions, label clicks won't focus" />;
 }
