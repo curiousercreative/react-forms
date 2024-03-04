@@ -1,6 +1,14 @@
 import React from 'react';
 
 /**
+ * @param  {string} val
+ * @return {string}
+ */
+function defaultRedact (val) {
+  return val.replace(/./g, '•');
+}
+
+/**
  * @param {boolean} [asPassword]
  * @param {string} [autoComplete]
  * @param {boolean} [disabled]
@@ -12,6 +20,7 @@ import React from 'react';
  * @param {string} name
  * @param {string} [placeholder]
  * @param {any} [readOnly]
+ * @param {typeof defaultRedact} [redact=defaultRedact]
  * @param {function} setValue
  * @param {string} [type = text]
  * @return {jsx} .form-password > input.form__input
@@ -28,6 +37,7 @@ export default function RedactedInput ({
   name,
   placeholder,
   readOnly,
+  redact = defaultRedact,
   setValue,
   type = 'text',
 }) {
@@ -38,7 +48,7 @@ export default function RedactedInput ({
     || (!asPassword && hasFocus); // otherwise, we must be focused
   const _value = getValue() || '';
   // are we rendering redacted?
-  const value = _showPassword ? _value : _value.replace(/./g, '•');
+  const value = React.useMemo(() => _showPassword ? _value : redact(_value), [ _showPassword, _value, redact ]);
 
   const handleBeforeInput = React.useCallback(e => {
     // NOTE: because chromium browsers only send the pasted data in the beforeinput
