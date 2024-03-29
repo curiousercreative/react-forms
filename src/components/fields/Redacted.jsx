@@ -74,7 +74,12 @@ export default function RedactedInput ({
         break;
       case 'insertText':
       default:
-        if (data) setValue(_value.slice(0, cursor[0]) + data + _value.slice(cursor[1]));
+        if (data) {
+          setValue(cursor
+            ? _value.slice(0, cursor[0]) + data + _value.slice(cursor[1])
+            : _value + data
+          );
+        }
     }
   }, [ _value, cursor ]);
 
