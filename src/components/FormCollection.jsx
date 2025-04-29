@@ -7,6 +7,7 @@ import Form from './Form.jsx';
 import FormContext from './config/FormContext';
 import localStateStoreCollection from '../lib/form/stores/localStateStoreCollection.js';
 
+import arrayify from '../lib/transformers/arrayify.js';
 import bindMethods from '../util/bindMethods.js';
 import callMe from '../util/callMe.js';
 import curry from '../util/curry.js';
@@ -67,20 +68,12 @@ export default class FormCollection extends Form {
     super(...args);
     bindMethods(this);
 
-    const errors = [];
     const values = this.store.getPersistentData()
       // unlikely, but prefilled collection data that is not yet persistent
-      .concat(this.props.initialValues)
-      .map(this.create);
+      .concat(this.props.initialValues);
 
     // init any lists per collection item
-    values.forEach(() => {
-      errors.push([]);
-      this.fieldsBlurred.push([]);
-    });
-
-    this.store.initData(values);
-    this.store.initErrors(errors);
+    this.add(values, true)
 
     this.renderItem = curry(this.renderItem);
   }
@@ -158,25 +151,29 @@ export default class FormCollection extends Form {
 
   /**
    * add - create a new default object and add to collection
-   * @param {object} [attr] - model attributes to merge in while adding
+   * @param {object|object[]} [attr] - model attributes to merge in while adding
+   * @param {boolean} [init = false] - is this during init
    * @return {Promise}
    */
-  add (attr={}) {
+  add (attr={}, init = false) {
     // default object with a cid merged over
-    let object = this.create(attr);
+    const items = arrayify(attr).map(this.create);
+    const errors = items.map(() => [])
+    const blurred = items.map(() => [])
 
     // add a default object to the end of the collection
-    return Promise
-      .all([
-        this.store.setErrors([ ...this.getErrors(), [] ]),
-        this.store.setData(this.store.getData().concat(object)),
-      ])
-      .then(() => {
-        // init lists for this new item
-        this.fieldsBlurred.push([]);
-
-        this.pubsub.trigger('item.added');
-      });
+    return Promise.all(init
+      ? [
+        this.store.initErrors(errors),
+        this.store.initData(items),
+      ] : [
+        this.store.setErrors([ ...this.getErrors(), ...errors ]),
+        this.store.setData([ ...this.store.getData(), ...items ]),
+      ]
+    ).then(() => {
+      // init lists for this new item
+      this.fieldsBlurred.push(...blurred);
+    });
   }
 
   /**

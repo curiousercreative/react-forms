@@ -2,6 +2,7 @@ import React from 'react';
 
 import FormCollectionDirect from './components/FormCollectionDirect.jsx';
 import FormCollectionExtended from './components/FormCollectionExtended.jsx';
+import FormCollectionTable from './components/FormCollectionTable.jsx';
 import FormComplex from './components/FormComplex.jsx';
 import FormDirect from './components/FormDirect.jsx';
 import FormDirectRenderProp from './components/FormDirectRenderProp.jsx';
@@ -64,6 +65,8 @@ class App extends React.Component {
         <FormComplex collectionProps={collectionProps} />
         <h2>Nested form with nested collection</h2>
         <Nested />
+        <h2>Form Collection as table</h2>
+        <FormCollectionTable />
         <h2>Observe a form</h2>
         <Observable />
         <h2>React via onChange handler props to form and fields (console.logged)</h2>

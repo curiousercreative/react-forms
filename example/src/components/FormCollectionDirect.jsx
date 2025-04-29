@@ -28,11 +28,11 @@ export default class FormCollectionDirect extends React.Component {
   }
 
   handleClickAdd (...args) {
-    this.formRef.handleClickAdd(...args);
+    this.formRef.current.handleClickAdd(...args);
   }
 
   handleSubmit () {
-    alert(`form state: ${JSON.stringify(this.formRef.getData())}`);
+    alert(`form state: ${JSON.stringify(this.formRef.current.getData())}`);
   }
 
   render () {
