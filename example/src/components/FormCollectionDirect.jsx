@@ -21,23 +21,24 @@ const User = React.forwardRef(function User ({ index, username, password }, ref)
 });
 
 export default class FormCollectionDirect extends React.Component {
+  formRef = React.createRef();
   constructor (...args) {
     super(...args);
     util.bindMethods(this);
   }
 
   handleClickAdd (...args) {
-    this.refs.collection.handleClickAdd(...args);
+    this.formRef.handleClickAdd(...args);
   }
 
   handleSubmit () {
-    alert(`form state: ${JSON.stringify(this.refs.collection.getData())}`);
+    alert(`form state: ${JSON.stringify(this.formRef.getData())}`);
   }
 
   render () {
     return (
       <div className="form form-collection-extended">
-        <FormCollection ref="collection" {...this.props} component={User} />
+        <FormCollection {...this.props} component={User} ref={this.formRef} />
         <button onClick={this.handleClickAdd} type="button">Add</button>
         <button onClick={this.handleSubmit}>Check form state</button>
       </div>

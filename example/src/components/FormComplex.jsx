@@ -4,6 +4,7 @@ import {
   CheckboxField,
   EmailField,
   Fields,
+  FileField,
   NativeDateField,
   NativeSelectField,
   RadioField,
@@ -49,6 +50,9 @@ export default class FormComplex extends Form {
     ],
   };
 
+  movieRef = React.createRef();
+  userRef = React.createRef();
+
   constructor (...args) {
     super(...args);
     util.bindMethods(this);
@@ -67,9 +71,9 @@ export default class FormComplex extends Form {
 
     try {
       refsData = {
-        director: this.refs.movie.getData().director,
-        movie: this.refs.movie.getData(),
-        user: this.refs.user.getData(),
+        director: this.movieRef.getData().director,
+        movie: this.movieRef.getData(),
+        user: this.userRef.getData(),
       };
     }
     catch (e) {}
@@ -88,7 +92,7 @@ export default class FormComplex extends Form {
     return super.render(
       <div className="form form-complex">
         <Errors />
-        <Form ref="movie">
+        <Form ref={this.movieRef}>
           <div className="form__fields">
             <TextField label="Title" name="title" />
             <TextField label="Year" name="year" />
@@ -101,7 +105,7 @@ export default class FormComplex extends Form {
           </Form>
         </Form>
 
-        <FormExtended ref="user" />
+        <FormExtended ref={this.userRef} />
 
         <FormCollectionExtended name="cast" />
 
@@ -112,6 +116,7 @@ export default class FormComplex extends Form {
           <RadioField label="extra radio" name="extra_radio" value="radio on" />
           <CheckboxField label="extra checkbox" name="extra_checkbox" />
         </Fields>
+        <FileField label="file for upload" name="some_file" />
         <TextareaField label="extra textarea" name="extra_textarea" />
         <NativeSelectField label="native select" name="native_select" options={NATIVE_OPTIONS} placeholder="select one..." />
         <NativeDateField label="native date" name="native_date" placeholder="YYYY-MM-DD" />
