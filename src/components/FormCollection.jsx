@@ -35,7 +35,7 @@ const emptyValues = [];
  * @property {Pubsub} [pubsub] an existing Pubsub instance, perhaps you want to
  * observe several forms at once?
  * @property {FormStore|function} [store] supply any number of store overrides
- * @property {boolean} [validateAsYouGo = true]
+ * @property {boolean} [validateAsYouGo = 'form']
  * @property {object[]} [validations] - very specific data structure expected by
  * the validate function. The below example is for a form with two fields that are both required.
  * It should look like this:
@@ -47,6 +47,7 @@ const emptyValues = [];
  * }]
  * @property {object[]} [values] if you plan to manage storing form values, pass them in here.
  * Be sure you are passing in a store prop with setValue methods
+ * @property {React.Component} [wrapperComponent = div] root componenet that collection is wrapped in with classes attached
  * @return {jsx} .form, though this class is frequently extended rather than
  * used directly and the render method is overriden
  */
@@ -321,6 +322,7 @@ export default class FormCollection extends Form {
     const classes = this.props.className.split(' ').concat([ 'form', 'form-collection' ]);
     const formCollectionData = this.formatData(this.getData(true));
     Component = isComponent(Component) ? Component : this.props.component;
+    const WrapperComponent = this.wrapperComponent;
     const context = this.getContextValue();
     const itemRenderer = this.renderItem(Component);
     this.collection = [];
@@ -329,10 +331,10 @@ export default class FormCollection extends Form {
 
     return (
       <FormContext.Provider value={context}>
-        <div className={classes.join(' ')}>
+        <WrapperComponent className={classes.join(' ')}>
           {formCollectionData.map(itemRenderer)}
           {this.props.children}
-        </div>
+        </WrapperComponent>
       </FormContext.Provider>
     );
   }

@@ -32,7 +32,7 @@ export default function FormDirect (props) {
 
   return (
     <div className="form-direct">
-      <Form model={model} ref={form} store={store} values={values}>
+      <Form model={model} ref={form} store={store} values={values} wrapperTag="section">
         <Errors />
         <Fields>
           <TextField forwardedRef={inputRef} label="username" name="username" />

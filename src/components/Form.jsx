@@ -58,6 +58,8 @@ const defaultStore = localStateStore;
  * }]
  * @property {object} [values] if you plan to manage storing form values, pass them in here.
  * Be sure you are passing in a store prop with setValue methods
+ * @property {React.Component} [wrapperComponent = props => <div {...props}>{props.children}</div>] root componenet that collection is wrapped in with classes attached
+ * @property {string} [wrapperTag = 'div'] tag to be used by default wrapperComponent
  * @return {jsx} .form
  */
 export default class Form extends React.Component {
@@ -70,6 +72,7 @@ export default class Form extends React.Component {
     model: {},
     store: {},
     validateAsYouGo: 'form', // 'field', true, false
+    wrapperTag: 'div',
   };
 
   /** @property {array} fieldsBlurred - list of field names that have been blurred used for validating as you go */
@@ -112,6 +115,8 @@ export default class Form extends React.Component {
 
     // accept validations as component prop and override model.validations (not encouraged anyhow)
     this.model.validations = this.props.validations || injectInstance(this.props.model, this).validations || [];
+
+    this.wrapperComponent = this.props.wrapperComponent ? this.props.wrapperComponent : props => React.createElement(this.props.wrapperTag, props);
   }
 
   componentDidMount () {
@@ -491,16 +496,17 @@ export default class Form extends React.Component {
       values: context.state.values,
     };
     const Children = this.props.children;
+    const WrapperComponent = this.wrapperComponent;
 
     if (this.props.formName) classes.push(`form--${this.props.formName}`);
 
     return (
       <FormContext.Provider value={context}>
-        <div className={classes.join(' ')}>
+        <WrapperComponent className={classes.join(' ')}>
           {renderIf(isJsx(jsx), () => jsx)}
           {renderIf(Children && isComponent(Children), () => <Children {...renderProps} />)}
           {renderIf(Children && !isComponent(Children), () => Children)}
-        </div>
+        </WrapperComponent>
       </FormContext.Provider>
     );
   }
