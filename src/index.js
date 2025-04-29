@@ -21,6 +21,7 @@ export { default as CheckboxField } from './components/fields/CheckboxField.jsx'
 export { default as EmailField } from './components/fields/EmailField.jsx';
 export { default as Field } from './components/fields/Field.jsx';
 export { default as Fields } from './components/fields/Fields.jsx';
+export { default as FileField } from './components/fields/FileField.jsx';
 export { default as NativeDateField } from './components/fields/NativeDateField.jsx';
 export { default as NativeSelectField } from './components/fields/NativeSelectField.jsx';
 export { default as RadioField } from './components/fields/RadioField.jsx';
