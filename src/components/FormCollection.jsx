@@ -203,12 +203,13 @@ export default class FormCollection extends Form {
    * @return  {Error[]} collection of errors (name, error)
    */
   formatErrors (storeErrors, propErrors) {
-    return storeErrors.map((errors, i) => errors
-      .concat(propErrors[i] || [])
-      .map(this._normalizeError)
-      // filter out errors for fields that haven't been blurred yet
-      .filter(e => this.shouldErrorDisplay(e, i))
-    );
+    return storeErrors.map((errors, i) => [
+      ...errors
+        .map(this._normalizeError)
+        // filter out errors for fields that haven't been blurred yet
+        .filter(e => this.shouldErrorDisplay(e, i)),
+      ...(propErrors[i] || emptyValues).map(this._normalizeError),
+    ]);
   }
 
   getCid () {

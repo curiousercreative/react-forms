@@ -317,11 +317,13 @@ export default class Form extends React.Component {
    * @return  {Error[]} collection of errors (name, error)
    */
   formatErrors (storeErrors, propErrors) {
-    return storeErrors
-      .concat(propErrors)
-      .map(this._normalizeError)
-      // filter out errors for fields that haven't been blurred yet
-      .filter(e => this.shouldErrorDisplay(e));
+    return [
+      ...storeErrors
+        .map(this._normalizeError)
+        // filter out errors for fields that haven't been blurred yet
+        .filter(e => this.shouldErrorDisplay(e)),
+      ...propErrors.map(this._normalizeError),
+    ];
   }
 
   getContextValue () {
