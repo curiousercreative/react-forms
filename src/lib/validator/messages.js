@@ -49,12 +49,32 @@ export function maxLength (length, name) {
 
 /**
  * @function
+ * @param  {string|number} max
+ * @param  {string} name
+ * @return {boolean}
+ */
+export function maxNumber (max, name) {
+  return `${humanize(name)} must not be more than ${max}`;
+}
+
+/**
+ * @function
  * @param  {string|number} length
  * @param  {string} name
  * @return {boolean}
  */
 export function minLength (length, name) {
   return `${humanize(name)} must be at least ${length} characters`;
+}
+
+/**
+ * @function
+ * @param  {string|number} min
+ * @param  {string} name
+ * @return {boolean}
+ */
+export function minNumber (min, name) {
+  return `${humanize(name)} must be at least ${min}`;
 }
 
 /**

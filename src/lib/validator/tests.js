@@ -94,6 +94,22 @@ export function maxLength (length, value) {
 }
 
 /**
+ * checks number value against max
+ * @function
+ * @param  {number} max - maximum value (inclusive)
+ * @param  {string|number} value - if not an array, will be type cast as string
+ * @return {boolean}
+ * @example (5, '1') => true
+ * @example (5, '5') => true
+ * @example (5, '20') => false
+ */
+export function maxNumber (max, value) {
+  const val = Number(value);
+
+  return val <= max;
+}
+
+/**
  * checks length property
  * @function
  * @param  {number} length - minimum length (inclusive)
@@ -110,6 +126,22 @@ export function minLength (length, value) {
   const val = Array.isArray(value) ? value : String(value);
 
   return val.length >= length;
+}
+
+/**
+ * checks number value against min
+ * @function
+ * @param  {number} min - minimum value (inclusive)
+ * @param  {string|number} value - if not an array, will be type cast as string
+ * @return {boolean}
+ * @example (5, '15') => true
+ * @example (5, '5') => true
+ * @example (5, '2') => false
+ */
+export function minNumber (min, value) {
+  const val = Number(value);
+
+  return val >= min;
 }
 
 /**

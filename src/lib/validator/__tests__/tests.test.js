@@ -1,5 +1,5 @@
 import { tests } from '../';
-const { email, equals, integer, length, maxLength, minLength, numeric, passIfEmpty, phone, required } = tests;
+const { email, equals, integer, length, maxLength, minLength, maxNumber, minNumber, numeric, passIfEmpty, phone, required } = tests;
 const x = {};
 
 describe('validator.tests passIfEmpty', () => {
@@ -83,6 +83,20 @@ describe('validator.tests', () => {
     expect(maxLength(length, ['a', 'b', 'c', 'd', 'e', 'f'])).toBe(false);
     expect(maxLength(length, 'hello! my darling')).toBe(false);
   });
+  test('maxNumber', () => {
+    const max = 5;
+
+    expect(maxNumber(max)('5')).toBe(true);
+    expect(maxNumber(max, '4')).toBe(true);
+    expect(maxNumber(max, '4.99')).toBe(true);
+    expect(maxNumber(max, '0')).toBe(true);
+    expect(maxNumber(max, '')).toBe(true);
+    expect(maxNumber(max, 5)).toBe(true);
+    expect(maxNumber(max, 0)).toBe(true);
+    expect(maxNumber(max, '5.01')).toBe(false);
+    expect(maxNumber(max, '6')).toBe(false);
+    expect(maxNumber(max, 5.01)).toBe(false);
+  });
   test('minLength', () => {
     const length = 3;
 
@@ -93,6 +107,17 @@ describe('validator.tests', () => {
     expect(minLength(length, ['a', 'b', 'c', 'd'])).toBe(true);
     expect(minLength(length, 'hi')).toBe(false);
     expect(minLength(length, ['a', 'b' ])).toBe(false);
+  });
+  test('minNumber', () => {
+    const min = 18;
+
+    expect(minNumber(min)('21')).toBe(true);
+    expect(minNumber(min, '18')).toBe(true);
+    expect(minNumber(min, '18.01')).toBe(true);
+    expect(minNumber(min, '')).toBe(false);
+    expect(minNumber(min, '5.01')).toBe(false);
+    expect(minNumber(min, '6')).toBe(false);
+    expect(minNumber(min, 5.01)).toBe(false);
   });
   test('numeric', () => {
     expect(numeric('0')).toBe(true);
